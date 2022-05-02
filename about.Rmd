@@ -1,0 +1,9 @@
+---
+title: "Blog Hakkında"
+description: |
+  Uygulamalar ile R programlama dilini öğretmeyi hedefliyorum.
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```

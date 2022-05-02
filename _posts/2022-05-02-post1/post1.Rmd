@@ -1,0 +1,664 @@
+---
+title: "Event Study (Olay Çalışması): FED ve Gezi'nin Kısa Vadede Kura Etkisi"
+description: |
+  #GeziyiSavunacağız
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-02
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finans
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r}
+
+options(scipen = 999)
+library(tidyverse)
+
+```
+
+```{r}
+
+df <- readxl::read_excel("data.xlsx")
+
+```
+
+Gezi'nin 9. yıldönümü yaklaşırken 'kurun Gezi nedeniyle arttığı' sözleri duyulmaya başlandı ki bu da devam edecektir. Ben de blogumun ilk yazısında bu konuya *bilimsel* bir bakış açısı katmak istedim.
+
+Normal şartlarda bu konuyu incelemek kolay olabilirdi ancak Gezi'nin başladığı 28 Mayıs gününden önce 22 Mayıs'ta FED'in açıklamaları gelişmekte olan ülke piyasaları için kritikti. Dönemin FED Başkanı Ben Bernanke Merkez Bankası'nın tahvil alımlarını azaltabileceğini söylemişti. Bu da parasal genişlemeden (Quantitative Easing, QE) çıkışın ilk adımıydı.
+
+Gezi'nin FED'in açıklamasına yakın bir tarihte başlaması işleri biraz zorlaştırıyor. Bu tip durumlarda Türkiye ile benzer ülkeleri de çalışmaya katmak faydalı olabilir. Bunu göz önüne alarak iki grup ülkeyi çalışmaya dahil ettim: Kırılgan Beşli (Fragile Five) ve Zordaki Onlu (Troubled Ten).
+
+Kırılgan Beşli ülkeleri (Morgan Stanley, 2013): Brezilya, Endonezya, Güney Afrika, Hindistan ve Türkiye.
+
+Zordaki Onlu ülkeleri (Morgan Stanley, 2015): Brezilya, Güney Afrika, Güney Kore, Kolombiya, Peru, Rusya, Singapur, Şili, Tayland ve Tayvan.
+
+İki grubu birleştirirsek çalışmaya toplamda 13 ülkeyi dahil etmiş olacağız.
+
+Tartışmalar dolar üzerinden ilerlediği için Türkiye de dahil 13 ülkenin para birimlerinin dolar karşısındaki değeri baz alındı. Değerler Reuters'tan alınmıştır. Verilere [Github hesabımdan](https://github.com/rpydaneogrendim) ulaşabilirsiniz.
+
+```{r}
+
+currencies <- data.frame(
+  "Ülke" = c(
+    "Brezilya",
+    "Endonezya",
+    "Güney Afrika",
+    "Güney Kore",
+    "Hindistan",
+    "Kolombiya",
+    "Peru",
+    "Rusya",
+    "Singapur",
+    "Şili",
+    "Tayland",
+    "Tayvan",
+    "Türkiye"
+  ),
+  "Döviz Kodu" = c(
+    "USDBRL",
+    "USDIDR",
+    "USDZAR",
+    "USDKRW",
+    "USDINR",
+    "USDCOP",
+    "USDPEN",
+    "USDRUB",
+    "USDSGD",
+    "USDCLP",
+    "USDTHB",
+    "USDTWD",
+    "USDTRY"
+  )
+)
+
+knitr::kable(currencies,
+             col.names = c("Ülke","Döviz Kodu")) %>%  
+  kableExtra::kable_styling(position = "center")
+
+```
+
+Öncelikle ülkelerin performanslarına bakalım. 2013 yılının başından sonuna kadar bir aralık belirledim ve her bir ülke kurunu 100 ile başlatarak bir endeks oluşturdum. Tüm kurların yer aldığı görsel aşağıdaki gibidir.
+
+```{r}
+
+master <- df %>% 
+  mutate(Date = as.Date(Date)) %>% 
+  filter(Date >= as.Date("2013-01-01") & Date <= as.Date("2013-12-31"))
+
+emergingMarket <- master %>% 
+  pivot_longer(!Date, names_to = "Currencies", values_to = "Values") %>% 
+  arrange(Currencies)
+
+initialValues <- emergingMarket %>% 
+  group_by(Currencies) %>% 
+  slice_min(Date) %>% 
+  rename("Initial"=3)
+
+emergingMarketFinal <- emergingMarket %>% 
+  left_join(initialValues, by = c("Date","Currencies")) %>% 
+  mutate(Initial = zoo::na.locf(Initial)) %>% 
+  mutate("SubIndex" = Values / Initial * 100) %>% 
+  mutate("ColGr" = ifelse(Currencies == "USDTRY", "USDTRY", "Diğer EM'ler"))
+
+ggplot(emergingMarketFinal,
+       aes(x = Date, y = SubIndex, group = Currencies, color = ColGr)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        axis.title = element_blank(),
+        plot.caption = element_text(face = "italic")) +
+  scale_color_manual(values = c("gray80","red")) +
+  labs(caption = "EM: Emerging Market")
+
+```
+
+Yukarıdaki grafiğe bir de ayrı ayrı bakalım.
+
+```{r fig.width=15, fig.height=10}
+
+ggplot(emergingMarketFinal,
+       aes(x = Date, y = SubIndex, group = Currencies, color = ColGr)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        strip.text = element_text(size = 20)) +
+  scale_color_manual(values = c("gray30","red")) +
+  scale_x_date(date_labels = "%m-%Y") +
+  facet_wrap(~Currencies, ncol = 3)
+
+```
+
+22 Mayıs 2013 tarihi baz alındığında genel resimde bir hareketlenmenin yaşandığını söyleyebiliriz ancak tam olarak yeterli ve güvenilir bir yorum olmayacaktır. Bu noktada son bir görsel ile olay çalışmasına geçebiliriz. Aşağıdaki görselde 13 ülkenin endeks ortalamasının USDTRY ile olan ilişkisi zaman serisi olarak verilmiştir.
+
+```{r}
+
+emIndex <- emergingMarketFinal %>% 
+  select(Date,Currencies,SubIndex) %>% 
+  pivot_wider(names_from = "Currencies", values_from = "SubIndex") %>% 
+  mutate("EMIndex" = rowMeans(.[,-1], na.rm = TRUE))
+
+emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  pivot_longer(!Date, names_to = "Currencies", values_to = "Index") %>% 
+  ggplot(aes(x = Date, y = Index, group = Currencies, color = Currencies)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        plot.caption = element_text(face = "italic")) +
+  scale_color_manual(values = c("gray30","red")) +
+  labs(caption = "EMIndex: 13 Emerging Market'ın Ortalaması")
+
+```
+
+Yukarıdaki görsel, yoruma diğerlerine göre biraz daha kolaylık katıyor. Hareketlenmenin 22 Mayıs 2013 öncesinde başladığını ve diğer EM'ler ile korele bir şekilde hareket ettiğimizi görebiliriz. Kur ile endeks arasındaki farkı (USDTRY - Endeks > 0, pozitif bölge) ise aşağıdaki gibi verebiliriz.
+
+```{r}
+
+emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  mutate(Diff = USDTRY - EMIndex) %>% 
+  ggplot(aes(x = Date, y = Diff)) +
+  geom_area(fill = "gray40") +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank())
+
+```
+
+Yazının bundan sonraki kısmında Event Study'e geçebiliriz.
+
+Olay çalışması da diyebileceğimiz Event Study için kısaca herhangi bir olayın finansal piyasalar üzerine etkisini tespit etmek için kullanılan istatistiksel bir yöntemdir tanımını yapabiliriz. Literatüre bakıldığında yapılan çalışmaların hisse/borsa ağırlıklı olduğunu görebiliriz. Ancak bu çalışmada yazının başında da belirttiğim nedenden dolayı ülke kurları üzerinden gitmeyi tercih ettim.
+
+Olay çalışmasını üç parçada inceliyoruz.
+
+![Event Studies in Economics and Finance, A. Craig MacKinlay](img1.png)
+
+1. Estimation Window denilen Tahmin Penceresi.
+
+Tahmin penceresinde ortada henüz bir olay yoktur. Bu adımda USDTRY getirilerinin piyasa (13 ülke kurundan hesaplanan endeks) getirisine kıyasla gerçekleşen normal davranışı belirlenir. Tahmin penceresinde piyasaya göre düzeltilmiş getiri (market adjusted return) yöntemini kullanacağız. Aslında bu nedenle tahmin penceresi bölümüne ihtiyacımız olmayacak (diğer bazı yöntemlerde olabiliyor).
+
+$AR_{it} = R_{it} - R_{mt}$
+
+$AR_{it}:$ t gününe ait anormal getiri (AR: Abnormal Return)
+
+$R_{it}:$ t gününe ait USDTRY getirisi
+
+$R_{mt}:$ t gününe ait endeks getirisi
+
+Tahmin penceresi için bir başlangıç ve bir bitiş tarihi vardır.
+
+2. Event Window denilen Olay Penceresi.
+
+Olay penceresi olaydan sonraki aralığı ifade ediyor. İlgili olayın olduktan sonra kaç gün daha USDTRY üzerinde etkisinin olduğu gösterilir.
+
+Olay penceresinde tıpkı tahmin penceresinde olduğu gibi bir başlangıç ve bir de bitiş tarihi olmak ile beraber bir de olay günü vardır.
+
+3. Postevent Window denilen Olay Sonrası Pencere.
+
+Olay sonrası pencerede ise USDTRY'nin uzun vadeli performansı gösterilir.
+
+Olay sonrası pencerede de diğer iki pencerede olduğu gibi bir başlangıç ve bir de bitiş tarihi vardır.
+
+Olay çalışması ile FED ve Gezi'nin herhangi bir anormal getiriye yol açıp açmadığı inceleyeceğiz.
+
+Adım adım neler yapacağız?
+
+i. USDTRY ve EM endeksinin getirilerini hesaplayarak başlıyoruz. Bunun için logaritmik getiriyi kullanacağız.
+
+```{r}
+
+df_event <- emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  mutate(
+    "USDTRY Return" = lag(log(lead(USDTRY)/USDTRY)),
+    "EMIndex Return" = lag(log(lead(EMIndex)/EMIndex))
+  ) %>% 
+  na.omit()
+
+```
+
+```{r}
+
+df_event %>% 
+  select(Date,`USDTRY Return`,`EMIndex Return`) %>% 
+  pivot_longer(!Date, names_to = "Vars", values_to = "Return") %>% 
+  ggplot(aes(x = Date, y = Return, group = Vars, color = Vars)) +
+  geom_line() +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  facet_wrap(~Vars, ncol = 1) +
+  scale_color_manual(values = c("blue","red"))
+
+```
+
+ii. USDTRY getirilerinden hesaplanan EM endeks getirilerini çıkarıyoruz ve anormal getirileri (abnormal return) elde ediyoruz.
+
+```{r}
+
+df_event <- df_event %>% 
+  mutate("Abnormal Return" = `USDTRY Return` - `EMIndex Return`)
+
+```
+
+iii. Bir önceki adımda hesaplanan anormal getirilerden kümülatif anormal getirileri (cumulative abnormal return) hesaplıyoruz. Anormal getiri değerlerini günlük olarak hesapladık ve bu da piyasanın tepkisini tek bir gün için ölçer. Uzun dönemdeki olay etkisine bakabilmek için olay penceresi süresindeki anormal getiriler toplanarak kümülatif anormal getiri değerleri hesaplanır. Bu da piyasanın olay penceresi dönemindeki genel fiyat eğilimini gösterir.
+
+```{r}
+
+# -5,5 (FED için)
+
+df_event_fed <- df_event %>% 
+  filter(Date >= as.Date("2013-05-15") & Date <= as.Date("2013-05-29")) %>% 
+  mutate("Cumulative Abnormal Return" = cumsum(`Abnormal Return`))
+
+# -5,5 (Gezi için)
+
+df_event_gezi <- df_event %>% 
+  filter(Date >= as.Date("2013-05-24") & Date <= as.Date("2013-06-07")) %>% 
+  mutate("Cumulative Abnormal Return" = cumsum(`Abnormal Return`))
+
+```
+
+iv. Çalışmada, FED için olay penceresi, -5 gün olay öncesi, +5 gün olay sonrası ve olay günü olmak üzere 11 gün olarak; Gezi için (Gezi'nin 31 Mayıs'ta aktif olduğunu göz önüne alırsak) olay penceresi, -5 gün olay öncesi, +5 gün olay sonrası ve olay günü olmak üzere 11 gün olarak belirlenmiştir.
+
+v. Hesapladığımız kümülatif anormal getiri değerleri istatistiksel olarak sıfırdan farklı ise ilgili olayın değişkenler üzerinde etkili olduğunu ve anormal değişimi ortaya çıkardığını söyleyeceğiz. Ancak, elde edilen kümülatif anormal getiri 0'a eşit ya da 0'a çok yakın değerler alıyorsa ilgili olayın değişkenler üzerinde etkili olmadığı ifade edebileceğiz.
+
+Teste karar vermek için öncelikle getirilerin normal dağılıp dağılmadığını inceleyeceğiz. Normallik varsayımının kontrolü için Shapiro-Wilk normallik testi kullanılmıştır. Çünkü örnek büyüklüğünün 50'den küçük olması durumunda Shapiro-Wilk; büyük olması durumunda ise Kolmogorov Smirnov kullanılır gibi bir kullanım algoritması vardır.
+
+Olay penceresi FED(-5,+5) için;
+
+$H_0:$ Olay penceresi içerisinde, olay gününden 5 gün öncesi ve 5 gün sonrası kümülatif aşırı getiriler normal dağılım göstermektedir.
+
+$H_1:$ Olay penceresi içerisinde, olay gününden 5 gün öncesi ve 5 gün sonrası kümülatif aşırı getiriler normal dağılım göstermemektedir.
+
+```{r}
+
+obs_fed <- df_event_fed %>% 
+  pull(`Cumulative Abnormal Return`)
+
+shapiro.test(obs_fed)
+
+```
+
+Olay penceresi Gezi(-5,+5) için;
+
+$H_0:$ Olay penceresi içerisinde, olay gününden 5 gün öncesi ve 5 gün sonrası kümülatif aşırı getiriler normal dağılım göstermektedir.
+
+$H_1:$ Olay penceresi içerisinde, olay gününden 5 gün öncesi ve 5 gün sonrası kümülatif aşırı getiriler normal dağılım göstermemektedir.
+
+```{r}
+
+obs_gezi <- df_event_gezi %>% 
+  pull(`Cumulative Abnormal Return`)
+
+shapiro.test(obs_gezi)
+
+```
+
+Shapiro-Wilk testine göre p değerleri sırasıyla `r shapiro.test(obs_fed)$p.value` ve `r shapiro.test(obs_gezi)$p.value` %5'ten büyük çıktığı için (ikincisi yaklaşık %5) normallik varsayımının sağlandığını söyleyebiliriz. Bu durumda parametrik olmayan testler grubundaki bağımlı örneklem t testi (Paired Samples T-test) ile bir grubun belirli bir olaydan önceki ve sonraki ortalamaları arasındaki farkın anlamlılığı test edilebilir.
+
+Olay penceresi FED(-5,+5) için;
+
+$H_{0,(\pm5)}: CAR_{-5} = CAR_{+5}$
+
+*Olay günü tarihinden önceki 5 günlük kümülatif ortalama anormal getirileriyle olay gününden sonraki 5 günlük kümülatif anormal getirileri arasında fark yoktur.*
+
+$H_{1,(\pm5)}: CAR_{-5} \neq CAR_{+5}$
+
+*Olay günü tarihinden önceki 5 günlük kümülatif ortalama anormal getirileriyle olay gününden sonraki 5 günlük kümülatif anormal getirileri arasında fark vardır.*
+
+```{r}
+
+before_fed <- df_event_fed %>% 
+  filter(Date < as.Date("2013-05-22")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+after_fed <- df_event_fed %>% 
+  filter(Date > as.Date("2013-05-22")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+t.test(before_fed, after_fed, paired = TRUE)
+
+```
+
+Olay penceresi Gezi(-5,+5) için;
+
+$H_{0,(\pm5)}: CAR_{-5} = CAR_{+5}$
+
+*Olay günü tarihinden önceki 5 günlük kümülatif ortalama anormal getirileriyle olay gününden sonraki 5 günlük kümülatif anormal getirileri arasında fark yoktur.*
+
+$H_{1,(\pm5)}: CAR_{-5} \neq CAR_{+5}$
+
+*Olay günü tarihinden önceki 5 günlük kümülatif ortalama anormal getirileriyle olay gününden sonraki 5 günlük kümülatif anormal getirileri arasında fark vardır.*
+
+```{r}
+
+before_gezi <- df_event_gezi %>% 
+  filter(Date < as.Date("2013-05-31")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+after_gezi <- df_event_gezi %>% 
+  filter(Date > as.Date("2013-05-31")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+t.test(before_gezi, after_gezi, paired = TRUE)
+
+```
+
+p değerleri olay penceresi FED(-5,+5) için `r t.test(before_fed, after_fed, paired = TRUE)$p.value` ve Gezi(-5,+5) için `r t.test(before_gezi, after_gezi, paired = TRUE)$p.value` %5'ten büyük olduğu için sıfır hipotezi reddedilemez; bu da olay öncesi ile sonrası ortalama getirilerinde fark olmadığını gösterir.
+
+Ortalama getiriler FED(-5,+5) için olay öncesi `r mean(before_fed)` iken; olay sonrası `r mean(after_fed)`; Gezi(-5,+5) için olay öncesi `r mean(before_gezi)` iken; olay sonrası `r mean(after_gezi)` olmuştur.
+
+Bir de kümülatif anormal getirilerin istatistiksel olarak anlamlı olup olmadıklarına bireysel olarak bakalım. Bu durumda t istatistiği $\frac{CAR}{\sigma(CAR)*\sqrt{Gün\ Sayısı}}$ olacak.
+
+![USING DAILY STOCK RETURNS The Case of Event Studies*, S.J.Brown, J.B.Warner](img2.png)
+```{r fig.width=15, fig.height=10}
+
+sigma_fed <- df_event_fed %>% 
+  summarise(sd = sd(`Abnormal Return`)) %>% 
+  pull(sd)
+
+df_event_fed <- df_event_fed %>% 
+  mutate(t = seq(-5,5,1)) %>% 
+  mutate("t_stat" = `Cumulative Abnormal Return`/sigma_fed*sqrt(abs(t))) %>% 
+  mutate("Result" = ifelse(abs(t_stat) > 1.96, "SIGNIFICANT","INSIGNIFICANT"))
+
+df_event_fed %>% 
+  ggplot(aes(x = factor(t), y = `Cumulative Abnormal Return`, group = 1)) +
+  geom_line() +
+  geom_point(aes(color = Result), size = 7) +
+  geom_vline(xintercept = factor(0)) +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(size = 15)) +
+  scale_color_manual(values = c("gray40","red")) +
+  labs(title = "FED",
+       subtitle = "t0: 22 Mayıs 2013")
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+sigma_gezi <- df_event_gezi %>% 
+  summarise(sd = sd(`Abnormal Return`)) %>% 
+  pull(sd)
+
+df_event_gezi <- df_event_gezi %>% 
+  mutate(t = seq(-5,5,1)) %>% 
+  mutate("t_stat" = `Cumulative Abnormal Return`/sigma_gezi*sqrt(abs(t))) %>% 
+  mutate("Result" = ifelse(abs(t_stat) > 1.96, "SIGNIFICANT","INSIGNIFICANT"))
+
+df_event_gezi %>% 
+  ggplot(aes(x = factor(t), y = `Cumulative Abnormal Return`, group = 1)) +
+  geom_line() +
+  geom_point(aes(color = Result), size = 7) +
+  geom_vline(xintercept = factor(0)) +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(size = 15)) +
+  scale_color_manual(values = c("gray40","red")) +
+  labs(title = "GEZİ",
+       subtitle = "t0: 31 Mayıs 2013")
+
+```
+
+FED için olay öncesinde 3 kümülatif anormal getiri istatistiksel olarak anlamlı çıkarken; Gezi için olay sonrasında 2 kümülatif anormal getiri istatistiksel olarak anlamlı çıkmıştır.
+
+Olay penceresi için FED(-5,+5) ve Gezi(-5,+5) demiştik. Bunların istatistiksel anlamlılığına bakalım.
+
+```{r}
+
+ew_sum_fed <- sum(df_event_fed$`Abnormal Return`)
+ew_tstat_fed <- ew_sum_fed / (sigma_fed * sqrt(11))
+
+ew_sum_gezi <- sum(df_event_gezi$`Abnormal Return`)
+ew_tstat_gezi <- ew_sum_gezi / (sigma_gezi * sqrt(11))
+
+```
+
+Olay penceresinde FED(,-5,+5) ve Gezi(-5,+5) için |`r ew_tstat_fed`| > 1.96 ve |`r ew_tstat_gezi`| > 1.96 olmadığı için istatistiksel olarak anlamlı çıkmamıştır.
+
+Sonuç olarak şunları söyleyebilirim: Bu çalışma, FED ve Gezi'nin kısa vadeli etkilerini göstermektedir. Kısa vadede her iki olayda da istatistiksel olarak anlamlı bir etki olmasa da Türkiye'nin diğer EM'ler ile 22 Mayıs 2013'ten önce başlayarak korele bir şekilde hareket ettiği dikkate alınmalıdır. Belirlenen olay günlerinin farklı olay pencerelerinde de değerlendirilmesini tavsiye ederim. Ayrıca tercih ettiğim market adjusted returns dışında farklı yöntemlerin de kullanıldığını hatırlatmak isterim. Daha uzun vadedeki etkilere bakmak için farklı istatistiksel yöntemlerin uygulanması yazının başında belirtilen tartışmaya farklı bir açı katacaktır.
+
+Çalışmanın R kodlarına aşağıdan ulaşılabilir.
+
+```{r echo=TRUE, eval=FALSE}
+
+options(scipen = 999)
+library(tidyverse)
+
+df <- readxl::read_excel("data.xlsx")
+
+master <- df %>% 
+  mutate(Date = as.Date(Date)) %>% 
+  filter(Date >= as.Date("2013-01-01") & Date <= as.Date("2013-12-31"))
+
+emergingMarket <- master %>% 
+  pivot_longer(!Date, names_to = "Currencies", values_to = "Values") %>% 
+  arrange(Currencies)
+
+initialValues <- emergingMarket %>% 
+  group_by(Currencies) %>% 
+  slice_min(Date) %>% 
+  rename("Initial"=3)
+
+emergingMarketFinal <- emergingMarket %>% 
+  left_join(initialValues, by = c("Date","Currencies")) %>% 
+  mutate(Initial = zoo::na.locf(Initial)) %>% 
+  mutate("SubIndex" = Values / Initial * 100) %>% 
+  mutate("ColGr" = ifelse(Currencies == "USDTRY", "USDTRY", "Diğer EM'ler"))
+
+ggplot(emergingMarketFinal,
+       aes(x = Date, y = SubIndex, group = Currencies, color = ColGr)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = "bottom",
+        axis.title = element_blank(),
+        plot.caption = element_text(face = "italic")) +
+  scale_color_manual(values = c("gray80","red")) +
+  labs(caption = "EM: Emerging Market")
+
+ggplot(emergingMarketFinal,
+       aes(x = Date, y = SubIndex, group = Currencies, color = ColGr)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(legend.title = element_blank(),
+        legend.position = "none",
+        axis.title = element_blank(),
+        strip.text = element_text(size = 20)) +
+  scale_color_manual(values = c("gray30","red")) +
+  scale_x_date(date_labels = "%m-%Y") +
+  facet_wrap(~Currencies, ncol = 3)
+
+emIndex <- emergingMarketFinal %>% 
+  select(Date,Currencies,SubIndex) %>% 
+  pivot_wider(names_from = "Currencies", values_from = "SubIndex") %>% 
+  mutate("EMIndex" = rowMeans(.[,-1], na.rm = TRUE))
+
+emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  pivot_longer(!Date, names_to = "Currencies", values_to = "Index") %>% 
+  ggplot(aes(x = Date, y = Index, group = Currencies, color = Currencies)) +
+  geom_line() +
+  geom_hline(yintercept = 100) +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "bottom",
+        plot.caption = element_text(face = "italic")) +
+  scale_color_manual(values = c("gray30","red")) +
+  labs(caption = "EMIndex: 13 Emerging Market'ın Ortalaması")
+
+emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  mutate(Diff = USDTRY - EMIndex) %>% 
+  ggplot(aes(x = Date, y = Diff)) +
+  geom_area(fill = "gray40") +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank())
+
+df_event <- emIndex %>% 
+  select(Date,USDTRY,EMIndex) %>% 
+  mutate(
+    "USDTRY Return" = lag(log(lead(USDTRY)/USDTRY)),
+    "EMIndex Return" = lag(log(lead(EMIndex)/EMIndex))
+  ) %>% 
+  na.omit()
+
+df_event %>% 
+  select(Date,`USDTRY Return`,`EMIndex Return`) %>% 
+  pivot_longer(!Date, names_to = "Vars", values_to = "Return") %>% 
+  ggplot(aes(x = Date, y = Return, group = Vars, color = Vars)) +
+  geom_line() +
+  geom_vline(xintercept = as.Date("2013-05-22"), linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  facet_wrap(~Vars, ncol = 1) +
+  scale_color_manual(values = c("blue","red"))
+
+df_event <- df_event %>% 
+  mutate("Abnormal Return" = `USDTRY Return` - `EMIndex Return`)
+
+# -5,5 (FED için)
+
+df_event_fed <- df_event %>% 
+  filter(Date >= as.Date("2013-05-15") & Date <= as.Date("2013-05-29")) %>% 
+  mutate("Cumulative Abnormal Return" = cumsum(`Abnormal Return`))
+
+# -5,5 (Gezi için)
+
+df_event_gezi <- df_event %>% 
+  filter(Date >= as.Date("2013-05-24") & Date <= as.Date("2013-06-07")) %>% 
+  mutate("Cumulative Abnormal Return" = cumsum(`Abnormal Return`))
+
+obs_fed <- df_event_fed %>% 
+  pull(`Cumulative Abnormal Return`)
+
+shapiro.test(obs_fed)
+shapiro.test(obs_fed)$p.value
+
+obs_gezi <- df_event_gezi %>% 
+  pull(`Cumulative Abnormal Return`)
+
+shapiro.test(obs_gezi)
+shapiro.test(obs_gezi)$p.value
+
+before_fed <- df_event_fed %>% 
+  filter(Date < as.Date("2013-05-22")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+after_fed <- df_event_fed %>% 
+  filter(Date > as.Date("2013-05-22")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+t.test(before_fed, after_fed, paired = TRUE)
+t.test(before_fed, after_fed, paired = TRUE)$p.value
+
+before_gezi <- df_event_gezi %>% 
+  filter(Date < as.Date("2013-05-31")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+after_gezi <- df_event_gezi %>% 
+  filter(Date > as.Date("2013-05-31")) %>% 
+  pull(`Cumulative Abnormal Return`)
+
+t.test(before_gezi, after_gezi, paired = TRUE)
+t.test(before_gezi, after_gezi, paired = TRUE)$p.value
+
+mean(before_fed)
+mean(after_fed)
+
+mean(before_gezi)
+mean(after_gezi)
+
+sigma_fed <- df_event_fed %>% 
+  summarise(sd = sd(`Abnormal Return`)) %>% 
+  pull(sd)
+
+df_event_fed <- df_event_fed %>% 
+  mutate(t = seq(-5,5,1)) %>% 
+  mutate("t_stat" = `Cumulative Abnormal Return`/sigma_fed*sqrt(abs(t))) %>% 
+  mutate("Result" = ifelse(abs(t_stat) > 1.96, "SIGNIFICANT","INSIGNIFICANT"))
+
+df_event_fed %>% 
+  ggplot(aes(x = factor(t), y = `Cumulative Abnormal Return`, group = 1)) +
+  geom_line() +
+  geom_point(aes(color = Result), size = 7) +
+  geom_vline(xintercept = factor(0)) +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(size = 15)) +
+  scale_color_manual(values = c("gray40","red")) +
+  labs(title = "FED",
+       subtitle = "t0: 22 Mayıs 2013")
+
+sigma_gezi <- df_event_gezi %>% 
+  summarise(sd = sd(`Abnormal Return`)) %>% 
+  pull(sd)
+
+df_event_gezi <- df_event_gezi %>% 
+  mutate(t = seq(-5,5,1)) %>% 
+  mutate("t_stat" = `Cumulative Abnormal Return`/sigma_gezi*sqrt(abs(t))) %>% 
+  mutate("Result" = ifelse(abs(t_stat) > 1.96, "SIGNIFICANT","INSIGNIFICANT"))
+
+df_event_gezi %>% 
+  ggplot(aes(x = factor(t), y = `Cumulative Abnormal Return`, group = 1)) +
+  geom_line() +
+  geom_point(aes(color = Result), size = 7) +
+  geom_vline(xintercept = factor(0)) +
+  geom_hline(yintercept = 0) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        plot.title = element_text(size = 20),
+        plot.subtitle = element_text(size = 15)) +
+  scale_color_manual(values = c("gray40","red")) +
+  labs(title = "GEZİ",
+       subtitle = "t0: 31 Mayıs 2013")
+
+ew_sum_fed <- sum(df_event_fed$`Abnormal Return`)
+ew_tstat_fed <- ew_sum_fed / (sigma_fed * sqrt(11))
+
+ew_sum_gezi <- sum(df_event_gezi$`Abnormal Return`)
+ew_tstat_gezi <- ew_sum_gezi / (sigma_gezi * sqrt(11))
+
+```
