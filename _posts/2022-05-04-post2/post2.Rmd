@@ -10,7 +10,7 @@ output:
     self_contained: false
 categories:
   - Finans
-preview: img1.png
+preview: "./img1.png"
 ---
 
 
@@ -281,6 +281,8 @@ net_rezerv <- (dis_varliklar - doviz_yukumluluk) / kur
 Net Rezerv = -2247086 ya da -2,2 milyar dolar.
 
 **Swaplar**
+
+![](img1.png)
 
 Swaplar = Döviz Swapları + Altın Swapları
 
