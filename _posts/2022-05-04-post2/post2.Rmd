@@ -1,0 +1,497 @@
+---
+title: "Merkez Bankası Rezervleri Nasıl Hesaplanır?"
+description: |
+  Bir fonksiyon ile güncel rezerv değerine kolay erişim.
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-04
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finans
+preview: img1.png
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+```
+
+Rezervlerin R'da nasıl hesaplanabileceğini göstermek için Mahfi Eğilmez'in [Rezerv Meselesi](https://www.mahfiegilmez.com/2021/03/rezerv-meselesi.html) başlıklı bulabildiğim en güncel yazısından faydalandım. En güncel diyorum çünkü diğer yazılarına göre farklılıklar gördüm ve en güncelin en doğru olabileceğini düşündüm. Tabi ki hesaplama ile ilgili görüş farklılıkları çıkacaktır ancak bu tartışma bu yazının konusu değildir.
+
+Üç ana konuyu öğretmeyi hedefliyorum: 1) TCMB'den veri nasıl çekilir? 2) R'da bu hesaplamayı nasıl otomatik hale getirebiliriz? 3) Rezervlerimiz nasıl hesaplanıyor?
+
+**TCMB EVDS sistemine üye nasıl olunur ve sistemden API anahtarı nasıl alınır?**
+
+TCMB'nin Elektronik Veri Dağıtım Sistemi olan EVDS'ye [buradan](https://evds2.tcmb.gov.tr/) ulaşabilirsiniz. Dokümantasyon okumayı alışkanlık haline getirmeliyiz. Bunun için sayfada yer alan [Kullanıcı Dokümanları](https://evds2.tcmb.gov.tr/index.php?/evds/userDocs) başlığına tıklayıp [Web Servis Kullanım Kılavuzu'na](https://evds2.tcmb.gov.tr/help/videos/EVDS_Web_Servis_Kullanim_Kilavuzu.pdf) erişiyoruz.
+
+TCMB bu doküman ile web servis metotlarının parametrelerini açıklamış. Bu sayfa şimdilik kalsın.
+
+Yine aynı sayfada yer alan [Giriş Yap](https://evds2.tcmb.gov.tr/index.php?/evds/login) bölümüne giriyoruz. Daha önce kayıt olmadıysanız *Kayıt Olun* seçeneği ile kayıt işleminizi yapabilirsiniz. Ardından *kullanıcı adı*, *parola* ve *doğrulama kodu* ile giriş yapılabilir. Bundan sonra bir API anahtarına ihtiyacınız olacak. Bunun için de isminiz ve soyisminizin yer aldığı yerden profilinize gidip *API Anahtarı* butonuna tıklayabilirsiniz. Tarayıcınızda çıkan bir mesaj ile API anahtarınız verilecek. Bunu kopyalayın ya da aşağıdaki gibi bir objeye kaydedin.
+
+```{r}
+
+api_key <- "api_anahtariniz"
+
+```
+
+```{r}
+
+library(tidyverse)
+library(jsonlite)
+
+```
+
+Başlamadan bir not: Önce detaylı bir şekilde açıklayacağım, sonrasında öğrendiklerimizi tek bir fonksiyonda toplayıp vereceğim.
+
+Başlamadan diğer bir not: Önce yazıda hesaplanan değerlere ulaşıp bir nevi değerleri teyit edeceğiz; ardından güncel rezervi hesaplayacağız.
+
+Rezervleri Hesaplamak İçin Denklemler:
+
+Net Rezervler = (Dış Varlıklar / O günkü TCMB USD Alış Kuru) - (Döviz Yükümlülükleri / O günkü TCMB USD Alış Kuru)
+
+Swaplar = Döviz Swapları + Altın Swapları
+
+Swap Hariç Net Rezervler = Net Rezervler - Swaplar
+
+**Net Rezervler**
+
+Net Rezervler = (Dış Varlıklar / O günkü TCMB USD Alış Kuru) - (Döviz Yükümlülükleri / O günkü TCMB USD Alış Kuru)
+
+EVDS'deki yeri: Tüm Seriler > TCMB Bilanço Verileri > Merkez Bankası Analitik Bilanço (Bin TL)
+
+Web Servis ile almak için aşağıdaki adımları takip edebiliriz.
+
+*Kategori*leri görelim.
+
+Dokümanda 4 no'lu *EVDS Metaveri web servisleri* başlığı altındaki 4.1 no'lu *Konu Başlığı Servisi* alt başlığında bulunmaktadır.
+
+*Tüm konu başlıklarını sunan bir servistir. Bu servisi temsilen "https://evds2.tcmb.gov.tr/service/evds/" tanımından sonra "categories" eklenmelidir.*
+
+*https://evds2.tcmb.gov.tr/service/evds/categories/key=XXXXXX&type=xml*
+
+Uzantısı xml olsa da biz bunu json ile alabiliriz (json için jsonlite paketinin fromJSON() fonksiyonundan faydalanacağız).
+
+```{r}
+
+url_kategori <- paste0("https://evds2.tcmb.gov.tr/service/evds/categories/key=",
+                       api_key,
+                       "&type=json")
+
+df_kategori <- fromJSON(url_kategori) %>%
+  as.data.frame() %>%
+  select(CATEGORY_ID,TOPIC_TITLE_TR)
+
+kategori_id <- df_kategori %>% 
+  filter(TOPIC_TITLE_TR == 'TCMB BİLANÇO VERİLERİ') %>% 
+  pull(CATEGORY_ID)
+
+```
+
+2 sütun ve 24 satırdan oluşan df_kategori objesini aldık. TCMB Bilanço Verileri'nin kategori ID'si 13'tür.
+
+*Veri grupları*nı görelim.
+
+Dokümanda 4 no'lu *EVDS Metaveri web servisleri* başlığı altındaki 4.2 no'lu *Veri Grubu Servisi* alt başlığında bulunmaktadır.
+
+*İlgili Konu başlığı bazında ya da tek bir veri grubunun metaveri bilgilerini listeleyen bir servistir. Bu servisi temsilen "https://evds2.tcmb.gov.tr/service/evds/" tanımından sonra "datagroups" eklenmelidir.*
+
+*https://evds2.tcmb.gov.tr/service/evds/datagroups/key=XXXX&mode=1&code=bie_yssk&type=json*
+
+*https://evds2.tcmb.gov.tr/service/evds/datagroups/key=XXXX&mode=2&code=2&type=xml*
+
+Verilen örneklerde mode=1 ve mode=2 olarak verilse de biz mode=0 olarak kullanacağız. Çünkü tüm konu başlıkları altındaki tüm veri gruplarını göreceğiz.
+
+```{r}
+
+url_verigrubu <- paste0("https://evds2.tcmb.gov.tr/service/evds/datagroups/key=",
+                        api_key,
+                        "&mode=0&type=json")
+
+df_verigrubu <- fromJSON(url_verigrubu) %>% 
+  as.data.frame() %>% 
+  filter(CATEGORY_ID == kategori_id) %>% 
+  select(CATEGORY_ID,
+         DATAGROUP_CODE,
+         DATAGROUP_NAME,
+         FREQUENCY_STR,
+         NOTE,
+         START_DATE,
+         END_DATE)
+
+verigrubu_kodu <- df_verigrubu %>% 
+  filter(DATAGROUP_NAME == 'Merkez Bankası Analitik Bilanço(Bin TL)') %>% 
+  pull(DATAGROUP_CODE)
+
+```
+
+7 sütun ve 6 satırdan oluşan df_verigrubu objesini aldık. Merkez Bankası Analitik Bilanço(Bin TL)'nin veri grubu kodu bie_abanlbil'dir.
+
+*Seri*leri görelim.
+
+Dokümanda 4 no'lu *EVDS Metaveri web servisleri* başlığı altındaki 4.3 no'lu *Seri Listesi Servisi* alt başlığında bulunmaktadır.
+
+*Seri listesini veri grubu ya da seri kodu bazında sunan bir servistir. Bu servisi temsilen "https://evds2.tcmb.gov.tr/service/evds/" tanımından sonra "serieList" eklenmelidir.*
+
+*https://evds2.tcmb.gov.tr/service/evds/serieList/key=XXXXX&type=xml&code=TP.DK.USD.A*
+
+*https://evds2.tcmb.gov.tr/service/evds/serieList/key=XXXXX&type=csv&code=bie_yssk*
+
+Biz kodumuzu bildiğimiz için örnekte verilen code= kısmına kendi kodumuzu yazacağız.
+
+```{r}
+
+url_seri <- paste0("https://evds2.tcmb.gov.tr/service/evds/serieList/key=",
+                   api_key,
+                   "&type=json&code=",
+                   verigrubu_kodu)
+
+df_seri <- fromJSON(url_seri) %>% 
+  as.data.frame() %>% 
+  select(SERIE_CODE,
+         DATAGROUP_CODE,
+         SERIE_NAME,
+         FREQUENCY_STR,
+         DEFAULT_AGG_METHOD_STR,
+         DEFAULT_AGG_METHOD,
+         START_DATE,
+         END_DATE)
+
+seri <- df_seri %>% 
+  filter(SERIE_NAME %in% c('A.1-DIŞ VARLIKLAR(Bin TL)',
+                           'P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)')) %>% 
+  pull(SERIE_CODE)
+
+```
+
+8 sütun ve 31 satırdan oluşan df_seri objesini aldık. A.1-DIŞ VARLIKLAR(Bin TL)'nin seri kodu TP.AB.A02; P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)'nin seri kodu TP.AB.A10'dur.
+
+Son olarak verileri alabiliriz. URL olarak temelde *https://evds2.tcmb.gov.tr/service/evds/series=* kullanacağız. Sonrası ise parametrelerin eklenmesi olacak. Dokümanda bununla ilgili açıklayıcı örnekler bulunmaktadır.
+
+Aşağıdaki örnekte url'den sonra seri kodlarının arasına "-" koyduk. Yani, birden fazla seriyi alabiliyoruz. Devamında ise başlangıç ve bitiş tarihlerine sırasıyla &startDate= ve &endDate= ile adres gösterdik. Bunlara ek olarak url'e frekans tipini ekleyeceğiz çünkü bu seri default iş günü olarak geliyor ve bunu haftalık yapmamız gerekir. Eklenecek olan parametre frequency ve haftalık olduğu için 3 diyeceğiz.
+
+```{r}
+
+haftalikTarih <- "26-02-2021"
+frekans <- 3
+
+url_veri <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                   seri[1],
+                   "-",
+                   seri[2],
+                   "&startDate=",
+                   haftalikTarih,
+                   "&endDate=",
+                   haftalikTarih,
+                   "frequency=",
+                   frekans,
+                   "&type=json&key=",
+                   api_key)
+
+df_veri <- fromJSON(url_veri) %>% 
+  as.data.frame() %>% 
+  select(2,3,4) %>% 
+  rename(
+    "Tarih"=1,
+    "A.1-DIŞ VARLIKLAR(Bin TL)"=2,
+    "P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)"=3
+  )
+
+```
+
+Dış varlıklardan toplam döviz yükümlülüklerini çıkaracağız ancak çıkacak olan fark TL cinsinden olduğu için bunu dolara çevirmemiz gerekiyor. Bunu da o güne ait kur üzerinden yapacağız (yazıda hesaplama yapılırken 15:30'da belirlenen gösterge niteliğindeki Merkez Bankası kuru kullanılıyor; biz ise EVDS sisteminden aldığımız kuru kullanacağız).
+
+26 Şubat 2021'deki USD/TL kur değerine ulaşalım. Kurlar'ın bulunduğu kategorinin ID'si 2'dir. Bunun yanında Kurlar-Döviz Kurları'nın veri grubu kodu bie_dkdovytl; (USD) ABD Doları (Döviz Alış)'ın seri kodu TP.DK.USD.A.YTL'dir.
+
+```{r}
+
+kategori_id_2 <- df_kategori %>% 
+  filter(TOPIC_TITLE_TR == 'KURLAR') %>% 
+  pull(CATEGORY_ID)
+
+df_verigrubu_2 <- fromJSON(url_verigrubu) %>% 
+  as.data.frame() %>% 
+  filter(CATEGORY_ID == kategori_id_2) %>% 
+  select(CATEGORY_ID,
+         DATAGROUP_CODE,
+         DATAGROUP_NAME,
+         FREQUENCY_STR,
+         NOTE,
+         START_DATE,
+         END_DATE)
+
+verigrubu_kodu_2 <- df_verigrubu_2 %>% 
+  filter(DATAGROUP_NAME == 'Kurlar-Döviz Kurları') %>% 
+  pull(DATAGROUP_CODE)
+
+url_seri_2 <- paste0("https://evds2.tcmb.gov.tr/service/evds/serieList/key=",
+                     api_key,
+                     "&type=json&code=",
+                     verigrubu_kodu_2)
+
+df_seri_2 <- fromJSON(url_seri_2) %>% 
+  as.data.frame() %>% 
+  select(SERIE_CODE,
+         DATAGROUP_CODE,
+         SERIE_NAME,
+         FREQUENCY_STR,
+         DEFAULT_AGG_METHOD_STR,
+         DEFAULT_AGG_METHOD,
+         START_DATE,
+         END_DATE)
+
+seri_2 <- df_seri_2 %>% 
+  filter(SERIE_NAME == '(USD) ABD Doları (Döviz Alış)') %>% 
+  pull(SERIE_CODE)
+
+url_veri_2 <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                     seri_2,
+                     "&startDate=",
+                     haftalikTarih,
+                     "&endDate=",
+                     haftalikTarih,
+                     "&type=json&key=",
+                     api_key)
+
+df_veri_2 <- fromJSON(url_veri_2) %>% 
+  as.data.frame() %>% 
+  select(2,3) %>% 
+  rename(
+    "Tarih"=1,
+    "(USD) ABD Doları (Döviz Alış)"=2
+  )
+
+```
+
+Net Rezerv aşağıdaki gibi hesaplanabilir.
+
+```{r}
+
+# Birimler Bin TL'dir.
+
+dis_varliklar <- as.numeric(df_veri$`A.1-DIŞ VARLIKLAR(Bin TL)`)
+doviz_yukumluluk <- as.numeric(df_veri$`P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)`)
+kur <- as.numeric(df_veri_2$`(USD) ABD Doları (Döviz Alış)`)
+
+net_rezerv <- (dis_varliklar - doviz_yukumluluk) / kur
+
+```
+
+Net Rezerv = -2247086 ya da -2,2 milyar dolar.
+
+**Swaplar**
+
+Swaplar = Döviz Swapları + Altın Swapları
+
+EVDS'deki yeri: Tüm Seriler > Ödemeler Dengesi, Uluslararası Yatırım Pozisyonu > Uluslararası Rezervler ve Döviz Likiditesi Tablosu (Milyon ABD Doları)
+
+Web Servis ile almak için:
+
+ÖDEMELER DENGESİ, ULUSLARARASI YATIRIM POZİSYONU'nun bulunduğu kategorinin ID'si 18'dir. Bunun yanında Uluslararası Rezervler ve Döviz Likiditesi Tablosu (Milyon ABD Doları)'nın veri grubu kodu bie_ulusdovlkd; II.2. Yurt içi para karşılığında döviz forward ve future'ların toplam kısa ve fazla pozisyon büyüklükleri (para swaplarının gelecekteki bacağını da kapsar.) (Milyon ABD Doları)'nın ve II.3. Diğer (Milyon ABD Doları)'nın seri kodları sırasıyla TP.DOVVARNC.K14 ve TP.DOVVARNC.K23'tür.
+
+```{r}
+
+kategori_id_3 <- df_kategori %>% 
+  filter(TOPIC_TITLE_TR == 'ÖDEMELER DENGESİ, ULUSLARARASI YATIRIM POZİSYONU') %>% 
+  pull(CATEGORY_ID)
+
+df_verigrubu_3 <- fromJSON(url_verigrubu) %>% 
+  as.data.frame() %>% 
+  filter(CATEGORY_ID == kategori_id_3) %>% 
+  select(CATEGORY_ID,
+         DATAGROUP_CODE,
+         DATAGROUP_NAME,
+         FREQUENCY_STR,
+         NOTE,
+         START_DATE,
+         END_DATE)
+
+verigrubu_kodu_3 <- df_verigrubu_3 %>% 
+  filter(DATAGROUP_NAME == 'Uluslararası Rezervler ve Döviz Likiditesi Tablosu (Milyon ABD Doları)') %>% 
+  pull(DATAGROUP_CODE)
+
+url_seri_3 <- paste0("https://evds2.tcmb.gov.tr/service/evds/serieList/key=",
+                     api_key,
+                     "&type=json&code=",
+                     verigrubu_kodu_3)
+
+df_seri_3 <- fromJSON(url_seri_3) %>% 
+  as.data.frame() %>% 
+  select(SERIE_CODE,
+         DATAGROUP_CODE,
+         SERIE_NAME,
+         FREQUENCY_STR,
+         DEFAULT_AGG_METHOD_STR,
+         DEFAULT_AGG_METHOD,
+         START_DATE,
+         END_DATE)
+
+uzun_vektor <- paste0(
+  "II.2. Yurt içi para karşılığında döviz forward ve future'ların ",
+  "toplam kısa ve fazla pozisyon büyüklükleri ",
+  "(para swaplarının gelecekteki bacağını da kapsar.) (Milyon ABD Doları)"
+)
+
+seri_3 <- df_seri_3 %>% 
+  filter(SERIE_NAME %in% c(uzun_vektor,
+                           'II.3. Diğer (Milyon ABD Doları)')) %>% 
+  pull(SERIE_CODE)
+
+aylikTarih <- "01-02-2021"
+frekans_2 <- 5
+
+url_veri_3 <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                     seri_3[1],
+                     "-",
+                     seri_3[2],
+                     "&startDate=",
+                     aylikTarih,
+                     "&endDate=",
+                     aylikTarih,
+                     "&frequency=",
+                     frekans_2,
+                     "&type=json&key=",
+                     api_key)
+
+df_veri_3 <- fromJSON(url_veri_3) %>% 
+  as.data.frame() %>% 
+  select(2,3,4) %>% 
+  rename(
+    "Tarih"=1,
+    "II.2. Yurt içi para karşılığında..."=2,
+    "II.3. Diğer (Milyon ABD Doları)"=3
+  )
+
+```
+
+Yukarıda veriyi aylık olarak çekeceğimiz için frekansı 5 ve tarihi başında 1 olacak şekilde yazdık.
+
+Swap tutarını aşağıdaki gibi hesaplayabiliriz.
+
+```{r}
+
+# Birimler Milyon ABD Dolarıdır.
+
+doviz_swap <- as.numeric(df_veri_3$`II.2. Yurt içi para karşılığında...`)
+altin_swap <- as.numeric(df_veri_3$`II.3. Diğer (Milyon ABD Doları)`)
+
+swap <- doviz_swap + altin_swap
+
+```
+
+Swap tutarı = -58024 ya da -58,1 milyar dolar.
+
+**Swap Hariç Net Rezervler**
+
+Swap Hariç Net Rezervler = Net Rezervler - Swaplar
+
+```{r}
+
+rezerv <- net_rezerv + swap*1000 #birim farklılığı giderildi.
+
+```
+
+Net rezervler (-) olduğu ve swaplar ile yükümlülüğümüz arttığı için iki değeri topluyoruz.
+
+Swap hariç net rezervler -60271086 ya da -60,3 milyar dolardır.
+
+Son olarak, yazdıklarımızı bir fonksiyonda toplayalım ve güncel rezerv miktarımızı hesaplayalım.
+
+```{r}
+
+rezerv_hesapla <- function(api_key = NULL, haftalikTarih = NULL, aylikTarih = NULL){
+  
+  # Net Rezerv
+  
+  url_veri <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                     "TP.AB.A02-TP.AB.A10",
+                     "&startDate=",
+                     haftalikTarih,
+                     "&endDate=",
+                     haftalikTarih,
+                     "frequency=3",
+                     "&type=json&key=",
+                     api_key)
+  
+  df_veri <- fromJSON(url_veri) %>% 
+    as.data.frame() %>% 
+    select(2,3,4) %>% 
+    rename(
+      "Tarih"=1,
+      "A.1-DIŞ VARLIKLAR(Bin TL)"=2,
+      "P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)"=3
+    )
+  
+  url_veri_2 <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                       "TP.DK.USD.A.YTL",
+                       "&startDate=",
+                       haftalikTarih,
+                       "&endDate=",
+                       haftalikTarih,
+                       "&type=json&key=",
+                       api_key)
+  
+  df_veri_2 <- fromJSON(url_veri_2) %>% 
+    as.data.frame() %>% 
+    select(2,3) %>% 
+    rename(
+      "Tarih"=1,
+      "(USD) ABD Doları (Döviz Alış)"=2
+    )
+  
+  dis_varliklar <- as.numeric(df_veri$`A.1-DIŞ VARLIKLAR(Bin TL)`)
+  doviz_yukumluluk <- as.numeric(df_veri$`P.1-TOPLAM DÖVİZ YÜKÜMLÜLÜKLERİ(Bin TL)`)
+  kur <- as.numeric(df_veri_2$`(USD) ABD Doları (Döviz Alış)`)
+  
+  net_rezerv <- (dis_varliklar - doviz_yukumluluk) / kur
+  
+  # Swap
+  
+  url_veri_3 <- paste0("https://evds2.tcmb.gov.tr/service/evds/series=",
+                       "TP.DOVVARNC.K14-TP.DOVVARNC.K23",
+                       "&startDate=",
+                       aylikTarih,
+                       "&endDate=",
+                       aylikTarih,
+                       "&frequency=5",
+                       "&type=json&key=",
+                       api_key)
+  
+  df_veri_3 <- fromJSON(url_veri_3) %>% 
+    as.data.frame() %>% 
+    select(2,3,4) %>% 
+    rename(
+      "Tarih"=1,
+      "II.2. Yurt içi para karşılığında..."=2,
+      "II.3. Diğer (Milyon ABD Doları)"=3
+    )
+  
+  doviz_swap <- as.numeric(df_veri_3$`II.2. Yurt içi para karşılığında...`)
+  altin_swap <- as.numeric(df_veri_3$`II.3. Diğer (Milyon ABD Doları)`)
+  
+  swap <- doviz_swap + altin_swap
+  
+  # Swap Hariç Net Rezerv
+  
+  rezerv <- net_rezerv + swap*1000
+  
+  return(rezerv)
+  
+}
+
+rezerv_hesapla(api_key = "api_anahtariniz",
+               haftalikTarih = "28-04-2022",
+               aylikTarih = "01-03-2022")
+
+```
+
+Fonksiyonun sonucu her ne kadar önceki örnek ile bir çıksa da yine de günceli kontrol edelim.
+
+Elimizdeki son haftalık veriler 28 Nisan 2022'ye; çekebildiğimiz swap verileri ise Mart 2022'ye ait.
+
+Net Rezervler = (1639818009 / 14.7962) - (1548217098 / 14.7962) = (1639818009 - 1548217098) / 14.7962 = 6190840 ya da 6,2 milyar dolar
+
+Swaplar = (-58373) + (-3768) = -62141 ya da -62,1 milyar dolar
+
+Swap Hariç Net Rezervler = 6,2 + (-62,1) = -55,9 milyar dolar
