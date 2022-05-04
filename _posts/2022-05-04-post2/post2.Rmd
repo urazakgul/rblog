@@ -10,7 +10,6 @@ output:
     self_contained: false
 categories:
   - Finans
-preview: "./img1.png"
 ---
 
 
@@ -282,7 +281,9 @@ Net Rezerv = -2247086 ya da -2,2 milyar dolar.
 
 **Swaplar**
 
-![](img1.png)
+```{r echo=FALSE, eval=TRUE, out.width = '100%', preview=TRUE}
+knitr::include_graphics("img1.png")
+```
 
 Swaplar = Döviz Swapları + Altın Swapları
 
