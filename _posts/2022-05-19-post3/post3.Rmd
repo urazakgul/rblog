@@ -1,0 +1,309 @@
+---
+title: "Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli İle Analizi"
+description: |
+  Enflasyonun uzun dönemde yükselmesi olasılığı 70%'tir.
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-19
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finans
+  - Ekonomi
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Markov süreci, bir stokastik sürecin şu anki değerleri bilindiğinde, sürecin gelecekteki değerlerinin geçmişteki değerlerinden koşullu olarak bağımsız olduğu süreçtir. Markov zinciri ise Markov sürecinin kesikli durum uzayına sahip olduğu özel bir durumdur. Stokastik sistemlerin kısa veya uzun dönemdeki davranışlarının modellenmesinde Markov zincirlerinden yararlanılmaktadır.
+
+Aylık frekansta olan ve Haziran 2018 (başkanlık sistemi) ile Nisan 2022 (son veri) arasını kapsayan verileri TCMB/EVDS'den aldım. Faizi temsilen Ağırlık Ortalama Fonlama Maliyeti'ni; enflasyonu temsilen de TÜFE'den elde edilen yıllık değişimleri kullandım.
+
+```{r}
+
+library(kableExtra) # zorunlu değil
+library(expm) # %^% operatörü
+library(markovchain) # uzun dönem denge hesaplaması
+library(tidyverse)
+library(ggalluvial)
+
+df <- readxl::read_excel("data.xlsx")
+df <- df %>% 
+  mutate(tarih = as.Date(paste0(tarih,"-",1))) %>% 
+  filter(tarih >= as.Date("2018-06-01")) %>% 
+  na.omit() # Mayıs 2022 verisi çıkarıldı.
+
+```
+
+```{r echo=FALSE}
+
+df %>% 
+  rename("AOFM"=2, "Enflasyon"=3) %>% 
+  pivot_longer(!tarih, names_to = "variables", values_to = "values") %>% 
+  ggplot(aes(x = tarih, y = log(values), group = variables, color = variables)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 5)) +
+  scale_color_manual(values = c("blue","red")) +
+  labs(title = "Ağırlıklı Ortalama Fonlama Faizi ve Enflasyon (YoY)",
+       subtitle = "Haziran 2018 - Nisan 2022",
+       caption = "Değerler logaritmiktir.\nVeriler TCMB/EVDS'den alınmıştır.")
+
+```
+
+Elimizdeki durumların *(State; S1, S2, ...)* neler olabileceğine bakalım:
+
+* S1: Faiz Yükseldi - Enflasyon Yükseldi
+
+* S2: Faiz Yükseldi - Enflasyon Düştü
+
+* S3: Faiz Düştü - Enflasyon Yükseldi
+
+* S4: Faiz Düştü - Enflasyon Düştü
+
+* S5: Faiz Değişmedi - Enflasyon Yükseldi
+
+* S6: Faiz Değişmedi - Enflasyon Düştü
+
+```{r}
+
+df2 <- df %>% 
+  mutate(
+    durum = case_when(
+      lead(faiz) > faiz & lead(enflasyon) > enflasyon ~ "S1",
+      lead(faiz) > faiz & lead(enflasyon) < enflasyon ~ "S2",
+      lead(faiz) < faiz & lead(enflasyon) > enflasyon ~ "S3",
+      lead(faiz) < faiz & lead(enflasyon) < enflasyon ~ "S4",
+      lead(faiz) == faiz & lead(enflasyon) > enflasyon ~ "S5",
+      lead(faiz) == faiz & lead(enflasyon) < enflasyon ~ "S6",
+    ) # lead() ---> bir sonraki durum; t + 1 ile t karşılaştırılıyor
+  ) %>% 
+  na.omit() %>% # NA içeren değerler çıkarıldı
+  select(durum) # yeterli olacak sütun
+
+```
+
+Kesikli parametreli Markov zincirlerinde sistem belirli bir olasılık dağılımına bağlı olarak bulunduğu durumdan başka bir duruma geçebilir veya aynı durumda kalabilir. Bu nedenle, incelenen sistemin içinde bulunabileceği farklı durumların ve bu durumların birinden diğerine geçiş olasılıklarını bilmemiz gerekir. Sistemin bu durum değişiklikleri geçiş olarak isimlendirilir ve durum uzayındaki herhangi i ve j durumları için, $p_{ij}(m,n) = P(X_{m+n} = j/X_m = i)$ biçimindeki koşullu olasılığa geçiş olasılığı adı verilir. Ayrıca, homojen bir Markov zincirinde geçiş olasılığı yalnızca adım sayısının bir fonksiyonudur ve m zamanına bağlı değildir.
+
+Yukarıdaki durumları baz alarak Markov geçiş matrisini oluşturalım.
+
+```{r}
+
+mgm <- df2 %>% 
+  mutate(
+    durum2 = lead(durum)
+  ) %>% # hangi durumdan hangi duruma geçti
+  na.omit() %>% 
+  group_by(durum,durum2) %>% 
+  summarise(n = n()) %>% 
+  ungroup()
+
+```
+
+Tabloda olmayan bazı durumlar var. Bunları tüm durumları baz alarak ekleyebiliriz.
+
+```{r}
+
+tumDurumlar <- data.frame(
+  durum = paste0("S",seq(1,6,1)), # tüm durumlar
+  durum2 = paste0("S",seq(1,6,1)) # tüm durumlar 2
+) %>% 
+  expand(durum,durum2) %>% # tüm durumlar burada genişletiliyor
+  left_join(mgm, by = c("durum","durum2")) %>% 
+  mutate(n = replace(n,is.na(n),0))
+
+```
+
+```{r echo=FALSE, preview=TRUE}
+
+ggplot(data = tumDurumlar, aes(axis1 = durum, axis2 = durum2, y = n)) +
+  geom_alluvium(aes(fill = durum2)) +
+  geom_stratum(fill = "gray15") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), color = "white") +
+  scale_x_discrete(limits = c("durum", "durum2"), expand = c(0.15, 0.05)) +
+  theme_void() + 
+  theme(legend.position = "none") +
+  scale_fill_viridis_d()
+
+```
+
+Matrisi oluşturabiliriz. Her bir hücreyi o satırın toplamına bölerek olasılıkları hesaplayacağız.
+
+```{r}
+
+m <- tumDurumlar %>% 
+  pivot_wider(names_from = "durum2", values_from = "n") %>% # sütun
+  column_to_rownames(var = "durum") %>% # satır
+  mutate_all(.funs = function(x) round(x / rowSums(.), digits = 2)) %>% 
+  mutate_if(is.numeric, funs(ifelse(is.nan(.), 0, .))) %>% 
+  as.matrix()
+
+```
+
+```{r echo=FALSE}
+
+m %>%
+  kbl() %>%
+  kable_styling()
+
+```
+
+Yukarıdaki matris bir-adım geçiş olasılığı matrisidir. Homojen bir Markov zincirinde m. adımda i durumunda bulunan sürecin bir adım sonra j durumunda bulunması olasılığı $p_{ij} = p_{ij}(1) = p_{ij}^{(1)} = P(X_{m+1} = j/X_m = i)$'dir. Yukarıdaki bir-adım geçiş matrisinde satırlar sistemin şu an bulunabileceği durumları; sütunlar ise bir adım sonra bulunabileceği durumları göstermektedir.
+
+Başlangıç durumu S5'tir. Yani, faiz değişmedi - enflasyon yükseldi. Gelecek Mayıs ayına ait olasılıklara bakalım.
+
+```{r}
+
+baslangicDurum <- matrix(
+  data = c(0,0,0,0,1,0), # S5 ---> 1; diğerleri 0
+  nrow = 1,
+  byrow = TRUE
+)
+
+```
+
+```{r eval=FALSE}
+
+baslangicDurum %*% m
+
+```
+
+```{r echo=FALSE}
+
+m1 <- baslangicDurum %*% m
+
+m1 %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+Faizin değişmediği ve enflasyon yükseldiği bir dönemden yine faizin değişmediği ve enflasyonun yükseldiği bir döneme geçiş olasılığı 62%'dir.
+
+Peki, haziran ayı için (iki-adım geçiş) olasılıklar ne olacaktır?
+
+```{r eval=FALSE}
+
+m %^% 2 %>% as.matrix() %>% round(., digits = 2)
+
+```
+
+```{r echo=FALSE}
+
+m2 <- m %^% 2 %>% as.matrix() %>% round(., digits = 2)
+
+m2 %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+Markov zincirinde ilk olasılık dağılımı ve zincirin bir-adım geçiş matrisini belirlediğimizde zincirin tüm adımlarındaki olasılıkları kolayca elde edebiliriz. n-adım olasılıklı vektörü $\pi_{n} = \pi_{n-1}P$ olsun. Buradan aşağıdaki eşitlikleri türetebiliriz.
+
+$\pi_n = (\pi_{n-2}P)P = \pi_{n-2}P^2$
+
+.
+
+.
+
+.
+
+$\pi_n = \pi_0P^n$
+
+P geçiş matrisinin n. kuvvetini aldığımızda elde edeceğimiz n-adım geçiş matrisi $P^n$'de n değeri büyüdükçe $P_{ij}^{(n)}$ olasılık değerleri sabit bir değere ya da limite yaklaşıyorsa, n-adım geçiş olasılıkları denge durumuna ulaşır. Denge durumuna ulaştığımızda geçiş matrisinin satırlarında değişim olmadığını göreceğiz. Yani, her satırı aynı olan bir geçiş matrisi elde edeceğiz.
+
+$\pi_n = [\pi_0 \pi_1 ... \pi_n]$
+
+```{r}
+
+m <- tumDurumlar %>% 
+  pivot_wider(names_from = "durum2", values_from = "n") %>% # sütun
+  column_to_rownames(var = "durum") %>% # satır
+  mutate_all(.funs = function(x) x / rowSums(.)) %>% 
+  # satır toplamı 1 olması için round() kaldırıldı
+  mutate_if(is.numeric, funs(ifelse(is.nan(.), 0, .))) %>% 
+  as.matrix()
+
+n_adim <- new(
+  "markovchain",
+  transitionMatrix = matrix(as.numeric(m), nrow = 6, ncol = 6)
+)
+
+```
+
+```{r eval=FALSE}
+
+steadyStates(n_adim) %>% round(. ,digits = 2)
+
+```
+
+```{r echo=FALSE}
+
+steadyStates(n_adim) %>% 
+  round(. ,digits = 2) %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+Uzun dönemde;
+
+* Faizin yükseldiği ve enflasyonun yükseldiği dönem olasılığı 18%,
+
+* Faizin yükseldiği ve enflasyonun düştüğü dönem olasılığı 9%,
+
+* Faizin düştüğü ve enflasyonun yükseldiği dönem olasılığı 29%,
+
+* Faizin düştüğü ve enflasyonun düştüğü dönem olasılığı 15%,
+
+* Faizin değişmediği ve enflasyonun yükseldiği dönem olasılığı 23%,
+
+* Faizin değişmediği ve enflasyonun düştüğü dönem olasılığı 7%'dir.
+
+*Değerlerin toplamı yuvarlamadan dolayı 100% değildir.*
+
+Yukarıdaki olasılıkları baz aldığımızda uzun vadede enflasyonun yükselmesi olasılığı 70% iken; düşmesi olasılığı 30%'dur.
+
+Görsellere ait kodlara aşağıdan ulaşılabilir
+
+```{r eval=FALSE}
+
+df %>% 
+  rename("AOFM"=2, "Enflasyon"=3) %>% 
+  pivot_longer(!tarih, names_to = "variables", values_to = "values") %>% 
+  ggplot(aes(x = tarih, y = log(values), group = variables, color = variables)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top",
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 5)) +
+  scale_color_manual(values = c("blue","red")) +
+  labs(title = "Ağırlıklı Ortalama Fonlama Faizi ve Enflasyon (YoY)",
+       subtitle = "Ocak 2011 - Nisan 2022",
+       caption = "Değerler logaritmiktir.\nVeriler TCMB/EVDS'den alınmıştır.")
+
+ggplot(data = tumDurumlar, aes(axis1 = durum, axis2 = durum2, y = n)) +
+  geom_alluvium(aes(fill = durum2)) +
+  geom_stratum(fill = "gray15") +
+  geom_text(stat = "stratum", aes(label = after_stat(stratum)), color = "white") +
+  scale_x_discrete(limits = c("durum", "durum2"), expand = c(0.15, 0.05)) +
+  theme_void() + 
+  theme(legend.position = "none") +
+  scale_fill_viridis_d()
+
+```
+
+*Yararlandığım Kaynaklar:*
+
+*Stokastik Süreçler ve R Uygulamaları; G.Ö.Kadılar*
