@@ -272,7 +272,7 @@ Uzun dönemde;
 
 Yukarıdaki olasılıkları baz aldığımızda uzun vadede enflasyonun yükselmesi olasılığı 70% iken; düşmesi olasılığı 30%'dur.
 
-Görsellere ait kodlara aşağıdan ulaşılabilir
+Görsellere ait kodlara aşağıdan ulaşılabilir.
 
 ```{r eval=FALSE}
 
