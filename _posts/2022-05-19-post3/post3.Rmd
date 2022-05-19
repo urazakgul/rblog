@@ -188,7 +188,7 @@ m1 %>%
 
 Faizin değişmediği ve enflasyon yükseldiği bir dönemden yine faizin değişmediği ve enflasyonun yükseldiği bir döneme geçiş olasılığı 62%'dir.
 
-Peki, haziran ayı için (iki-adım geçiş) olasılıklar ne olacaktır?
+Peki, Haziran ayı için (iki-adım geçiş) olasılıklar ne olacaktır?
 
 ```{r eval=FALSE}
 
