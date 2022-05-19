@@ -7,6 +7,22 @@ navbar:
       href: index.html
     - text: "About"
       href: about.html
+    - text: "Books"
+      menu:
+        - text: "R'da Ekonometri Uygulamaları"
+          href: https://rpydaneogrendim.github.io/rEkonometri/
+        - text: "R'da Veri Görselleştirme"
+          href: https://rpydaneogrendim.github.io/rViz/
+    - text: "Packages"
+      menu:
+        - text: "TCMB"
+          href: https://github.com/rpydaneogrendim/TCMB
+        - text: "isyhisse"
+          href: https://github.com/rpydaneogrendim/isyhisse
+    - icon: fab fa-twitter
+      href: https://twitter.com/rpydaneogrendim
+    - icon: fab fa-github
+      href: https://github.com/rpydaneogrendim
 collections:
   posts:
     categories: true
