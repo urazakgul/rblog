@@ -42,7 +42,7 @@ Zordaki Onlu ülkeleri (Morgan Stanley, 2015): Brezilya, Güney Afrika, Güney K
 
 İki grubu birleştirirsek çalışmaya toplamda 13 ülkeyi dahil etmiş olacağız.
 
-Tartışmalar dolar üzerinden ilerlediği için Türkiye de dahil 13 ülkenin para birimlerinin dolar karşısındaki değeri baz alındı. Değerler Reuters'tan alınmıştır. Verilere [Github hesabımdan](https://github.com/rpydaneogrendim) ulaşabilirsiniz.
+Tartışmalar dolar üzerinden ilerlediği için Türkiye de dahil 13 ülkenin para birimlerinin dolar karşısındaki değeri baz alındı. Değerler Reuters'tan alınmıştır. Verilere *(post1.xlsx)* [Github hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz.
 
 ```{r}
 

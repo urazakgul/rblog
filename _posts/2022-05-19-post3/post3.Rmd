@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 Markov süreci, bir stokastik sürecin şu anki değerleri bilindiğinde, sürecin gelecekteki değerlerinin geçmişteki değerlerinden koşullu olarak bağımsız olduğu süreçtir. Markov zinciri ise Markov sürecinin kesikli durum uzayına sahip olduğu özel bir durumdur. Stokastik sistemlerin kısa veya uzun dönemdeki davranışlarının modellenmesinde Markov zincirlerinden yararlanılmaktadır.
 
-Aylık frekansta olan ve Haziran 2018 (başkanlık sistemi) ile Nisan 2022 (son veri) arasını kapsayan verileri TCMB/EVDS'den aldım. Faizi temsilen Ağırlık Ortalama Fonlama Maliyeti'ni; enflasyonu temsilen de TÜFE'den elde edilen yıllık değişimleri kullandım.
+Aylık frekansta olan ve Haziran 2018 (başkanlık sistemi) ile Nisan 2022 (son veri) arasını kapsayan verileri TCMB/EVDS'den aldım. Faizi temsilen Ağırlık Ortalama Fonlama Maliyeti'ni; enflasyonu temsilen de TÜFE'den elde edilen yıllık değişimleri kullandım. Verilere *(post3.xlsx)* [Github hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz.
 
 ```{r}
 
