@@ -1,0 +1,172 @@
+---
+title: "Twitter Verilerini Kullanarak Liderlerin Popülaritesini Ölçmek"
+description: |
+  Türkiye'deki bazı politik liderlerin Twitter'daki popülaritesi üzerine basit bir çalışma.
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-22
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Social Media
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+```
+
+Twitter geliştirici hesabı açmadan *rtweet* paketi ile belli sınırlarda veriler çekilebilir ve kısa vadeli analizler gerçekleştirilebilir. Bunun nasıl olabileceğini görelim.
+
+Uygulamada, isim ve gündem olarak ön plana çıkmış bazı politik liderlerin tweetlerini çekip zamanla popülaritelerinde nasıl bir değişim olmuş bunu inceleyeceğiz.
+
+Popülariteyi ölçmek için birtakım indikatörleri bir araya getirmemiz gerekir ancak bu uygulamada tek bir indikatör olarak tweetlerine gelen beğeni sayılarını alacağız.
+
+```{r}
+
+#install.packages("rtweet")
+library(rtweet)
+library(tidyverse)
+
+```
+
+Başlamadan önce bir not: rtweet paketinin fonksiyonlarını kullanmaya başladığınız zaman karşınıza bir authentication (kimlik doğrulama) sayfası gelecektir. Bu noktada giriş yapmanız yeterli olacaktır. Giriş yaptıktan sonra authentication gerçekleşmiş olacaktır.
+
+Aşağıdaki liderlerin tweetlerini çekerek başlayalım.
+
+```{r}
+
+leaders <- c(
+  "RTErdogan",
+  "kilicdarogluk",
+  "meral_aksener",
+  "ekrem_imamoglu",
+  "mansuryavas06",
+  "umitozdag",
+  "alibabacan",
+  "Ahmet_Davutoglu"
+)
+
+```
+
+rtweet paketindeki *get_timeline()* fonksiyonu ile bir hesabın tweetlerini diğer tüm detayları ile birlikte çekebiliriz. Dokümantasyonda yer alan bilgiye göre maksimum 3200 tweet çekebiliyoruz.
+
+![https://www.rdocumentation.org/packages/rtweet/versions/0.7.0/topics/get_timeline](img1.png)
+```{r}
+
+master <- data.frame()
+
+for(i in 1:length(leaders)){
+  
+  user_tl <- get_timeline(
+    user = leaders[i],
+    n = Inf, # alınabilecek maksimum tweet sayısıdır; girilmezse default 100 tane çeker
+  )
+  
+  # her bir hesabın çekilen tweetlerini (user_tl) master veri çerçevesinde birleştir
+  master <- master %>% 
+    bind_rows(user_tl)
+  
+  Sys.sleep(time = 1) # döngü her çalıştığında 1 saniye bekletebiliriz
+  # sık gönderilen isteklerde problem olmaması için kullanılabilecek bir fonksiyon
+  
+}
+
+```
+
+Veri çerçevesini biraz düzenleyelim.
+
+```{r}
+
+df <- master %>% 
+  filter(!is_retweet) %>% # retweetler kaldırıldı
+  select(created_at,name,favorite_count) %>% # 3 adet kolon seçildi
+  mutate(created_at = as.Date(created_at)) # tarih formatı düzeltildi (sadece yyyy-mm-dd)
+
+```
+
+Her bir liderin 2022 yılında attığı toplam tweet ve beğeni sayısına bakalım.
+
+```{r}
+
+df2022 <- df %>% 
+  filter(created_at >= as.Date("2022-01-01")) %>% 
+  group_by(name) %>% 
+  summarise(
+    n = n(), # toplam tweet sayısı
+    totalFav = sum(favorite_count) # toplam beğeni sayısı
+  )
+
+```
+
+```{r echo=FALSE}
+
+ggplot(df2022, aes(x = n, y = totalFav, color = totalFav)) +
+  geom_point() +
+  ggrepel::geom_text_repel(aes(label = name)) +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_color_gradient(low = "orange", high = "red") +
+  labs(x = "Tweet Sayısı", y = "Beğeni Sayısı")
+
+```
+
+Bir de 2022 yılına ait tweet başına düşen beğeni sayısına bakalım.
+
+```{r}
+
+df2022 <- df2022 %>% 
+  mutate(lpt = totalFav / n) # lpt: like per tweet (tweet başına beğeni)
+
+```
+
+```{r}
+
+ggplot(df2022, aes(x = reorder(name,lpt), y = lpt, fill = lpt)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "none") +
+  scale_y_continuous(labels = scales::comma) +
+  scale_fill_gradient(low = "orange", high = "red") +
+  labs(x = "", y = "Tweet Başına Beğeni Sayısı")
+
+```
+
+2022 yılına ait günlük bazda popülaritenin zaman ile olan eğilimine bakabiliriz.
+
+```{r}
+
+df_pop <- df %>% 
+  filter(created_at >= as.Date("2022-01-01")) %>% 
+  group_by(name,created_at) %>% 
+  summarise(
+    n = n(),
+    totalFav = sum(favorite_count)
+  ) %>% 
+  mutate(lpt = totalFav / n) %>% 
+  group_by(name) %>% 
+  mutate(t = row_number()) # t: gözlem sayısı
+
+```
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+ggplot(df_pop, aes(x = t, y = lpt)) +
+  geom_line(color = "gray") +
+  geom_point(color = "gray40") +
+  geom_smooth(method = "loess", color = "red") +
+  facet_wrap(~name, scales = "free") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_text(size = 7),
+        axis.text.x = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic")) +
+  scale_y_continuous(labels = scales::unit_format(unit = "K", scale = 1e-3, sep = "")) +
+  labs(title = "Günlük Tweet Başına Beğeni Sayısı, 2022",
+       subtitle = "Günlük Toplam Beğeni / Günlük Toplam Tweet")
+
+```

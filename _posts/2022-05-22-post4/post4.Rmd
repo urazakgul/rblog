@@ -9,8 +9,8 @@ output:
   distill::distill_article:
     self_contained: false
 categories:
-  - Finans
-  - Makine Öğrenmesi
+  - Finance
+  - Machine Learning
 ---
 
 
