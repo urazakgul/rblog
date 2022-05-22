@@ -163,7 +163,7 @@ musigma_hist %>%
         legend.title = element_blank(),
         legend.position = "top") +
   labs(title = expression("Tarihsel "~mu~"ve"~sigma~"Değerleri"),
-       subtitle = "2013-2021",
+       subtitle = "2003-2021",
        caption = "Veriler standardize edilmiştir.") +
   scale_color_manual(values = c("red","blue"))
 
@@ -484,7 +484,7 @@ musigma_hist %>%
         legend.title = element_blank(),
         legend.position = "top") +
   labs(title = expression("Tarihsel "~mu~"ve"~sigma~"Değerleri"),
-       subtitle = "2013-2021",
+       subtitle = "2003-2021",
        caption = "Veriler standardize edilmiştir.") +
   scale_color_manual(values = c("red","blue"))
 
