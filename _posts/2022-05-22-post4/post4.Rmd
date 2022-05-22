@@ -321,14 +321,14 @@ A ve B noktaları arasındaki Öklid uzaklığı:
 
 $d(A,B) = \sqrt{(x_1 - x_2)^2 + (y_1 - y_2)^2}$
 
-Algoritmayı uygulama aşamasına geçebiliriz. Önceki testlerimizden farklı olarak burada simülasyonu biraz daha geriden başlatacağız. Çünkü test edilecek yıla ait değerlerin henüz gerçekleşmediğini varsayarsak, önceki yılın bir bölümünü alıp burada gerçekleşen değerleri bir kümeye dahil etmemiz gerekir. Bunun için de test edilecek yıldan bir önceki yılın son 90 iş gününü alabiliriz. Bu durumda aşamaları şöyle sıralayabiliriz: Test edilecek yıldan bir önceki yılın son 90 iş gününü al, burayı simüle et, simüle değerleri kümelere ayır, 90 gün için gerçekleşen değerleri bir kümeye dahil et ve buradan seçilen kümeleri kullanarak test edilecek yılın değerlerini bul. 90 iş gününü (~4 ay) seçme nedenim vade uzadıkça tahmin gücünün zayıflayabileceğini dikkate alarak çok geriden başlatıp tahmini kötüleştirmemek; bununla beraber, çok da erken başlatıp zaman serilerini kümelerken kaliteyi düşürmemek.
+Algoritmayı uygulama aşamasına geçebiliriz. Önceki testlerimizden farklı olarak burada simülasyonu biraz daha geriden başlatacağız. Çünkü test edilecek yıla ait değerlerin henüz gerçekleşmediğini varsayarsak, önceki yılın bir bölümünü alıp burada gerçekleşen değerleri bir kümeye dahil etmemiz gerekir. Bunun için de test edilecek yıldan bir önceki yılın son 100 iş gününü alabiliriz. Bu durumda aşamaları şöyle sıralayabiliriz: Test edilecek yıldan bir önceki yılın son 100 iş gününü al, burayı simüle et, simüle değerleri kümelere ayır, 100 gün için gerçekleşen değerleri bir kümeye dahil et ve buradan seçilen kümeleri kullanarak test edilecek yılın değerlerini bul. 100 iş gününü seçme nedenim vade uzadıkça tahmin gücünün zayıflayabileceğini dikkate alarak çok geriden başlatıp tahmini kötüleştirmemek; bununla beraber, çok da erken başlatıp zaman serilerini kümelerken kaliteyi düşürmemek.
 
 ```{r}
 
 filter_min <- df %>% 
   filter(year %in% 2017:2020) %>% 
   group_by(year) %>% 
-  slice(tail(row_number(), 90)) %>% 
+  slice(tail(row_number(), 100)) %>% 
   filter(date == min(date)) %>% 
   pull(date)
 
@@ -359,11 +359,11 @@ for(m in 1:length(target)){
   
   mlsim_master <- mlsim_master %>% bind_rows(mlsim)
   
-  mlgbm <- t(scale(mlsim[-c(1,2)]))
+  mlgbm <- t(scale(mlsim[1:100,-c(1,2)])) # son 100 günü kümelemeye dahil etmeliyiz
   mlgbm_dist <- dist(mlgbm, method="euclidean")
   fit <- hclust(mlgbm_dist, method="ward.D")
   
-  clustered <- cutree(fit, k=100) # 100 adet küme oluşturulmuştur
+  clustered <- cutree(fit, k=50) # 50 adet küme oluşturulmuştur
   clustered_tidy <- as.data.frame(as.table(clustered)) %>% 
     rename("sim"=1,"cluster"=2) %>% 
     mutate(sim = as.character(sim))
@@ -380,7 +380,8 @@ for(m in 1:length(target)){
     filter(cluster == cluster_x) %>% 
     select(-cluster) %>% 
     pivot_wider(names_from = "sim", values_from = "value") %>% 
-    mutate("simAvg" = rowMeans(.[,-c(1,2,ncol(.))])) %>% 
+    mutate("simAvg" = apply(.[,-c(1,2,ncol(.))], 1, function(x) median(x))) %>% 
+    # uç değerlerden etkilenmemek için ortalama yerine medyan (ortanca) kullanıldı
     pivot_longer(!c(rn,year), names_to = "sim", values_to = "value")
   
   joined_clusters_master <- joined_clusters_master %>% bind_rows(joined_clusters)
@@ -426,7 +427,7 @@ rmse_df2 %>%
 
 ```
 
-Yukarıdaki tablodan ve aşağıdaki grafikten görüleceği üzere RMSE değerlerini düşürdük ki sıfıra yaklaşması hiç tahmin hatası yapılmadığı anlamına geliyor.
+Yukarıdaki tablodan ve aşağıdaki grafikten görüleceği üzere RMSE değerlerini tek bir yıl hariç düşürdük ki sıfıra yaklaşması hiç tahmin hatası yapılmadığı anlamına geliyor.
 
 ```{r echo=FALSE}
 
@@ -443,6 +444,8 @@ rmse_df2 %>%
   scale_fill_manual(values = c("gray30","red"))
 
 ```
+
+Çalışmada kümeleme algoritmasının simülasyonda faydalı olabileceğine odaklanmak istedim. Burada $\mu$ ve $\sigma$ değerlerinin, iş günü sayısının, küme sayısının en uygun şekilde seçimi önem kazanacaktır.
 
 Görsellere ait kodlara aşağıdan ulaşılabilir.
 
