@@ -1,0 +1,680 @@
+---
+title: "İllerin Seçim Zamanı Tüketici Güven Endeksi ve Enflasyona Olan Duyarlılığı"
+description: |
+  Tüketici Güven Endeksi ve Enflasyon ile illerin oy oranları arasındaki korelasyon.
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-24
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Election
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen = 999)
+```
+
+Oy vermede seçmenleri etkileyen birçok faktör bulunmaktadır ve literatürde birçok oy verme modeli bulunmaktadır. Bunlardan biri de ekonomik oy verme modelidir. Siyaset biliminde ekonomik oylama, seçmen davranışının seçim anında ülkelerindeki ekonomik koşullardan büyük ölçüde etkilendiğini savunan teorik bir bakış açısıdır.
+
+Ekonomik oy verme modelinden yola çıkarak iki tane değişken belirledim: Tüketici Güven Endeksi ve Enflasyon. İllerin oy oranlarını ise AKP ile sınırlayıp 2007, 2011, 2015-I, 2015-II ve 2018 genel seçimlerini dikkate aldım. Gözlem sayısının az oluşundan (N = 5) dolayı analizime temkinli yaklaşılması konusunda uyarmalıyım ancak bir miktar fikir verebileceğini de eklemek istiyorum. Özellikle Tüketici Güven Endeksi tarafı yakından takip edilmelidir.
+
+TÜİK'ten aldığım verilere *(post6_1.xlsx, post6_2.xlsx, post6_3.xlsx)* [GitHub hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz. Oy oranları verileri Vikipedi'den web kazıma yöntemi ile alınmıştır.
+
+```{r}
+
+library(tidyverse)
+library(rvest)
+
+```
+
+**Tüketici Güven Endeksi**
+
+```{r}
+
+tge1 <- readxl::read_excel("tge1.xls") %>% 
+  select(1,2) %>% 
+  slice(5:100) %>% 
+  rename("donem"=1,"tge"=2) %>% 
+  mutate(donem = seq(as.Date("2004-01-01"),as.Date("2011-12-01"), "months"),
+         tge = as.numeric(tge))
+
+tge2 <- readxl::read_excel("tge2.xls") %>% 
+  select(1,4) %>% 
+  slice(5:129) %>% 
+  rename("donem"=1,"tge"=2) %>% 
+  mutate(donem = seq(as.Date("2012-01-01"),as.Date("2022-05-01"), "months"),
+         tge = as.numeric(tge))
+
+tge <- rbind(tge1,tge2) %>% 
+  mutate(tgeLag = lag(tge))
+
+```
+
+Tüketici Güven Endeksi, 2004 yılının Ocak ayından 2022 yılının Mayıs ayına kadar toparlama sürecine girse de aşağı yönlü bir eğilim sergilemiştir. 0 ile 200 arasında yer alan endeksin 100 üzerinde olmasının iyimser durumu gösterdiğini baz alırsak 221 ayın sadece 7'sinde iyimser bölgede kalabilmiş. Bu 7 değerin 6'sı 2004, 1'i ise 2006 yılına aittir.
+
+Verilerin olduğu aralıkta ilk genel seçim 22 Temmuz 2007'de oldu ve endeks Haziran ve Temmuz 2007'de sırasıyla `r round(tge[42,2], digits = 1)` ve `r round(tge[43,2], digits = 1)` idi. Bugün endeks `r round(tge[221,2], digits = 1)` olmuştur.
+
+```{r}
+
+ggplot(tge, aes(x = donem, y = tge)) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "red") +
+  geom_hline(yintercept = 100) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "Tüketici Güven Endeksi",
+       subtitle = "Ocak/2004 - Mayıs/2022",
+       caption = "Veri: TÜİK")
+
+```
+
+**Enflasyon**
+
+```{r}
+
+enf <- readxl::read_excel("enflasyon.xls") %>% 
+  slice(80:98) %>% 
+  `colnames<-`(c("yil",paste0("C",seq(1,18,1)))) %>% 
+  pivot_longer(!yil, names_to = "ay", values_to = "enf") %>% 
+  na.omit() %>% 
+  mutate(donem = seq(as.Date("2004-01-01"),as.Date("2022-04-01"), "months"),
+         enf = as.numeric(enf),
+         enfLag = lag(enf)) %>% 
+  select(donem,enf,enfLag)
+
+```
+
+Enflasyon, 2004 yılının Ocak ayından 2022 yılının Nisan ayına kadar logaritmik olarak baktığımız zaman eksponansiyel bir artış sergilemiş diyebiliriz. İlk ciddi bozulmasını ise 2018 yılında göstermiş. 20% üstü enflasyonun olduğu 11 ayın 4'ü 2018'e, 1'i 2019'a, 2'si 2021'e ve kalan 4'ü 2022'ye aittir.
+
+Verilerin olduğu aralıkta ilk genel seçim 22 Temmuz 2007'de oldu ve enflasyon Haziran ve Temmuz 2007'de sırasıyla `r round(enf[42,2], digits = 1)`% ve `r round(enf[43,2], digits = 1)`% idi. Bugün enflasyon `r round(enf[220,2], digits = 1)`% olmuştur.
+
+```{r}
+
+ggplot(enf, aes(x = donem, y = log(enf))) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "red") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "Enflasyon (Bir Önceki Yılın Aynı Ayına Göre)",
+       subtitle = "Ocak/2004 - Nisan/2022",
+       caption = "Veriler logaritmiktir.\n Veri: TÜİK")
+
+```
+
+**Genel Seçimler AKP Oy Oranı**
+
+Türkiye, AKP'nin olduğu 6 genel seçim görmüştür.
+
+* 3 Kasım 2002
+
+* 22 Temmuz 2007
+
+* 12 Haziran 2011
+
+* 7 Haziran 2015
+
+* 1 Kasım 2015
+
+* 24 Haziran 2018
+
+Genel seçimlerde (2002 analizde olmayacağı için hariç) aldıkları oy oranlarının zaman serisi aşağıdaki gibidir.
+
+```{r}
+
+akp <- data.frame(
+  t = seq(1,5,1),
+  tarih = c(
+    as.Date("2007-07-22"),
+    as.Date("2011-06-12"),
+    as.Date("2015-06-07"),
+    as.Date("2015-11-01"),
+    as.Date("2018-06-24")
+  ),
+  oran = c(46.58,49.83,40.87,49.50,42.56)
+)
+
+ggplot(akp, aes(x = t, y = oran)) +
+  geom_line() +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(tarih,"\n",oran,"%")), vjust = -0.5, size = 2) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption = element_text(face = "italic")) +
+  scale_y_continuous(limits = c(0,100)) +
+  labs(title = "Genel Seçimler AKP Oy Oranları",
+       caption = "Veri: Vikipedi")
+
+```
+
+**Değişkenler ile Oy Oranları Arasındaki İlişki**
+
+```{r}
+
+e1 <- read_html("https://tr.wikipedia.org/wiki/2007_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[7]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2007-07-01"))
+
+e2 <- read_html("https://tr.wikipedia.org/wiki/2011_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[9]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2011-06-01"))
+
+e3 <- read_html("https://tr.wikipedia.org/wiki/Haziran_2015_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[23]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2015-06-01"))
+
+e4 <- read_html("https://tr.wikipedia.org/wiki/Kas%C4%B1m_2015_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[19]] %>% 
+  select(1,5) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         il = gsub("\\(toplam)","",il),
+         donem = as.Date("2015-11-01")) %>% 
+  filter(!grepl("\\(I)|\\(II)|\\(III)",il))
+    
+e5 <- read_html("https://tr.wikipedia.org/wiki/2018_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[21]] %>% 
+  select(1,5) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp)) %>% 
+  mutate(akp = gsub(",",".",akp),
+         il = gsub("\\(toplam)","",il),
+         donem = as.Date("2018-06-01")) %>% 
+  filter(!grepl("\\(I)|\\(II)|\\(III)",il))
+
+e <- rbind(e1,e2,e3,e4,e5) %>% 
+  mutate(il = str_trim(il),
+         akp = as.numeric(akp),
+         il = gsub(" Toplamı| toplamı","",il))
+
+master <- e %>% 
+  left_join(tge[,c(1,2)], by = "donem") %>% 
+  left_join(enf[,c(1,2)], by = "donem") %>% 
+  arrange(donem)
+
+```
+
+**Tüketici Güven Endeksi ve Türkiye Geneli Oy Oranları Korelasyonu**
+
+Türkiye genelinde, Tüketici Güven Endeksi'nin artışı oy oranlarına pozitif; düşüşü ise negatif yansımıştır. Aradaki korelasyon: `r master %>% filter(il == "Türkiye") %>% summarise(cor(akp,tge)*100) %>% as.numeric() %>% round(., digits = 1)`%
+
+```{r}
+
+master %>% 
+  filter(il == "Türkiye") %>% 
+  ggplot(aes(x = tge, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(donem,"\n",akp,"%")), vjust = -0.7, size = 2) +
+  geom_text(aes(label = round(tge, digits = 1)), vjust = 2.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Tüketici Güven Endeksi",
+       y = "Oy Oranı")
+
+```
+
+**Enflasyon ve Türkiye Geneli Oy Oranları Korelasyonu**
+
+Türkiye genelinde, Enflasyon artışı oy oranlarına negatif; düşüşü ise pozitif yansımıştır ifadesini aslında tam olarak söyleyemiyoruz. 2018 yılına ait enflasyon oranı bir uç değer olmuştur ve eğimi aşağıya çekmektedir. Aradaki korelasyon: `r master %>% filter(il == "Türkiye") %>% summarise(cor(akp,enf)*100) %>% as.numeric() %>% round(., digits = 1)`%
+
+```{r}
+
+master %>% 
+  filter(il == "Türkiye") %>% 
+  ggplot(aes(x = enf, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(donem,"\n",akp,"%")), vjust = -0.7, size = 2) +
+  geom_text(aes(label = round(enf, digits = 1)), vjust = 2.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Enflasyon",
+       y = "Oy Oranı")
+
+```
+
+Yukarıdaki inceleme geneli yansıtmaktaydı. İller bazında ilişkiler ve korelasyon katsayıları değişkenlik gösterebilir ki konumuz da bununla ilgilidir.
+
+**Tüketici Güven Endeksi ve İllere Ait Oy Oranları Korelasyonu**
+
+```{r}
+
+tge_corr_il <- master %>% 
+  group_by(il) %>% 
+  summarise(corr = cor(akp,tge)) %>% 
+  arrange(corr) %>% 
+  mutate(tip = "TGE",
+         grup = ifelse(corr > 0, "pozitif", "negatif"))
+
+```
+
+Tüketici Güven Endeksi'ne en hassas ilin Erzurum olduğunu söyleyebiliriz. Bu ili sırasıyla Eskişehir ve Bingöl takip ediyor. Zayıf da olsa negatif korelasyon gösteren 3 il ise Rize, Kırklareli ve Edirne. 81 ilin 58'i 50%'den fazla pozitif korelasyonu olan yerlerdir.
+
+```{r fig.height=15, fig.width=10}
+
+ggplot(tge_corr_il, aes(x = reorder(il, corr), y = corr, fill = grup)) +
+  geom_col() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_fill_manual(values = c("red","orange")) +
+  scale_y_continuous(sec.axis = sec_axis(trans=~.*1)) +
+  coord_flip()
+
+```
+
+*90% üstü pozitif korelasyona sahip iller*
+
+```{r}
+
+corr90_tge <- tge_corr_il %>% 
+  arrange(desc(corr)) %>% 
+  filter(corr > 0.9 & il != "Türkiye") %>% 
+  pull(il)
+
+master %>% 
+  filter(il %in% corr90_tge) %>% 
+  ggplot(aes(x = tge, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(x = "Tüketici Güven Endeksi",
+       y = "Oy Oranı") +
+  facet_wrap(~il, scales = "free")
+
+```
+
+**Enflasyon ve İllere Ait Oy Oranları Korelasyonu**
+
+```{r}
+
+enf_corr_il <- master %>% 
+  group_by(il) %>% 
+  summarise(corr = cor(akp,enf)) %>% 
+  arrange(corr) %>% 
+  mutate(tip = "ENF",
+         grup = ifelse(corr > 0, "pozitif", "negatif"))
+
+```
+
+Enflasyona en hassas ilin Yozgat olduğunu söyleyebiliriz. Bu ili sırasıyla Erzincan ve Kırıkkale takip ediyor. Ne zayıf ne güçlü diyebileceğimiz pozitif korelasyon gösteren en yüksek 3 il ise Sinop, Tunceli ve Kırklareli'dir. 81 ilin 19'u 50%'den fazla negatif korelasyonu olan yerlerdir.
+
+```{r fig.height=15, fig.width=10}
+
+ggplot(enf_corr_il, aes(x = reorder(il, corr), y = corr, fill = grup)) +
+  geom_col() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_fill_manual(values = c("red","orange")) +
+  scale_y_continuous(sec.axis = sec_axis(trans=~.*1)) +
+  coord_flip()
+
+```
+
+*60% üstü negatif korelasyona sahip iller*
+
+```{r}
+
+corr60_enf <- enf_corr_il %>% 
+  arrange(desc(corr)) %>% 
+  filter(corr < -0.6 & il != "Türkiye") %>% 
+  pull(il)
+
+master %>% 
+  filter(il %in% corr60_enf) %>% 
+  ggplot(aes(x = enf, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(x = "Enflasyon",
+       y = "Oy Oranı") +
+  facet_wrap(~il, scales = "free")
+
+```
+
+**Tüketici Güven Endeksi ve Enflasyon Oranı Değişkenlerinin Oy Oranlarıyla Olan Korelasyonu**
+
+```{r}
+
+corr_il <- rbind(tge_corr_il,enf_corr_il) %>% 
+  select(-grup) %>% 
+  pivot_wider(names_from = "tip", values_from = "corr")
+
+tr_enf <- corr_il %>% 
+  filter(il == "Türkiye") %>% 
+  pull(ENF)
+
+tr_tge <- corr_il %>% 
+  filter(il == "Türkiye") %>% 
+  pull(TGE)
+
+```
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+ggplot(corr_il, aes(x = TGE, y = ENF)) +
+  geom_point(alpha = .1) +
+  geom_vline(xintercept = tr_tge, linetype = "dashed") +
+  geom_hline(yintercept = tr_enf, linetype = "dashed") +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  ggrepel::geom_text_repel(data = corr_il %>% filter(il != "Türkiye"),
+                           aes(label = il), size = 5) +
+  ggrepel::geom_label_repel(data = corr_il %>% filter(il == "Türkiye"),
+                            aes(label = il), fill = "red",
+                            size = 5, alpha = .5, color = "white") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic"),
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15)) +
+  labs(title = "İllere Göre Enflasyon ile Tüketici Güven Endeksinin 
+       AKP Oy Oranıyla Korelasyonu",
+       caption = "Türkiye Genel Seçimleri 
+       (2007,2011,2015-I,2015-II,2018) oy oranlarıdır.\n
+       Veriler seçimden önceki aya aittir.",
+       x = "Tüketici Güven Endeksi Korelasyonu",
+       y = "Enflasyon Korelasyonu")
+
+```
+
+Yukarıdaki grafiği, *dikey eksenden (enflasyon) aşağıya doğru gittikçe ve yatay eksenden (tüketici güven endeksi) sağa doğru gittikçe bu değişkenlere olan hassasiyet artmaktadır* şeklinde okuyabiliriz.
+
+Çalışmanın R kodlarına aşağıdan ulaşılabilir.
+
+```{r echo=TRUE, eval=FALSE}
+
+options(scipen = 999)
+
+library(tidyverse)
+library(rvest) # web kazıma
+
+tge1 <- readxl::read_excel("tge1.xls") %>% 
+  select(1,2) %>% 
+  slice(5:100) %>% 
+  rename("donem"=1,"tge"=2) %>% 
+  mutate(donem = seq(as.Date("2004-01-01"),as.Date("2011-12-01"), "months"),
+         tge = as.numeric(tge))
+
+tge2 <- readxl::read_excel("tge2.xls") %>% 
+  select(1,4) %>% 
+  slice(5:129) %>% 
+  rename("donem"=1,"tge"=2) %>% 
+  mutate(donem = seq(as.Date("2012-01-01"),as.Date("2022-05-01"), "months"),
+         tge = as.numeric(tge))
+
+tge <- rbind(tge1,tge2) %>% 
+  mutate(tgeLag = lag(tge))
+
+ggplot(tge, aes(x = donem, y = tge)) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "red") +
+  geom_hline(yintercept = 100) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "Tüketici Güven Endeksi",
+       subtitle = "Ocak/2004 - Mayıs/2022",
+       caption = "Veri: TÜİK")
+
+enf <- readxl::read_excel("enflasyon.xls") %>% 
+  slice(80:98) %>% 
+  `colnames<-`(c("yil",paste0("C",seq(1,18,1)))) %>% 
+  pivot_longer(!yil, names_to = "ay", values_to = "enf") %>% 
+  na.omit() %>% 
+  mutate(donem = seq(as.Date("2004-01-01"),as.Date("2022-04-01"), "months"),
+         enf = as.numeric(enf),
+         enfLag = lag(enf)) %>% 
+  select(donem,enf,enfLag)
+
+ggplot(enf, aes(x = donem, y = log(enf))) +
+  geom_line() +
+  geom_smooth(method = "loess", color = "red") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "Enflasyon (Bir Önceki Yılın Aynı Ayına Göre)",
+       subtitle = "Ocak/2004 - Nisan/2022",
+       caption = "Veriler logaritmiktir.\n Veri: TÜİK")
+
+akp <- data.frame(
+  t = seq(1,5,1),
+  tarih = c(
+    as.Date("2007-07-22"),
+    as.Date("2011-06-12"),
+    as.Date("2015-06-07"),
+    as.Date("2015-11-01"),
+    as.Date("2018-06-24")
+  ),
+  oran = c(46.58,49.83,40.87,49.50,42.56)
+)
+
+ggplot(akp, aes(x = t, y = oran)) +
+  geom_line() +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(tarih,"\n",oran,"%")), vjust = -0.5, size = 2) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption = element_text(face = "italic")) +
+  scale_y_continuous(limits = c(0,100)) +
+  labs(title = "Genel Seçimler AKP Oy Oranları",
+       caption = "Veri: Vikipedi")
+
+e1 <- read_html("https://tr.wikipedia.org/wiki/2007_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[7]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2007-07-01"))
+
+e2 <- read_html("https://tr.wikipedia.org/wiki/2011_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[9]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2011-06-01"))
+
+e3 <- read_html("https://tr.wikipedia.org/wiki/Haziran_2015_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[23]] %>% 
+  select(1,4) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         donem = as.Date("2015-06-01"))
+
+e4 <- read_html("https://tr.wikipedia.org/wiki/Kas%C4%B1m_2015_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[19]] %>% 
+  select(1,5) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp),
+         il = gsub("\\(toplam)","",il),
+         donem = as.Date("2015-11-01")) %>% 
+  filter(!grepl("\\(I)|\\(II)|\\(III)",il))
+    
+e5 <- read_html("https://tr.wikipedia.org/wiki/2018_T%C3%BCrkiye_genel_se%C3%A7imleri") %>% 
+  html_table() %>% 
+  .[[21]] %>% 
+  select(1,5) %>% 
+  rename("il"=1,"akp"=2) %>% 
+  mutate(akp = gsub(",",".",akp)) %>% 
+  mutate(akp = gsub(",",".",akp),
+         il = gsub("\\(toplam)","",il),
+         donem = as.Date("2018-06-01")) %>% 
+  filter(!grepl("\\(I)|\\(II)|\\(III)",il))
+
+e <- rbind(e1,e2,e3,e4,e5) %>% 
+  mutate(il = str_trim(il),
+         akp = as.numeric(akp),
+         il = gsub(" Toplamı| toplamı","",il))
+
+master <- e %>% 
+  left_join(tge[,c(1,2)], by = "donem") %>% 
+  left_join(enf[,c(1,2)], by = "donem") %>% 
+  arrange(donem)
+
+master %>% 
+  filter(il == "Türkiye") %>% 
+  ggplot(aes(x = tge, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(donem,"\n",akp,"%")), vjust = -0.7, size = 2) +
+  geom_text(aes(label = round(tge, digits = 1)), vjust = 2.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Tüketici Güven Endeksi",
+       y = "Oy Oranı")
+
+master %>% 
+  filter(il == "Türkiye") %>% 
+  ggplot(aes(x = enf, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 5) +
+  geom_text(aes(label = paste0(donem,"\n",akp,"%")), vjust = -0.7, size = 2) +
+  geom_text(aes(label = round(enf, digits = 1)), vjust = 2.5, size = 2) +
+  theme_minimal() +
+  labs(x = "Enflasyon",
+       y = "Oy Oranı")
+
+tge_corr_il <- master %>% 
+  group_by(il) %>% 
+  summarise(corr = cor(akp,tge)) %>% 
+  arrange(corr) %>% 
+  mutate(tip = "TGE",
+         grup = ifelse(corr > 0, "pozitif", "negatif"))
+
+ggplot(tge_corr_il, aes(x = reorder(il, corr), y = corr, fill = grup)) +
+  geom_col() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_fill_manual(values = c("red","orange")) +
+  scale_y_continuous(sec.axis = sec_axis(trans=~.*1)) +
+  coord_flip()
+
+corr90_tge <- tge_corr_il %>% 
+  arrange(desc(corr)) %>% 
+  filter(corr > 0.9 & il != "Türkiye") %>% 
+  pull(il)
+
+master %>% 
+  filter(il %in% corr90_tge) %>% 
+  ggplot(aes(x = tge, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(x = "Tüketici Güven Endeksi",
+       y = "Oy Oranı") +
+  facet_wrap(~il, scales = "free")
+
+enf_corr_il <- master %>% 
+  group_by(il) %>% 
+  summarise(corr = cor(akp,enf)) %>% 
+  arrange(corr) %>% 
+  mutate(tip = "ENF",
+         grup = ifelse(corr > 0, "pozitif", "negatif"))
+
+ggplot(enf_corr_il, aes(x = reorder(il, corr), y = corr, fill = grup)) +
+  geom_col() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_text(size = 10),
+        axis.text.x = element_text(size = 10),
+        legend.position = "none") +
+  scale_fill_manual(values = c("red","orange")) +
+  scale_y_continuous(sec.axis = sec_axis(trans=~.*1)) +
+  coord_flip()
+
+corr60_enf <- enf_corr_il %>% 
+  arrange(desc(corr)) %>% 
+  filter(corr < -0.6 & il != "Türkiye") %>% 
+  pull(il)
+
+master %>% 
+  filter(il %in% corr60_enf) %>% 
+  ggplot(aes(x = enf, y = akp)) +
+  geom_smooth(method = "lm") +
+  geom_point(size = 2) +
+  theme_minimal() +
+  labs(x = "Enflasyon",
+       y = "Oy Oranı") +
+  facet_wrap(~il, scales = "free")
+
+corr_il <- rbind(tge_corr_il,enf_corr_il) %>% 
+  select(-grup) %>% 
+  pivot_wider(names_from = "tip", values_from = "corr")
+
+tr_enf <- corr_il %>% 
+  filter(il == "Türkiye") %>% 
+  pull(ENF)
+
+tr_tge <- corr_il %>% 
+  filter(il == "Türkiye") %>% 
+  pull(TGE)
+
+ggplot(corr_il, aes(x = TGE, y = ENF)) +
+  geom_point(alpha = .1) +
+  geom_vline(xintercept = tr_tge, linetype = "dashed") +
+  geom_hline(yintercept = tr_enf, linetype = "dashed") +
+  geom_vline(xintercept = 0) +
+  geom_hline(yintercept = 0) +
+  ggrepel::geom_text_repel(data = corr_il %>% filter(il != "Türkiye"),
+                           aes(label = il), size = 5) +
+  ggrepel::geom_label_repel(data = corr_il %>% filter(il == "Türkiye"),
+                            aes(label = il), fill = "red",
+                            size = 5, alpha = .5, color = "white") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic"),
+        axis.text = element_text(size = 15),
+        axis.title = element_text(size = 15)) +
+  labs(title = "İllere Göre Enflasyon ile Tüketici Güven Endeksinin 
+       AKP Oy Oranıyla Korelasyonu",
+       caption = "Türkiye Genel Seçimleri 
+       (2007,2011,2015-I,2015-II,2018) oy oranlarıdır.\n
+       Veriler seçimden önceki aya aittir.",
+       x = "Tüketici Güven Endeksi Korelasyonu",
+       y = "Enflasyon Korelasyonu")
+
+```
+
+*Yararlandığım Kaynaklar:*
+
+[*Economic voting*](https://en.wikipedia.org/wiki/Economic_voting#:~:text=In%20political%20science%2C%20economic%20voting,the%20time%20of%20the%20election.)
