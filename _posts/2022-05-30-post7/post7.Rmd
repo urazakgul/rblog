@@ -332,6 +332,7 @@ ggplot(kur_ceyreklik, aes(x = tarih, y = kur)) +
         plot.subtitle = element_text(face = "italic", size = 7),
         plot.caption = element_text(face = "italic", size = 7),
         axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
   labs(title = "Kur, Çeyreklik*",
        subtitle = "2015/Q1-2022/Q2**",
        caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
@@ -673,6 +674,7 @@ ggplot(kur_ceyreklik, aes(x = tarih, y = kur)) +
         plot.subtitle = element_text(face = "italic", size = 7),
         plot.caption = element_text(face = "italic", size = 7),
         axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
   labs(title = "Kur, Çeyreklik*",
        subtitle = "2015/Q1-2022/Q2**",
        caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
