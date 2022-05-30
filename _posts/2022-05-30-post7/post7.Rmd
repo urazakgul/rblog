@@ -1,0 +1,761 @@
+---
+title: "Cumhurbaşkanlığı Hükümet Sistemi Yapısal Kırılmaya Yol Açtı mı?"
+description: |
+  Ekonomik ve finansal değişkenlerin yapısal kırılma analizi.
+author:
+  - name: A. Uraz Akgül
+date: 2022-05-30
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Economics
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+options(scipen = 999)
+```
+
+Cumhurbaşkanlığı hükümet sistemi, 16 Nisan 2017 referandumu ile kabul edildi ve 9 Temmuz 2018 tarihinden itibaren de uygulanmaya başlandı. 24 Haziran 2018'de de genel seçimler ile birlikte Cumhurbaşkanlığı seçimi yapıldı ve sistemin ilk lideri Erdoğan oldu.
+
+Bu yazıda inceleyeceğimiz konu, Cumhurbaşkanlığı Hükümet Sistemi'nin ekonomik ve finansal değişkenlerde yapısal kırılmaya yol açıp açmadığıdır.
+
+Yapısal kırılma analizi için enflasyon, kur ve faiz verilerini seçtim. TCMB/EVDS'den aldığım verilere *(post7.xlsx)* [GitHub hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz.
+
+Frekansları aylık ve çeyreklik bazda alıp yapısal kırılmayı bu şekilde inceleyeceğiz. Veri aralığı ise 2015-2022 yılları arasını kapsayacak.
+
+Aylık olan frekansları çeyreklik olarak da incelemek isteme sebebim, bir olayın etkisi hemen o ay değil; içinde bulunduğu çeyrek içinde başladıysa kaçırmamaktır. 2015-2022 yıllarını seçme sebebim ise 2018 yılının öncesi ve sonrasına zamanı yaklaşık olarak eşit dağıtmaktır.
+
+Çalışmada, serilerde birden fazla yapısal kırılma olduğu zaman kullanılabilen ve bu kırılmaları endojen (içsel) olarak kabul eden Bai-Perron yöntemi kullanılmıştır. Bai-Perron (1998,2003), en küçük kareler yöntemi ile tahmin edilen regresyon modelinde bilinmeyen kırılma zamanlarını belirlemek amacıyla çoklu kırılmaların tespitine yönelik test geliştirmişlerdir.
+
+Bilinmeyen tarihlerdeki m adet kırılma (m+1 rejim) için oluşturulan çoklu regresyon modeli şöyledir:
+
+$y_t = x_t'\beta + z_t'\delta_1 + \epsilon_t; t = 1,...,T_1$
+
+$y_t = x_t'\beta + z_t'\delta_2 + \epsilon_t; t = T_1 + 1,...,T_2$
+
+.
+.
+.
+
+$y_t = x_t'\beta + z_t'\delta_j + \epsilon_t; t = T_{j-1} + 1,...T_j; j = 1,...,m$
+
+Son yazdığımız denklemde;
+
+$x_t'$ ve $z_t'$ sırasıyla px1 ve qx1 boyutlu bağımsız değişkenler vektörü,
+
+$\beta$ ve $\delta_j$ katsayılar vektörü,
+
+$\epsilon_t$ saf hata terimi,
+
+$T_0 = 0$ ve $T_{m+1} = T$ olmak üzere, $T_1,T_2,...,T_m$ bilinmeyen kırılma noktalarıdır.
+
+Bai-Perron testinin temel amacı, T sayıda gözlem, $y_t$, $x_t'$ ve $z_t'$'nin değerlerinin bilindiği varsayımı altında, bilinmeyen regresyon parametreleri ($\beta,\delta_1,...,\delta_m$) ve kırılma tarihlerinin ($T_1,T_2,...,T_m$) birlikte tahmin edilmesidir.
+
+```{r}
+
+library(strucchange) # yapısal kırılma
+library(tidyverse)
+library(lubridate)
+library(stargazer)
+
+df_aylik <- readxl::read_excel("data.xlsx") %>% 
+  mutate(tarih = as.Date(paste0(tarih,"-",1))) %>% 
+  na.omit() %>% 
+  filter(tarih >= as.Date("2015-01-01"))
+
+# enflasyon
+
+enf_aylik <- df_aylik %>% 
+  select(tarih,enflasyon) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+enf_ceyreklik <- enf_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(enflasyon = mean(enflasyon)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+# faiz
+
+faiz_aylik <- df_aylik %>% 
+  select(tarih,faiz) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+faiz_ceyreklik <- faiz_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(faiz = mean(faiz)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+# kur
+
+kur_aylik <- df_aylik %>% 
+  select(tarih,kur) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+kur_ceyreklik <- kur_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(kur = mean(kur)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+```
+
+***Enflasyon***
+
+```{r}
+
+enf_aylik_ts <- ts(data = enf_aylik$enflasyon,
+                   start = c(2015,1),
+                   frequency = 12)
+
+enf_aylik_bps <- breakpoints(enf_aylik_ts~1)
+
+enf_aylik <- enf_aylik %>% 
+  mutate(bp = ifelse(t %in% enf_aylik_bps$breakpoints, t, NA))
+
+ggplot(enf_aylik, aes(x = tarih, y = enflasyon)) +
+  geom_line() +
+  geom_vline(data = enf_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Enflasyon, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(enf_aylik_bps), type = "text")
+
+```
+
+Aylık frekansta 2 tane kırılmanın olduğunu görüyoruz. İlk kırılma 2018 yılının Mayıs ayına denk geliyor. Haziran ve Temmuz 2018'in sırasıyla seçimin yapıldığı ve sistemin uygulanmaya başlandığı aylar olduğunu biliyoruz. Sistem içerisinde bir kırılma da Mart 2021'de yaşanmış. Bu, piyasalara verdiği güven ile bilinen TCMB eski başkanı Naci Ağbal'ın görevden alındığı dönemdir. Yazının ilerleyen bölümlerinde faizi de inceleyeceğiz. Şimdi o faizi alıp enflasyon ile bir araya getirip bir bakalım. Çünkü, *faiz sebep enflasyon sonuçtur* ısrarının bedelini ödemeye devam ettiğimizin resmi olacak.
+
+```{r}
+
+enf_faiz_aylik <- merge(enf_aylik[,c(1,2)], faiz_aylik[,c(1,2)]) %>% 
+  mutate(t = seq(1,nrow(.),1)) %>% 
+  pivot_longer(!c(t,tarih), names_to = "vars", values_to = "vals")
+
+enf_faiz_tarih <- enf_faiz_aylik %>% 
+  filter(t == enf_aylik_bps$breakpoints[2]) %>% 
+  pull(tarih)
+
+ggplot(enf_faiz_aylik, aes(x = tarih, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  geom_vline(xintercept = enf_faiz_tarih, linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        legend.title = element_blank()) +
+  scale_color_manual(values = c("red","blue")) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Aylık")
+
+```
+
+```{r}
+
+enf_ceyreklik_ts <- ts(data = enf_ceyreklik$enflasyon,
+                       start = c(2015,1),
+                       frequency = 4)
+
+enf_ceyreklik_bps <- breakpoints(enf_ceyreklik_ts~1)
+
+enf_ceyreklik <- enf_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% enf_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(enf_ceyreklik, aes(x = tarih, y = enflasyon)) +
+  geom_line() +
+  geom_vline(data = enf_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Enflasyon, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(enf_ceyreklik_bps), type = "text")
+
+```
+
+Çeyreklik frekansta sadece 1 kırılma verdi o da 2021 yılının 2. çeyreğine ait.
+
+Üzerinde durduğumuz enflasyon-faiz serilerindeki kırılmayı çeyreklik olarak biraz daha fazla görebiliriz.
+
+```{r}
+
+enf_faiz_ceyreklik <- merge(enf_ceyreklik[,c(1,2)], faiz_ceyreklik[,c(1,2)]) %>% 
+  mutate(t = seq(1,nrow(.),1)) %>% 
+  pivot_longer(!c(t,tarih), names_to = "vars", values_to = "vals")
+
+enf_faiz_tarih2 <- enf_faiz_ceyreklik %>% 
+  filter(t == enf_ceyreklik_bps$breakpoints[1]) %>% 
+  pull(tarih)
+
+ggplot(enf_faiz_ceyreklik, aes(x = tarih, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  geom_vline(xintercept = enf_faiz_tarih2, linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        legend.title = element_blank()) +
+  scale_color_manual(values = c("red","blue")) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Çeyreklik")
+
+```
+
+***Faiz***
+
+```{r}
+
+faiz_aylik_ts <- ts(data = faiz_aylik$faiz,
+                    start = c(2015,1),
+                    frequency = 12)
+
+faiz_aylik_bps <- breakpoints(faiz_aylik_ts~1)
+
+faiz_aylik <- faiz_aylik %>% 
+  mutate(bp = ifelse(t %in% faiz_aylik_bps$breakpoints, t, NA))
+
+ggplot(faiz_aylik, aes(x = tarih, y = faiz)) +
+  geom_line() +
+  geom_vline(data = faiz_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Faiz, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(faiz_aylik_bps), type = "text")
+
+```
+
+Aylık frekansta 4 tane kırılmanın olduğunu görüyoruz. Sistemle beraber ilk kırılma 2018 yılının Haziran ayında yaşanmış ve bu kırılmadan sonra 2 kırılma daha yaşanmış. Erdoğan'ın 24 Haziran öncesi söylediği, *24'ünde siz bu kardeşinize yetkiyi verin, ondan sonra bu faizle, şunla bunla nasıl uğraşılır göreceksiniz* sözünün tabloya yansımış halini görüyoruz adeta.
+
+```{r}
+
+faiz_ceyreklik_ts <- ts(data = faiz_ceyreklik$faiz,
+                        start = c(2015,1),
+                        frequency = 4)
+
+faiz_ceyreklik_bps <- breakpoints(faiz_ceyreklik_ts~1)
+
+faiz_ceyreklik <- faiz_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% faiz_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(faiz_ceyreklik, aes(x = tarih, y = faiz)) +
+  geom_line() +
+  geom_vline(data = faiz_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Faiz, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(faiz_ceyreklik_bps), type = "text")
+
+```
+
+Çeyreklik frekansta sistem ile beraber 3 kırılma görüyoruz. İlki seçimin de içinde bulunduğu 2. çeyrek.
+
+***Kur***
+
+```{r}
+
+kur_aylik_ts <- ts(data = kur_aylik$kur,
+                   start = c(2015,1),
+                   frequency = 12)
+
+kur_aylik_bps <- breakpoints(kur_aylik_ts~1)
+
+kur_aylik <- kur_aylik %>% 
+  mutate(bp = ifelse(t %in% kur_aylik_bps$breakpoints, t, NA))
+
+ggplot(kur_aylik, aes(x = tarih, y = kur)) +
+  geom_line() +
+  geom_vline(data = kur_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Kur, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(kur_aylik_bps), type = "text")
+
+```
+
+Aylık frekansta 3 tane kırılmanın olduğunu görüyoruz. Sistemden önce kırılma 2018 yılının Nisan ayında yaşanmış ve bu kırılmadan sonra sistem içerisinde 2 kırılma daha yaşanmış. Kırılmalardan biri yine daha önce bahsettiğim eski başkan Ağbal'ın görevden alındığı tarihte yaşanmış.
+
+```{r}
+
+kur_ceyreklik_ts <- ts(data = kur_ceyreklik$kur,
+                       start = c(2015,1),
+                       frequency = 4)
+
+kur_ceyreklik_bps <- breakpoints(kur_ceyreklik_ts~1)
+
+kur_ceyreklik <- kur_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% kur_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(kur_ceyreklik, aes(x = tarih, y = kur)) +
+  geom_line() +
+  geom_vline(data = kur_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  labs(title = "Kur, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(kur_ceyreklik_bps), type = "text")
+
+```
+
+Çeyreklik frekansta sistemin de içinde bulunduğu 2018 yılının 2. çeyreğindeki kırılma ile beraber toplamda 3 kırılma yaşanmış.
+
+***Son olarak enflasyon, faiz ve kur değişkenlerini endeks haline getirelim. Soru: 2011 yılı itibarıyla kaç kırılma yaşandı?***
+
+Serileri önce aşağıdaki gibi normalize edeceğiz.
+
+$X_{nor} = \frac{X - X_{min}}{X_{max} - X_{min}}$
+
+Ardından da değişken sayısına bölerek bir endeks oluşturacağız.
+
+$Endeks = \frac{Nor(Enflasyon)+Nor(Faiz)+Nor(Kur)}{3}$
+
+Faiz için Ağırlıklı Ortalama Fonlama Maliyeti'ni kullandığımız ve bu veri de 2011 yılı itibarıyla ulaşılabilir olduğu için 2011/Ocak - 2022/Nisan verilerini kullanacağız.
+
+```{r}
+
+df_aylik2 <- readxl::read_excel("data.xlsx") %>% 
+  mutate(tarih = as.Date(paste0(tarih,"-",1))) %>% 
+  na.omit()
+
+normalize <- function(x){
+  
+  return((x - min(x)) / (max(x) - min(x)))
+  
+}
+
+```
+
+```{r preview=TRUE}
+
+df_endeks <- df_aylik2 %>% 
+  mutate_at(vars(-tarih), function(x) normalize(x)) %>% 
+  mutate(endeks = rowSums(.[,-1])/ncol(.[,-1]),
+         t = seq(1,nrow(.),1))
+
+endeks_aylik_ts <- ts(data = df_endeks$endeks,
+                      start = c(2011,1),
+                      frequency = 12)
+
+endeks_aylik_bps <- breakpoints(endeks_aylik_ts~1)
+
+df_endeks <- df_endeks %>% 
+  mutate(bp = ifelse(t %in% endeks_aylik_bps$breakpoints, t, NA))
+
+ggplot(df_endeks, aes(x = tarih, y = endeks)) +
+  geom_line() +
+  geom_vline(data = df_endeks %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic"),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "2011 Yılı İtibarıyla Yapısal Kırılmalar",
+       subtitle = "2011/Ocak-2022/Nisan",
+       caption = "*Normalize edilen (Enflasyon+Faiz+Kur)/3")
+
+stargazer(coef(endeks_aylik_bps), type = "text")
+
+```
+
+2011 yılı itbarıyla aylık (ve çeyreklik) frekansta 3 kırılmanın yaşandığını görüyoruz. Bunların ilki sistem öncesi, biri sisteme çok yakın ve biri sistem sonrası. Sistem ile beraber oluşturulan endeksin yukarı doğru tırmanışı dikkat çekici. Her ne kadar sonrasında bir toparlanma sürecine girse de atılan yanlış adımların etkisi çok ciddi olmuş ki olmaya da devam ediyor.
+
+```{r}
+
+df_endeks2 <- df_endeks %>% 
+  select(1:5) %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(endeks = mean(endeks)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+endeks_ceyreklik_ts <- ts(data = df_endeks2$endeks,
+                          start = c(2011,1),
+                          frequency = 4)
+
+endeks_ceyreklik_bps <- breakpoints(endeks_ceyreklik_ts~1)
+
+df_endeks2 <- df_endeks2 %>% 
+  mutate(bp = ifelse(t %in% endeks_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(df_endeks2, aes(x = tarih, y = endeks)) +
+  geom_line() +
+  geom_vline(data = df_endeks2 %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic"),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "2011 Yılı İtibarıyla Yapısal Kırılmalar",
+       subtitle = "2011/Q1-2022/Q2*",
+       caption = "*Normalize edilen (Enflasyon+Faiz+Kur)/3\nHenüz tamamlanmamıştır.")
+
+stargazer(coef(endeks_ceyreklik_bps), type = "text")
+
+```
+
+Çalışmanın R kodlarına aşağıdan ulaşılabilir.
+
+```{r echo=TRUE, eval=FALSE}
+
+options(scipen = 999)
+
+library(strucchange) # yapısal kırılma
+library(tidyverse)
+library(lubridate)
+library(stargazer)
+
+df_aylik <- readxl::read_excel("data.xlsx") %>% 
+  mutate(tarih = as.Date(paste0(tarih,"-",1))) %>% 
+  na.omit() %>% 
+  filter(tarih >= as.Date("2015-01-01"))
+
+# enflasyon
+
+enf_aylik <- df_aylik %>% 
+  select(tarih,enflasyon) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+enf_ceyreklik <- enf_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(enflasyon = mean(enflasyon)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+# faiz
+
+faiz_aylik <- df_aylik %>% 
+  select(tarih,faiz) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+faiz_ceyreklik <- faiz_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(faiz = mean(faiz)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+# kur
+
+kur_aylik <- df_aylik %>% 
+  select(tarih,kur) %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+kur_ceyreklik <- kur_aylik %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(kur = mean(kur)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+enf_aylik_ts <- ts(data = enf_aylik$enflasyon,
+                   start = c(2015,1),
+                   frequency = 12)
+
+enf_aylik_bps <- breakpoints(enf_aylik_ts~1)
+
+enf_aylik <- enf_aylik %>% 
+  mutate(bp = ifelse(t %in% enf_aylik_bps$breakpoints, t, NA))
+
+ggplot(enf_aylik, aes(x = tarih, y = enflasyon)) +
+  geom_line() +
+  geom_vline(data = enf_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Enflasyon, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(enf_aylik_bps), type = "text")
+
+enf_faiz_aylik <- merge(enf_aylik[,c(1,2)], faiz_aylik[,c(1,2)]) %>% 
+  mutate(t = seq(1,nrow(.),1)) %>% 
+  pivot_longer(!c(t,tarih), names_to = "vars", values_to = "vals")
+
+enf_faiz_tarih <- enf_faiz_aylik %>% 
+  filter(t == enf_aylik_bps$breakpoints[2]) %>% 
+  pull(tarih)
+
+ggplot(enf_faiz_aylik, aes(x = tarih, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  geom_vline(xintercept = enf_faiz_tarih, linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        legend.title = element_blank()) +
+  scale_color_manual(values = c("red","blue")) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Aylık")
+
+enf_ceyreklik_ts <- ts(data = enf_ceyreklik$enflasyon,
+                       start = c(2015,1),
+                       frequency = 4)
+
+enf_ceyreklik_bps <- breakpoints(enf_ceyreklik_ts~1)
+
+enf_ceyreklik <- enf_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% enf_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(enf_ceyreklik, aes(x = tarih, y = enflasyon)) +
+  geom_line() +
+  geom_vline(data = enf_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Enflasyon, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(enf_ceyreklik_bps), type = "text")
+
+enf_faiz_ceyreklik <- merge(enf_ceyreklik[,c(1,2)], faiz_ceyreklik[,c(1,2)]) %>% 
+  mutate(t = seq(1,nrow(.),1)) %>% 
+  pivot_longer(!c(t,tarih), names_to = "vars", values_to = "vals")
+
+enf_faiz_tarih2 <- enf_faiz_ceyreklik %>% 
+  filter(t == enf_ceyreklik_bps$breakpoints[1]) %>% 
+  pull(tarih)
+
+ggplot(enf_faiz_ceyreklik, aes(x = tarih, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  geom_vline(xintercept = enf_faiz_tarih2, linetype = "dashed") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        legend.position = "top",
+        legend.title = element_blank()) +
+  scale_color_manual(values = c("red","blue")) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Çeyreklik")
+
+faiz_aylik_ts <- ts(data = faiz_aylik$faiz,
+                    start = c(2015,1),
+                    frequency = 12)
+
+faiz_aylik_bps <- breakpoints(faiz_aylik_ts~1)
+
+faiz_aylik <- faiz_aylik %>% 
+  mutate(bp = ifelse(t %in% faiz_aylik_bps$breakpoints, t, NA))
+
+ggplot(faiz_aylik, aes(x = tarih, y = faiz)) +
+  geom_line() +
+  geom_vline(data = faiz_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Faiz, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(faiz_aylik_bps), type = "text")
+
+faiz_ceyreklik_ts <- ts(data = faiz_ceyreklik$faiz,
+                        start = c(2015,1),
+                        frequency = 4)
+
+faiz_ceyreklik_bps <- breakpoints(faiz_ceyreklik_ts~1)
+
+faiz_ceyreklik <- faiz_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% faiz_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(faiz_ceyreklik, aes(x = tarih, y = faiz)) +
+  geom_line() +
+  geom_vline(data = faiz_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Faiz, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(faiz_ceyreklik_bps), type = "text")
+
+kur_aylik_ts <- ts(data = kur_aylik$kur,
+                   start = c(2015,1),
+                   frequency = 12)
+
+kur_aylik_bps <- breakpoints(kur_aylik_ts~1)
+
+kur_aylik <- kur_aylik %>% 
+  mutate(bp = ifelse(t %in% kur_aylik_bps$breakpoints, t, NA))
+
+ggplot(kur_aylik, aes(x = tarih, y = kur)) +
+  geom_line() +
+  geom_vline(data = kur_aylik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "Kur, Aylık",
+       subtitle = "2015/Ocak-2022/Nisan")
+
+stargazer(coef(kur_aylik_bps), type = "text")
+
+kur_ceyreklik_ts <- ts(data = kur_ceyreklik$kur,
+                       start = c(2015,1),
+                       frequency = 4)
+
+kur_ceyreklik_bps <- breakpoints(kur_ceyreklik_ts~1)
+
+kur_ceyreklik <- kur_ceyreklik %>% 
+  mutate(bp = ifelse(t %in% kur_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(kur_ceyreklik, aes(x = tarih, y = kur)) +
+  geom_line() +
+  geom_vline(data = kur_ceyreklik %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic", size = 7),
+        axis.title = element_blank()) +
+  labs(title = "Kur, Çeyreklik*",
+       subtitle = "2015/Q1-2022/Q2**",
+       caption = "*Üçer aylık ortalamalardır.\n**Henüz tamamlanmamıştır.")
+
+stargazer(coef(kur_ceyreklik_bps), type = "text")
+
+df_aylik2 <- readxl::read_excel("data.xlsx") %>% 
+  mutate(tarih = as.Date(paste0(tarih,"-",1))) %>% 
+  na.omit()
+
+normalize <- function(x){
+  
+  return((x - min(x)) / (max(x) - min(x)))
+  
+}
+
+df_endeks <- df_aylik2 %>% 
+  mutate_at(vars(-tarih), function(x) normalize(x)) %>% 
+  mutate(endeks = rowSums(.[,-1])/ncol(.[,-1]),
+         t = seq(1,nrow(.),1))
+
+endeks_aylik_ts <- ts(data = df_endeks$endeks,
+                      start = c(2011,1),
+                      frequency = 12)
+
+endeks_aylik_bps <- breakpoints(endeks_aylik_ts~1)
+
+df_endeks <- df_endeks %>% 
+  mutate(bp = ifelse(t %in% endeks_aylik_bps$breakpoints, t, NA))
+
+ggplot(df_endeks, aes(x = tarih, y = endeks)) +
+  geom_line() +
+  geom_vline(data = df_endeks %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic"),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "2011 Yılı İtibarıyla Yapısal Kırılmalar",
+       subtitle = "2011/Ocak-2022/Nisan",
+       caption = "*Normalize edilen (Enflasyon+Faiz+Kur)/3")
+
+stargazer(coef(endeks_aylik_bps), type = "text")
+
+df_endeks2 <- df_endeks %>% 
+  select(1:5) %>% 
+  mutate(tarih = as.Date(paste0(year(tarih),"-",quarter(tarih),"-",1))) %>% 
+  group_by(tarih) %>% 
+  summarise(endeks = mean(endeks)) %>% 
+  ungroup() %>% 
+  mutate(t = seq(1,nrow(.),1))
+
+endeks_ceyreklik_ts <- ts(data = df_endeks2$endeks,
+                          start = c(2011,1),
+                          frequency = 4)
+
+endeks_ceyreklik_bps <- breakpoints(endeks_ceyreklik_ts~1)
+
+df_endeks2 <- df_endeks2 %>% 
+  mutate(bp = ifelse(t %in% endeks_ceyreklik_bps$breakpoints, t, NA))
+
+ggplot(df_endeks2, aes(x = tarih, y = endeks)) +
+  geom_line() +
+  geom_vline(data = df_endeks2 %>% na.omit(),
+             aes(xintercept = tarih), linetype = "dashed") +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", size = 10),
+        plot.subtitle = element_text(face = "italic", size = 7),
+        plot.caption = element_text(face = "italic"),
+        axis.title = element_blank()) +
+  scale_x_date(date_breaks = "year", date_labels = "%Y") +
+  labs(title = "2011 Yılı İtibarıyla Yapısal Kırılmalar",
+       subtitle = "2011/Q1-2022/Q2*",
+       caption = "*Normalize edilen (Enflasyon+Faiz+Kur)/3\nHenüz tamamlanmamıştır.")
+
+stargazer(coef(endeks_ceyreklik_bps), type = "text")
+
+```
+
+*Yararlandığım Kaynaklar:*
+
+*Finansal Ekonometri; N.Ç.Yavuz*
+
+[*Cumhurbaşkanlığı Hükûmet Sistemi*](https://tr.wikipedia.org/wiki/Cumhurba%C5%9Fkanl%C4%B1%C4%9F%C4%B1_H%C3%BCk%C3%BBmet_Sistemi)

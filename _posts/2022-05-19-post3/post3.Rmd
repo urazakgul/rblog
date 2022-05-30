@@ -1,5 +1,5 @@
 ---
-title: "Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli İle Analizi"
+title: "Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi"
 description: |
   Enflasyonun uzun dönemde yükselmesi olasılığı 70%'tir.
 author:
