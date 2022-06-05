@@ -1,0 +1,440 @@
+---
+title: "Bir Sürecin Otomatize Edilmesi: Temel Gıda Fiyatlarının Takibi"
+description: |
+  Fiyat algısının kaybolduğu bir ortamda temel gıda fiyatlarının takibini otomatikleştirmek.
+author:
+  - name: A. Uraz Akgül
+date: 2022-06-05
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Automation
+preview: img1.png
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(scipen = 999)
+```
+
+Mayıs 2022 verilerine göre Türkiye'de enflasyon TÜİK'e göre 73.5%; ENAG'a göre ise 160.76% oldu. [*Trading Economics*](https://tradingeconomics.com/country-list/inflation-rate-) verilerine göre dünyada 6., Avrupa'da 1. sıradayız.
+
+R'da bir süreci otomatize etmeyi eğlenceli bir konu ile anlatmak isterdim ancak içinde bulunduğumuz ortam maalesef buna izin vermiyor.
+
+Bu uygulamada, Cimri'den temel gıda kategorisini baz alarak aşağıdaki işlemleri yapacağız.
+
+i. Web kazıma ile istenen kategoride verilerin çekilmesi (web kazıma ile ilgili temel bilginizin olduğunu varsayacağım).
+
+ii. Çekilen verilerin veri tabanına kaydedilmesi.
+
+iii. Güncel veriler ile bir önceki zamana ait verilerin karşılaştırılması ve karşılaştırmanın kaydedilmesi.
+
+iv. Tüm bu sürecin otomatik olarak yapılması için görev zamanlayıcının ayarlanması ve script'in belli bir frekansta çalıştırılması.
+
+*Cimri.com, farklı çevrimiçi alışveriş sitelerinde yer alan ürünleri listeleyen ve aralarında karşılaştırmalar yapan İstanbul, Türkiye merkezli web sitesidir. -Vikipedi*
+
+```{r}
+
+library(rvest) # web kazıma
+library(DBI); library(RSQLite) # sqlite
+library(taskscheduleR) # görev zamanlayıcı
+library(openxlsx) # excel olarak kaydetmek için
+library(tidyverse)
+library(lubridate)
+library(kableExtra) # zorunlu değil
+
+```
+
+**Web kazıma ile istenen kategoride verilerin çekilmesi**
+
+Aşağıdaki link'i kullanarak verileri çekeceğiz.
+
+```{r}
+
+url <- "https://www.cimri.com/market/temel-gida"
+
+```
+
+Temel gıda kategorisi 50 sayfadan oluşuyor. Eğer link'in yanına *?page=1* yazarsak bu ilk sayfa olduğu anlamına gelecek. Yani;
+
+```{r}
+
+url <- "https://www.cimri.com/market/temel-gida?page=1"
+
+```
+
+İlk sayfada yer alan ürünleri ve fiyatları çekelim.
+
+```{r}
+
+# ürün
+item <- read_html(url) %>% 
+  html_nodes("div.ProductCard_productName__35zi5") %>% 
+  html_text()
+
+# fiyat
+price <- read_html(url) %>% 
+  html_nodes("div.ProductCard_footer__Fc9OL span.ProductCard_price__10UHp") %>% 
+  html_text()
+
+df <- data.frame(
+  Item = item,
+  Price = price
+)
+
+```
+
+İlk sayfada yer alan 32 ürünün ilk 10'u aşağıdadır.
+
+```{r echo=FALSE}
+
+df %>% 
+  head(., 10) %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+İlk sayfayı çektiğimize göre artık diğer sayfaları da bir döngü ile çekebiliriz (total sayfa sayısı: 50). Son sayfa sayısını belirlemeyi dinamik hale getirebiliriz.
+
+```{r}
+
+# son sayfa
+lastPage <- read_html(url) %>% 
+  html_nodes("div.Pagination_pagination__6kvLO li") %>% 
+  html_text()
+
+lastPage <- as.numeric(tail(lastPage[lastPage != ""], 1))
+
+urls <- str_c(
+  "https://www.cimri.com/market/temel-gida?page=",
+  seq(1,lastPage,1)
+) # tüm linkler
+
+```
+
+Döngüye geçebiliriz.
+
+```{r}
+
+######### global #########
+
+master <- data.frame()
+time <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+
+##########################
+
+for(i in 1:2){ # 1:2 yazdım ancak siz 1:lastPage yazabilirsiniz
+  
+  thepage <- read_html(urls[i]) # sayfa okundu
+  
+  # ürün
+  item <- thepage %>% 
+    html_nodes("div.ProductCard_productName__35zi5") %>% 
+    html_text()
+  
+  # fiyat
+  price <- thepage %>% 
+    html_nodes("div.ProductCard_footer__Fc9OL span.ProductCard_price__10UHp") %>% 
+    html_text()
+  
+  # ürün ve fiyatın birleştirilmesi
+  tbl <- data.frame(
+    Item = item,
+    Price = price
+  )
+  
+  # birleştirilen tablonun globalde yaratılan master ile birleştirilmesi
+  master <- master %>% 
+    bind_rows(tbl)
+  
+  # sürekli istek göndermemek için sistem bir süre (ör: 3 saniye) uyutulabilir
+  Sys.sleep(time = 3)
+  
+  if(i == 2){ # 2 yerine lastPage yazabilirsiniz
+    
+    # eğer i değişkeni son sayfaya eşitse ki döngü bitecek;
+    # globalde yaratılan time değişkeni master veri çerçevesine eklenecek.
+    # time değişkeni zamanın sabit olması için globalde yaratıldı.
+    
+    master$Time <- time
+    
+  }
+  
+}
+
+```
+
+Varsayımsal olarak 50; şimdilik 2 sayfanın tamamını çektik. Son 10 ürüne ve fiyatına bakalım.
+
+```{r echo=FALSE}
+
+master %>% 
+  tail(., 10) %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+**Çekilen verilerin veri tabanına kaydedilmesi**
+
+Çektiğimiz verileri veri tabanına kaydetme vakti. Bunun için SQLite'ı kullanacağız. Bu uygulama için tercih etme nedenim, herhangi bir yazılım/sunucu kurulumuna ihtiyacımız olmayacak. Bunun yanında sade ve basit bir yapısı vardır.
+
+SQLite için *DBI* ve *RSQLite* paketini; veri tabanını (geçici değil; sürekli) yaratmak için aşağıdaki komutu kullanacağız. Dosya yolu neredeyse oraya kaydedecektir.
+
+```{r}
+
+# dosya yolu
+# getwd()
+
+myDB <- dbConnect(SQLite(), "marketDB.sqlite") # Dosya yolunu adres göstermenizi tavsiye ederim.
+# Ör: "C:/.../marketDB.sqlite"
+
+```
+
+Verileri veri tabanına kaydedelim. Bu işlemi belli bir frekansta ya da uygulamamızda olduğu gibi saat başı yapacağımız zaman yeni gelen verilerin veri tabanındaki tablonun üzerine yazmaması önemli olacak. Bunun için *append* parametresi *TRUE* olarak belirlendi.
+
+```{r}
+
+dbWriteTable(myDB, "master", master, append = TRUE)
+
+```
+
+Veri tabanına kaydettiğimiz verileri SQL sorgusu ile çekelim.
+
+```{r}
+
+mastertbl <- dbGetQuery(myDB, "SELECT * FROM master")
+
+```
+
+```{r echo=FALSE}
+
+mastertbl %>% 
+  head(., 10) %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+İşlemler bittikten sonra aşağıdaki kod ile veri tabanından çıkılabilir. Başta yazılan kod (aşağıdaki yorum satırı) ile tekrar bağlanacaktır.
+
+```{r}
+
+dbDisconnect(myDB)
+# myDB <- dbConnect(SQLite(), "marketDB.sqlite")
+
+```
+
+**Güncel veriler ile bir önceki zamana ait verilerin karşılaştırılması ve karşılaştırmanın kaydedilmesi**
+
+Veri tabanından alınan tablonun *time* sütunu character formatında olacağı için aşağıdaki gibi zaman formatına dönüştürülmelidir.
+
+```{r}
+
+mastertbl$Time <- as.POSIXct(mastertbl$Time)
+
+```
+
+Bizim bu tabloda iki zamana ihtiyacımız olacak: En güncel zaman ve bir önceki.
+
+```{r}
+
+# En güncel zaman
+maxTime <- mastertbl[ymd_hms(mastertbl$Time)==max(ymd_hms(mastertbl$Time)),]
+# Bir önceki zaman
+maxTime2 <- mastertbl[ymd_hms(mastertbl$Time)!=max(ymd_hms(mastertbl$Time)),]
+maxTime2 <- maxTime2[ymd_hms(maxTime2$Time)==max(ymd_hms(maxTime2$Time)),]
+
+```
+
+İstediğimiz verileri alıp birleştirdikten sonra bazı düzenlemeler yapacağız. Ama öncesinde şunu not düşmekte fayda var: Bu süreci ilk defa başlattığımız zaman elimizde bir tane zaman olacak. Yani, herhangi bir karşılaştırma olmayacak. Hata almamak ve süreci devam ettirebilmek için bazı koşullara ihtiyaç olacaktır.
+
+Aşağıdaki kodu çalıştırmadan önce *maxTime2* değişkeninin sıfırdan büyük olup olmadığına bakmamız gerekir. Bakmaz isek hata alırız.
+
+```{r}
+
+if(nrow(maxTime2) > 0){
+  
+  comparetbl <- maxTime %>% 
+  bind_rows(maxTime2) %>% 
+  group_by(Time) %>% 
+  mutate(ID = cur_group_id(),
+         ID  = if_else(ID == 1, "Before", "After")) %>% 
+  pivot_wider(!Time, names_from = "ID", values_from = "Price") %>% 
+  mutate(
+    # Virgülün nokta yapılması ve TL'nin kaldırılması; numeric'e dönüştürülmesi
+    After = as.numeric(gsub("\\,",".",gsub(" TL","",After))),
+    Before = as.numeric(gsub("\\,",".",gsub(" TL","",Before))),
+    # Öncesi ve sonrası arasındaki fiyat farkı
+    Diff = After - Before
+  ) %>% 
+  filter(Diff != 0) # farkı sıfır olmayanlar filtrelendi
+  
+}
+
+```
+
+Eğer son filtreden sonra veri çerçevesi 0'dan büyük ise bir excel dosyası ile kaydedeceğiz. Öncesinde ise bir koşul koymak gerekiyor. Eğer *comparetbl* tablosu var ise sıfırdan büyük olup olmadığı koşuluna geçmelidir.
+
+```{r}
+
+if(exists("comparetbl")){
+  
+  if(nrow(comparetbl) > 0){
+    
+    write.xlsx(comparetbl, "PriceTracker.xlsx")
+    
+  }
+  
+}
+
+```
+
+**Görev zamanlayıcının ayarlanması ve script'in belli bir frekansta çalıştırılması**
+
+Görev zamanlayıcı PC'den ayarlanabileceği gibi *taskscheduleR* paketi ile de yapılabilir.
+
+```{r eval=FALSE}
+
+taskscheduler_create(
+  
+  taskname = "OrnekScript", # görev adı
+  rscript = "OrnekScript.R", # çalıştırılacak olan script;
+  # dosya yolu belirtilmeli ("C:/.../OrnekScript.R")
+  schedule = "HOURLY", # saatlik
+  starttime = "18:00", # manuel belirlenen saat ile başlayacak; Ör: 18:00
+  modifier = 1 # 1 saat ara ile
+  
+)
+
+```
+
+Ayarlar kod ile yapılabileceği gibi Addins ile de yapılabilir. R Studio'da *Addins*'e tıkladıktan sonra *Schedule R Scripts on Windows*'a tıklanır. Açılan ekran ile ayarlar daha kolay bir şekilde yapılabilir.
+
+Görev zamanlayıcı çalıştıktan sonra *taskname*'e verdiğiniz isim ile birlikte bir log dosyası atabilir. Burada olası uyarı ve hataları görebilirsiniz.
+
+Sürecin otomatize edilmesi bitti. Ürünlere ait fiyatlar veri tabanında kayıtlı ve 1 adet de karşılaştırma dosyası bulunmaktadır. Buna bir de görsel ekleyebilirsiniz. Bu kısmı size bırakıyorum :)
+
+**BONUS**
+
+İş hayatında Outlook kullanıldığı ve bu tip süreçleri birçok konuda entegre ettiğim için Outlook ile nasıl mail atılır bunu göstermek istiyorum.
+
+```{r eval=FALSE}
+
+library(RDCOMClient) # outlook mail
+library(xtable) # html ile tablo oluşturmak için
+
+if(nrow(comparetbl) > 0){
+  
+  x <- head(comparetbl)
+  y <- print(xtable(x), type="html", print.results=FALSE)
+  body <- paste0("<html>", y, "</html>")
+  
+  OutApp <- COMCreate("Outlook.Application")
+  outMail = OutApp$CreateItem(0)
+  outMail[["To"]] = "mailingidecegiadres@sirket.com"
+  outMail[["subject"]] = paste0(nrow(comparetbl)," Adet Ürünün Fiyatında Değişiklik Var!")
+  outMail[["Attachments"]]$Add(paste0("PriceTracker.xlsx"))
+  outMail[["HTMLbody"]] = body
+  outMail$Send()
+}
+
+```
+
+[*GitHub hesabımdan*](https://github.com/rpydaneogrendim/rblog/tree/main/_posts/2022-06-05-post9) örnek bir script'e ulaşabilirsiniz.
+
+OrnekScript.R:
+
+```{r eval=FALSE}
+
+library(rvest)
+library(DBI); library(RSQLite)
+library(openxlsx)
+library(tidyverse)
+library(lubridate)
+
+url <- "https://www.cimri.com/market/temel-gida?page=1"
+
+lastPage <- read_html(url) %>% 
+  html_nodes("div.Pagination_pagination__6kvLO li") %>% 
+  html_text()
+lastPage <- as.numeric(tail(lastPage[lastPage != ""], 1))
+
+urls <- str_c(
+  "https://www.cimri.com/market/temel-gida?page=",
+  seq(1,lastPage,1)
+)
+
+master <- data.frame()
+time <- format(Sys.time(), "%Y-%m-%d %H:%M:%S")
+
+for(i in 1:2){
+  
+  thepage <- read_html(urls[i])
+  
+  item <- thepage %>% 
+    html_nodes("div.ProductCard_productName__35zi5") %>% 
+    html_text()
+  
+  price <- thepage %>% 
+    html_nodes("div.ProductCard_footer__Fc9OL span.ProductCard_price__10UHp") %>% 
+    html_text()
+  
+  tbl <- data.frame(
+    Item = item,
+    Price = price
+  )
+  
+  master <- master %>% 
+    bind_rows(tbl)
+  
+  Sys.sleep(time = 3)
+  
+  if(i == 2){
+    
+    master$Time <- time
+    
+  }
+  
+}
+
+myDB <- dbConnect(SQLite(), "marketDB.sqlite")
+dbWriteTable(myDB, "master", master, append = TRUE)
+mastertbl <- dbGetQuery(myDB, "SELECT * FROM master")
+dbDisconnect(myDB)
+
+mastertbl$Time <- as.POSIXct(mastertbl$Time)
+maxTime <- mastertbl[ymd_hms(mastertbl$Time)==max(ymd_hms(mastertbl$Time)),]
+maxTime2 <- mastertbl[ymd_hms(mastertbl$Time)!=max(ymd_hms(mastertbl$Time)),]
+maxTime2 <- maxTime2[ymd_hms(maxTime2$Time)==max(ymd_hms(maxTime2$Time)),]
+
+if(nrow(maxTime2) > 0){
+  
+  comparetbl <- maxTime %>% 
+    bind_rows(maxTime2) %>% 
+    group_by(Time) %>% 
+    mutate(ID = cur_group_id(),
+           ID  = if_else(ID == 1, "Before", "After")) %>% 
+    pivot_wider(!Time, names_from = "ID", values_from = "Price") %>% 
+    mutate(
+      After = as.numeric(gsub("\\,",".",gsub(" TL","",After))),
+      Before = as.numeric(gsub("\\,",".",gsub(" TL","",Before))),
+      Diff = After - Before
+    ) %>% 
+    filter(Diff != 0)
+  
+}
+
+if(exists("comparetbl")){
+  
+  if(nrow(comparetbl) > 0){
+    
+    write.xlsx(comparetbl, "PriceTracker.xlsx")
+    
+  }
+  
+}
+
+```
