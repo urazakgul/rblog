@@ -627,7 +627,7 @@ ggplot(ret_vol, aes(x = Return, y = EqualWeighted)) +
 
 *Finansal Ekonometri; N.Ç.Yavuz*
 
-*Türev Piyasalar ve Yapılandırılmamış Ürünler; M.B.Akçay, M.Kasap, T.Doğuç, G.Kasap*
+*Türev Piyasalar ve Yapılandırılmış Ürünler; M.B.Akçay, M.Kasap, T.Doğuç, G.Kasap*
 
 [*Volatility: Exponentially weighted moving average, EWMA (FRM T2-22)*](https://www.youtube.com/watch?v=ffDLG7Vt6JE)
 
