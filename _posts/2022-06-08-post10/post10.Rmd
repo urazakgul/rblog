@@ -1,0 +1,634 @@
+---
+title: "TCMB Başkanlarının Kendi Döneminde Döviz Kuru Volatilitesi ve Değişimi"
+description: |
+  TCMB başkanlarının kurdaki volatilite ve değişim bazlı performansı.
+author:
+  - name: A. Uraz Akgül
+date: 2022-06-08
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Çalışma boyunca kurdaki değişim, eşit ağırlıklandırılmış volatilite ve özellikle açıklayacağım eşit ağırlıklandırılmamış volatiliteden (EWMA) bahsedeceğim.
+
+Exponential Weighted Moving Average kelimelerinin kısaltmasından oluşan ve Üssel Hareketli Ortalamalar olarak çevrilen EWMA, geçmiş volatilitenin ortalama hareketiyle gelecekteki volatiliteyi hesaplamak için zaman ve volatiliteyi ilişkilendiren en popüler volatilite modellerinden birisidir. EWMA'da, geçmiş gözlemler üssel olarak ağırlıklandırılmak ile beraber yakın geçmişteki gözlemlere daha çok; uzak geçmişteki gözlemlere ise daha az ağırlık verilir. EWMA, varlık getirilerinin simetrik ve bağımsız olarak dağıldığı prensibi üzerine kurulmuştur.
+
+EWMA modeli şöyle yazılabilir:
+
+$\sigma^2_n = \lambda\sigma^2_{n-1} + (1 - \lambda)u^2_{n-1}$
+
+$\lambda$, 0 ile 1 arasında değer alır ($0 < \lambda < 1$). $\lambda$ değeri 1'e yaklaştıkça her gözleme eşit ağırlık verilmesi yönündeki eğilim artar. $\lambda = 1$ hareketli ortalama (Moving Average, MA) ile aynıdır. Diğer bir açıdan, yüksek $\lambda$ güncel piyasa hareketlerine daha zayıf tepki demektir. Literatürde, günlük verilerde $\lambda = 0.94$, aylık verilerde $\lambda = 0.97$ önerilmiştir. Tabi bu değerler değişebilmektedir.
+
+$\lambda$ dışında modelde;
+
+$\sigma^2_n:$ Bugünün varyansı,
+
+$\sigma^2_{n-1}:$ Dünün varyansı,
+
+$u^2_{n-1}:$ Dünün getirisinin karesidir.
+
+Yukarıda gördüğümüz EWMA modelinde iki bileşen vardır. $(1-\lambda)u^2_{n-1}$ bileşeni, volatilitenin finansal piyasalarda meydana gelen fiyat hareketlerine karşı hassasiyetini gösterirken; $\lambda\sigma^2_{n-1}$ bileşeni ise piyasa hareketlerinden bağımsız olarak önceki dönemdeki volatilitenin cari dönem volatilitesi üzerindeki etkisini göstermektedir. Bu bileşen aynı zamanda volatilite direncidir. Buradan hareketle $\lambda$ parametresi için şunu diyebiliriz: Parametre 1'e yakın değer alırsa volatilite direnci piyasa hareketlerine baskın gelmekte; 0'a yakın değer alırsa piyasa hareketleri belirleyici olmaktadır.
+
+Uygulamada, TCMB başkanları dönemine ait USDTRY kur volatilitesini EWMA ile hesaplayacağız ki bu volatilite bir başkanın diğerine devrettiği volatilite olacak. Bunun yanında kendi döneminde yarattığı volatilite ile kurdaki değişimi de hesaplayacağız.
+
+[Vikipedi'den](https://tr.wikipedia.org/wiki/T%C3%BCrkiye_Cumhuriyet_Merkez_Bankas%C4%B1_ba%C5%9Fkanlar%C4%B1_listesi) aldığım başkanlar ve görev tarihlerine ait bilgiler aşağıdadır. Serdengeçti ile Yılmaz arasındaki boşlukta atama ile ilgili bir veto yaşanmıştır.
+
+```{r}
+
+library(rvest)
+library(tidyverse)
+library(lubridate)
+library(kableExtra)
+
+url <- "https://tr.wikipedia.org/wiki/T%C3%BCrkiye_Cumhuriyet_Merkez_Bankas%C4%B1_ba%C5%9Fkanlar%C4%B1_listesi"
+
+cbrt_governor <- read_html(url) %>% 
+  html_table() %>% 
+  .[[2]] %>% 
+  slice(-nrow(.)) %>% 
+  rename("No"=1,"Governor"=2,"Start"=3,"End"=4) %>% 
+  mutate(No = as.numeric(No),
+         Start = dmy(Start),
+         End = dmy(End)) %>% 
+  filter(No >= 19)
+
+cbrt_governor %>% 
+  kbl() %>% 
+  kable_styling()
+
+```
+
+7 başkan döneminde USDTRY kur değerleri ve getirileri ($u_t = log(\frac{P_t}{P_{t-1}})$) aşağıdaki gibidir. Investing'ten alınan verilere (*post10.xlsx*) [GitHub hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz.
+
+```{r}
+
+usdtry <- readxl::read_excel("data.xlsx") %>% 
+  mutate(
+    Date = as.Date(Date),
+    Governor = case_when(
+      Date <= cbrt_governor$End[1] ~ "Süreyya Serdengeçti",
+      Date >= cbrt_governor$Start[2] & Date <= cbrt_governor$End[2] ~ "Durmuş Yılmaz",
+      Date >= cbrt_governor$Start[3] & Date <= cbrt_governor$End[3] ~ "Erdem Başçı",
+      Date >= cbrt_governor$Start[4] & Date <= cbrt_governor$End[4] ~ "Murat Çetinkaya",
+      Date >= cbrt_governor$Start[5] & Date <= cbrt_governor$End[5] ~ "Murat Uysal",
+      Date >= cbrt_governor$Start[6] & Date <= cbrt_governor$End[6] ~ "Naci Ağbal",
+      Date >= cbrt_governor$Start[7] ~ "Şahap Kavcıoğlu"
+    ),
+    LClose = log(Close),
+    Return = lag(log(lead(Close)/Close))
+  ) %>% 
+  na.omit()
+
+ggplot(usdtry, aes(x = Date, y = LClose)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "USDTRY",
+       subtitle = "14.03.2001-07.06.2022",
+       caption = "Verilerin logaritması alınmıştır.") +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[1],
+           xmax = cbrt_governor$End[1],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[2],
+           xmax = cbrt_governor$End[2],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[3],
+           xmax = cbrt_governor$End[3],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[4],
+           xmax = cbrt_governor$End[4],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[5],
+           xmax = cbrt_governor$End[5],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[6],
+           xmax = cbrt_governor$End[6],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[7],
+           xmax = as.Date("2022-06-07"),
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3)
+
+ggplot(usdtry, aes(x = Date, y = Return)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "USDTRY",
+       subtitle = "14.03.2001-07.06.2022",
+       caption = "Logaritmik getiridir.") +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[1],
+           xmax = cbrt_governor$End[1],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[2],
+           xmax = cbrt_governor$End[2],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[3],
+           xmax = cbrt_governor$End[3],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[4],
+           xmax = cbrt_governor$End[4],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[5],
+           xmax = cbrt_governor$End[5],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[6],
+           xmax = cbrt_governor$End[6],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[7],
+           xmax = as.Date("2022-06-07"),
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3)
+
+```
+
+EWMA hesaplaması için aşağıdaki adımlar izleniyor.
+
+i. En güncel tarihten en eski tarihe göre sıralama yapılır. Örneğin, 07.06.2022, 06.06.2022, 03.06.2022, ... gibi.
+
+ii. Getiriler hesaplanır. Örneğin, $log(\frac{16.7383}{16.6135}) = 0.007483889$ getiri 07.06.2022'ye aittir.
+
+iii. Getirilerin karesi alınır. Örneğin, $0.007483889^2 = 5.600859e-05$ gibi.
+
+iv. $\lambda$ parametresi belirlenir. Ağırlıklandırmada ilk ağırlık $1 - \lambda$ şeklinde yazılır ve sonrakiler hesaplanan ağırlık ile $\lambda$'nın çarpımı şeklinde ilerletilir. Yani;
+
+$(1-\lambda)\lambda^0, (1-\lambda)\lambda^1, (1-\lambda)\lambda^2, ...$ gibi. $w_0$ başlangıçtaki ağırlık; m gün sayısı olsun. Şöyle özetleyebiliriz:
+
+$w_0\sum_{i=0}^{\infty}\lambda^m$
+
+Örneğin, $\lambda = 0.94$ olsun. İlk ağırlık $(1-0.94)0.94^0 = 0.06$ olur. İkinci ağırlık, $0.94*0.06 = 0.0564$ ya da $(1-0.94)0.94^1 = 0.0564$ olur ve bu şekilde ilerletilir.
+
+v. Getiri karesi ile ağırlık çarpılır. Örneğin, $5.600859e-05*0.06 = 3.360515e-06$ gibi. Bu şekilde elde edilen tüm değerler toplanır ve EWMA varyans değerine ulaşılır.
+
+vi. Önceki adımda elde edilen EWMA varyansın kare kökü (standart sapma) volatilite değeridir.
+
+vii. Eşit ağırlıklandırılmamış EWMA'dan bağımsız olarak, eşit ağırlıklandırılmış şekilde tarihsel volatilite için getirilerin karesinin ortalamasının (varyans) karekökü (standart sapma) alınır. Nedeni ise şudur:
+
+m tane gün; n de varyansını hesaplamak istediğimiz gün olsun.
+
+Varyans;
+
+$\sigma^2_n = \frac{1}{m-1}\sum_{i=1}^{m}(u_{n-i}-\bar u)^2$
+
+Standart sapma (volatilite), $\sqrt{\sigma^2_n}$ ya da $\sigma_n$ olur.
+
+Yukarıda yazdığımız $\bar u$, m günün ortalama getirisidir. Aşağıdaki gibi yazılabilir.
+
+$\bar u = \frac{1}{m}\sum_{i=1}^{m}u_{n-i}$
+
+Biz ortalama getiriyi sıfır bekliyoruz: $\bar u = 0$. Bu durumda varyans aşağıdaki gibi olur.
+
+$\sigma^2_n = \frac{1}{m}\sum_{i=1}^{m}u_{n-i}^2$
+
+Aynı şekilde, standart sapma (volatilite), $\sqrt{\sigma^2_n}$ ya da $\sigma_n$ olur.
+
+Çalışmada, $\lambda$ değeri 0.94 alınmıştır.
+
+```{r}
+
+curr <- usdtry %>% 
+  select(Date,Governor,Return) %>% 
+  arrange(desc(Date))
+
+lambda <- 0.94
+
+```
+
+Başta da belirttiğim üzere iki tane volatilite hesaplayacağız. Başkanın devrettiği volatilitede son görev günlerinin daha çok ağırlığı olacak. Dönemi boyunca elde ettiği volatilite de görev başlangıç ve bitiş tarihleri arasındaki volatilite olacak. Mantığını şuna dayandırdım: EWMA yakın döneme ağırlık verdiği için bu, görevin bitiş tarihine doğru ağırlıklandırmanın artması demektir. Eşit ağırlıklandırılmışta ise görevi boyunca elde ettiği volatilite elde edilecek.
+
+```{r}
+
+cbrt_governor_vol <- data.frame(
+  "Governor" = cbrt_governor$Governor,
+  "UnequalWeighted" = NA,
+  "EqualWeighted" = NA
+)
+
+for(i in 1:nrow(cbrt_governor_vol)){
+  
+  filteredgov <- curr %>% 
+    filter(Governor == cbrt_governor$Governor[i]) %>% 
+    slice(-1) %>% 
+    mutate(
+      Return2 = Return^2,
+      t = seq(1,nrow(.),1),
+      Weight = (1 - lambda) * lambda^(t-1),
+      Return2Weight = Return2 * Weight
+  ) %>% 
+    arrange(Date)
+  
+  unequal_vol <- sqrt(sum(filteredgov$Return2Weight)) * 100
+  equal_vol <- sqrt(mean(filteredgov$Return2))
+  
+  cbrt_governor_vol$UnequalWeighted[i] <- unequal_vol
+  cbrt_governor_vol$EqualWeighted[i] <- equal_vol
+  
+}
+
+```
+
+```{r}
+
+ggplot(cbrt_governor_vol, aes(x = UnequalWeighted, y = EqualWeighted)) +
+  geom_point(size = 5, alpha = .2) +
+  geom_text(aes(label = Governor), vjust = -0.2, hjust = 0.47, size = 4) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  labs(
+    title = "TCMB Başkanlarının Kendi Döneminde Döviz Kuru Volatilitesi",
+    x = "Devrettiği Volatilite (EWMA)",
+    y = "Görev Dönemindeki Volatilite (Standart Sapma)",
+    caption = "Kavcıoğlu'nun görevi devrettiği varsayılmıştır."
+  ) +
+  scale_x_continuous(limits = c(min(cbrt_governor_vol$UnequalWeighted-0.1),
+                                max(cbrt_governor_vol$UnequalWeighted+0.1)))
+
+```
+
+Görevini en yüksek volatilite ile devreden Naci Ağbal; en düşük volatilite ile devreden Erdem Başçı olmuştur.
+
+Görev süresi boyunca en yüksek volatilite Şahap Kavcıoğlu; en düşük volatilite Murat Uysal döneminde olmuştur.
+
+Her iki volatilitenin ortalamasını aldığımızda ise sıralama:
+
+```{r}
+
+cbrt_governor_vol <- cbrt_governor_vol %>% 
+  mutate(AvgVol = (UnequalWeighted + EqualWeighted)/2)
+
+ggplot(cbrt_governor_vol, aes(x = reorder(Governor, AvgVol), y = AvgVol, fill = AvgVol)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  scale_fill_gradient(low = "orange", high = "red") +
+  labs(title = "Ortalama Volatilite*",
+       caption = "*Devrettiği volatilite ile döneminde elde ettiği volatilite ortalamasıdır.")
+
+```
+
+Son olarak, başkanların döneminde elde ettiği volatilite ile kuru aldıkları ve getirdikleri yerin seviyesine (değişim) bakalım.
+
+```{r preview=TRUE}
+
+ret_vol <- usdtry %>% 
+  select(Date,Close,Governor) %>% 
+  group_by(Governor) %>% 
+  filter(Date == min(Date) | Date == max(Date)) %>% 
+  mutate(
+    Return = log(lead(Close)/Close)
+  ) %>% 
+  select(Governor,Return) %>% 
+  na.omit() %>% 
+  left_join(cbrt_governor_vol, by = "Governor")
+
+ggplot(ret_vol, aes(x = Return, y = EqualWeighted)) +
+  geom_point(size = 5, alpha = .2) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(aes(label = Governor), vjust = -0.2, hjust = 0.47, size = 4) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  labs(
+    title = "TCMB Başkanlarının Kendi Döneminde Kur Değişimi ve Volatilite",
+    x = "Kur Değişimi (Log Değişim)",
+    y = "Görev Dönemindeki Volatilite (Standart Sapma)",
+    caption = "Kavcıoğlu'nun görevi devrettiği varsayılmıştır."
+  ) +
+  scale_x_continuous(limits = c(min(ret_vol$Return-0.1),
+                                max(ret_vol$Return+0.1)))
+
+```
+
+Son 7 başkan arasında kuru aldığı seviyenin aşağısında bırakan tek isim Naci Ağbal olmuş. Kur en çok Şahap Kavcıoğlu döneminde artmış.
+
+Bu tip performans değerlendirmelerinde TCMB'nin bağımsızlığı önem kazanmaktadır diye düşünüyorum. Çünkü çalışma isim bazlı performansa bakıyor ve aslında bağımsızlığı kusursuz varsayıyor. Üzerinizde bir baskı varsa (elinizdeki araçları en iyi şekilde kullanıp kararları bu şekilde alma isteğinizin olduğu birisiniz) kendinizi gösteremezsiniz ki Erdem Başçı'dan sonra (Başçı'da da olmuştu) Merkez'in üzerindeki artan baskı ortadadır.
+
+Çalışmanın R kodlarına aşağıdan ulaşılabilir.
+
+```{r echo=TRUE, eval=FALSE}
+
+library(rvest)
+library(tidyverse)
+library(lubridate)
+
+url <- "https://tr.wikipedia.org/wiki/T%C3%BCrkiye_Cumhuriyet_Merkez_Bankas%C4%B1_ba%C5%9Fkanlar%C4%B1_listesi"
+
+cbrt_governor <- read_html(url) %>% 
+  html_table() %>% 
+  .[[2]] %>% 
+  slice(-nrow(.)) %>% 
+  rename("No"=1,"Governor"=2,"Start"=3,"End"=4) %>% 
+  mutate(No = as.numeric(No),
+         Start = dmy(Start),
+         End = dmy(End)) %>% 
+  filter(No >= 19)
+
+usdtry <- readxl::read_excel("data.xlsx") %>% 
+  mutate(
+    Date = as.Date(Date),
+    Governor = case_when(
+      Date <= cbrt_governor$End[1] ~ "Süreyya Serdengeçti",
+      Date >= cbrt_governor$Start[2] & Date <= cbrt_governor$End[2] ~ "Durmuş Yılmaz",
+      Date >= cbrt_governor$Start[3] & Date <= cbrt_governor$End[3] ~ "Erdem Başçı",
+      Date >= cbrt_governor$Start[4] & Date <= cbrt_governor$End[4] ~ "Murat Çetinkaya",
+      Date >= cbrt_governor$Start[5] & Date <= cbrt_governor$End[5] ~ "Murat Uysal",
+      Date >= cbrt_governor$Start[6] & Date <= cbrt_governor$End[6] ~ "Naci Ağbal",
+      Date >= cbrt_governor$Start[7] ~ "Şahap Kavcıoğlu"
+    ),
+    LClose = log(Close),
+    Return = lag(log(lead(Close)/Close))
+  ) %>% 
+  na.omit()
+
+ggplot(usdtry, aes(x = Date, y = LClose)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "USDTRY",
+       subtitle = "14.03.2001-07.06.2022",
+       caption = "Verilerin logaritması alınmıştır.") +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[1],
+           xmax = cbrt_governor$End[1],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[2],
+           xmax = cbrt_governor$End[2],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[3],
+           xmax = cbrt_governor$End[3],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[4],
+           xmax = cbrt_governor$End[4],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[5],
+           xmax = cbrt_governor$End[5],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[6],
+           xmax = cbrt_governor$End[6],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[7],
+           xmax = as.Date("2022-06-07"),
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3)
+
+ggplot(usdtry, aes(x = Date, y = Return)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.subtitle = element_text(face = "italic"),
+        plot.caption = element_text(face = "italic")) +
+  labs(title = "USDTRY",
+       subtitle = "14.03.2001-07.06.2022",
+       caption = "Logaritmik getiridir.") +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[1],
+           xmax = cbrt_governor$End[1],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[2],
+           xmax = cbrt_governor$End[2],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[3],
+           xmax = cbrt_governor$End[3],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[4],
+           xmax = cbrt_governor$End[4],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[5],
+           xmax = cbrt_governor$End[5],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[6],
+           xmax = cbrt_governor$End[6],
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "blue",
+           alpha = .3) +
+  annotate(geom = "rect",
+           xmin = cbrt_governor$Start[7],
+           xmax = as.Date("2022-06-07"),
+           ymin = -Inf,
+           ymax = Inf,
+           fill = "red",
+           alpha = .3)
+
+curr <- usdtry %>% 
+  select(Date,Governor,Return) %>% 
+  arrange(desc(Date))
+
+lambda <- 0.94
+
+cbrt_governor_vol <- data.frame(
+  "Governor" = cbrt_governor$Governor,
+  "UnequalWeighted" = NA,
+  "EqualWeighted" = NA
+)
+
+for(i in 1:nrow(cbrt_governor_vol)){
+  
+  filteredgov <- curr %>% 
+    filter(Governor == cbrt_governor$Governor[i]) %>% 
+    slice(-1) %>% 
+    mutate(
+      Return2 = Return^2,
+      t = seq(1,nrow(.),1),
+      Weight = (1 - lambda) * lambda^(t-1),
+      Return2Weight = Return2 * Weight
+  ) %>% 
+    arrange(Date)
+  
+  unequal_vol <- sqrt(sum(filteredgov$Return2Weight)) * 100
+  equal_vol <- sqrt(mean(filteredgov$Return2))
+  
+  cbrt_governor_vol$UnequalWeighted[i] <- unequal_vol
+  cbrt_governor_vol$EqualWeighted[i] <- equal_vol
+  
+}
+
+ggplot(cbrt_governor_vol, aes(x = UnequalWeighted, y = EqualWeighted)) +
+  geom_point(size = 5, alpha = .2) +
+  geom_text(aes(label = Governor), vjust = -0.2, hjust = 0.47, size = 4) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  labs(
+    title = "TCMB Başkanlarının Kendi Döneminde Döviz Kuru Volatilitesi",
+    x = "Devrettiği Volatilite (EWMA)",
+    y = "Görev Dönemindeki Volatilite (Standart Sapma)",
+    caption = "Kavcıoğlu'nun görevi devrettiği varsayılmıştır."
+  ) +
+  scale_x_continuous(limits = c(min(cbrt_governor_vol$UnequalWeighted-0.1),
+                                max(cbrt_governor_vol$UnequalWeighted+0.1)))
+
+cbrt_governor_vol <- cbrt_governor_vol %>% 
+  mutate(AvgVol = (UnequalWeighted + EqualWeighted)/2)
+
+ggplot(cbrt_governor_vol, aes(x = reorder(Governor, AvgVol), y = AvgVol, fill = AvgVol)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        plot.title = element_text(face = "bold"),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  scale_fill_gradient(low = "orange", high = "red") +
+  labs(title = "Ortalama Volatilite*",
+       caption = "*Devrettiği volatilite ile döneminde elde ettiği volatilite ortalamasıdır.")
+
+ret_vol <- usdtry %>% 
+  select(Date,Close,Governor) %>% 
+  group_by(Governor) %>% 
+  filter(Date == min(Date) | Date == max(Date)) %>% 
+  mutate(
+    Return = log(lead(Close)/Close)
+  ) %>% 
+  select(Governor,Return) %>% 
+  na.omit() %>% 
+  left_join(cbrt_governor_vol, by = "Governor")
+
+ggplot(ret_vol, aes(x = Return, y = EqualWeighted)) +
+  geom_point(size = 5, alpha = .2) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  geom_text(aes(label = Governor), vjust = -0.2, hjust = 0.47, size = 4) +
+  theme_minimal() +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5),
+        plot.caption = element_text(face = "italic", size = 7)) +
+  labs(
+    title = "TCMB Başkanlarının Kendi Döneminde Kur Değişimi ve Volatilite",
+    x = "Kur Değişimi (Log Değişim)",
+    y = "Görev Dönemindeki Volatilite (Standart Sapma)",
+    caption = "Kavcıoğlu'nun görevi devrettiği varsayılmıştır."
+  ) +
+  scale_x_continuous(limits = c(min(ret_vol$Return-0.1),
+                                max(ret_vol$Return+0.1)))
+
+```
+
+*Yararlandığım Kaynaklar:*
+
+*Finansal Ekonometri; N.Ç.Yavuz*
+
+*Türev Piyasalar ve Yapılandırılmamış Ürünler; M.B.Akçay, M.Kasap, T.Doğuç, G.Kasap*
+
+[*Volatility: Exponentially weighted moving average, EWMA (FRM T2-22)*](https://www.youtube.com/watch?v=ffDLG7Vt6JE)
+
+[*Measuring and Monitoring Volatility*](https://analystprep.com/study-notes/frm/part-1/valuation-and-risk-management/quantifying-volatility-in-var-models/)

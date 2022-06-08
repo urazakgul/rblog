@@ -552,6 +552,6 @@ autoplot(forecast(model, h = 8))
 
 *Yararlandığım Kaynaklar:*
 
-Ekonometrik Zaman Serileri Analizi; M.Sevüktekin, M.Çınar
+*Ekonometrik Zaman Serileri Analizi; M.Sevüktekin, M.Çınar*
 
 [*ZAMAN SERİLERİ ANALİZİNDE ARIMA MODELLERİ VE BİR UYGULAMA; Ö.Duru*](http://nek.istanbul.edu.tr:4444/ekos/TEZ/43349.pdf)
