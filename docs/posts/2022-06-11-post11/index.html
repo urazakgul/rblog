@@ -1,0 +1,2724 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ad0000; } /* Alert */
+code span.an { color: #5e5e5e; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #ad0000; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007ba5; } /* ControlFlow */
+code span.ch { color: #20794d; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #5e5e5e; } /* Comment */
+code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+code span.dt { color: #ad0000; } /* DataType */
+code span.dv { color: #ad0000; } /* DecVal */
+code span.er { color: #ad0000; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #ad0000; } /* Float */
+code span.fu { color: #4758ab; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #5e5e5e; } /* Information */
+code span.kw { color: #007ba5; } /* Keyword */
+code span.op { color: #5e5e5e; } /* Operator */
+code span.ot { color: #007ba5; } /* Other */
+code span.pp { color: #ad0000; } /* Preprocessor */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
+code span.ss { color: #20794d; } /* SpecialString */
+code span.st { color: #20794d; } /* String */
+code span.va { color: #111111; } /* Variable */
+code span.vs { color: #20794d; } /* VerbatimString */
+code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+</style>
+
+
+  <!--radix_placeholder_meta_tags-->
+<title>R blog: JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi</title>
+
+<meta property="description" itemprop="description" content="İBB Açık Veri Portalı&#39;ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması."/>
+
+
+<!--  https://schema.org/Article -->
+<meta property="article:published" itemprop="datePublished" content="2022-06-11"/>
+<meta property="article:created" itemprop="dateCreated" content="2022-06-11"/>
+<meta name="article:author" content="A. Uraz Akgül"/>
+
+<!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+<meta property="og:title" content="R blog: JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi"/>
+<meta property="og:type" content="article"/>
+<meta property="og:description" content="İBB Açık Veri Portalı&#39;ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması."/>
+<meta property="og:locale" content="en_US"/>
+<meta property="og:site_name" content="R blog"/>
+
+<!--  https://dev.twitter.com/cards/types/summary -->
+<meta property="twitter:card" content="summary"/>
+<meta property="twitter:title" content="R blog: JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi"/>
+<meta property="twitter:description" content="İBB Açık Veri Portalı&#39;ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması."/>
+
+<!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+
+<script type="text/json" id="radix-rmarkdown-metadata">
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","categories","preview"]}},"value":[{"type":"character","attributes":{},"value":["JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi"]},{"type":"character","attributes":{},"value":["İBB Açık Veri Portalı'ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["A. Uraz Akgül"]}]}]},{"type":"character","attributes":{},"value":["2022-06-11"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["Web","Map"]},{"type":"character","attributes":{},"value":["img4.png"]}]}
+</script>
+<!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["img1.PNG","img2.PNG","img3.PNG","img4.PNG","post11_files/anchor-4.2.2/anchor.min.js","post11_files/bowser-1.9.3/bowser.min.js","post11_files/distill-2.2.21/template.v2.js","post11_files/header-attrs-2.13/header-attrs.js","post11_files/htmlwidgets-1.5.4/htmlwidgets.js","post11_files/jquery-3.6.0/jquery-3.6.0.js","post11_files/jquery-3.6.0/jquery-3.6.0.min.js","post11_files/jquery-3.6.0/jquery-3.6.0.min.map","post11_files/kePrint-0.0.1/kePrint.js","post11_files/leaflet-1.3.1/images/layers-2x.png","post11_files/leaflet-1.3.1/images/layers.png","post11_files/leaflet-1.3.1/images/marker-icon-2x.png","post11_files/leaflet-1.3.1/images/marker-icon.png","post11_files/leaflet-1.3.1/images/marker-shadow.png","post11_files/leaflet-1.3.1/leaflet.css","post11_files/leaflet-1.3.1/leaflet.js","post11_files/leaflet-binding-2.1.1/leaflet.js","post11_files/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js","post11_files/leaflet-providers-plugin-2.1.1/leaflet-providers-plugin.js","post11_files/leafletfix-1.0.0/leafletfix.css","post11_files/lightable-0.0.1/lightable.css","post11_files/popper-2.6.0/popper.min.js","post11_files/proj4-2.6.2/proj4.min.js","post11_files/Proj4Leaflet-1.0.1/proj4leaflet.js","post11_files/rstudio_leaflet-1.3.1/images/1px.png","post11_files/rstudio_leaflet-1.3.1/rstudio_leaflet.css","post11_files/tippy-6.2.7/tippy-bundle.umd.min.js","post11_files/tippy-6.2.7/tippy-light-border.css","post11_files/tippy-6.2.7/tippy.css","post11_files/tippy-6.2.7/tippy.umd.min.js","post11_files/webcomponents-2.0.0/webcomponents.js"]}
+  </script>
+  <!--radix_placeholder_navigation_in_header-->
+<meta name="distill:offset" content="../.."/>
+
+<script type="application/javascript">
+
+  window.headroom_prevent_pin = false;
+
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+
+    // initialize headroom for banner
+    var header = $('header').get(0);
+    var headerHeight = header.offsetHeight;
+    var headroom = new Headroom(header, {
+      tolerance: 5,
+      onPin : function() {
+        if (window.headroom_prevent_pin) {
+          window.headroom_prevent_pin = false;
+          headroom.unpin();
+        }
+      }
+    });
+    headroom.init();
+    if(window.location.hash)
+      headroom.unpin();
+    $(header).addClass('headroom--transition');
+
+    // offset scroll location for banner on hash change
+    // (see: https://github.com/WickyNilliams/headroom.js/issues/38)
+    window.addEventListener("hashchange", function(event) {
+      window.scrollTo(0, window.pageYOffset - (headerHeight + 25));
+    });
+
+    // responsive menu
+    $('.distill-site-header').each(function(i, val) {
+      var topnav = $(this);
+      var toggle = topnav.find('.nav-toggle');
+      toggle.on('click', function() {
+        topnav.toggleClass('responsive');
+      });
+    });
+
+    // nav dropdowns
+    $('.nav-dropbtn').click(function(e) {
+      $(this).next('.nav-dropdown-content').toggleClass('nav-dropdown-active');
+      $(this).parent().siblings('.nav-dropdown')
+         .children('.nav-dropdown-content').removeClass('nav-dropdown-active');
+    });
+    $("body").click(function(e){
+      $('.nav-dropdown-content').removeClass('nav-dropdown-active');
+    });
+    $(".nav-dropdown").click(function(e){
+      e.stopPropagation();
+    });
+  });
+</script>
+
+<style type="text/css">
+
+/* Theme (user-documented overrideables for nav appearance) */
+
+.distill-site-nav {
+  color: rgba(255, 255, 255, 0.8);
+  background-color: #0F2E3D;
+  font-size: 15px;
+  font-weight: 300;
+}
+
+.distill-site-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.distill-site-nav a:hover {
+  color: white;
+}
+
+@media print {
+  .distill-site-nav {
+    display: none;
+  }
+}
+
+.distill-site-header {
+
+}
+
+.distill-site-footer {
+
+}
+
+
+/* Site Header */
+
+.distill-site-header {
+  width: 100%;
+  box-sizing: border-box;
+  z-index: 3;
+}
+
+.distill-site-header .nav-left {
+  display: inline-block;
+  margin-left: 8px;
+}
+
+@media screen and (max-width: 768px) {
+  .distill-site-header .nav-left {
+    margin-left: 0;
+  }
+}
+
+
+.distill-site-header .nav-right {
+  float: right;
+  margin-right: 8px;
+}
+
+.distill-site-header a,
+.distill-site-header .title {
+  display: inline-block;
+  text-align: center;
+  padding: 14px 10px 14px 10px;
+}
+
+.distill-site-header .title {
+  font-size: 18px;
+  min-width: 150px;
+}
+
+.distill-site-header .logo {
+  padding: 0;
+}
+
+.distill-site-header .logo img {
+  display: none;
+  max-height: 20px;
+  width: auto;
+  margin-bottom: -4px;
+}
+
+.distill-site-header .nav-image img {
+  max-height: 18px;
+  width: auto;
+  display: inline-block;
+  margin-bottom: -3px;
+}
+
+
+
+@media screen and (min-width: 1000px) {
+  .distill-site-header .logo img {
+    display: inline-block;
+  }
+  .distill-site-header .nav-left {
+    margin-left: 20px;
+  }
+  .distill-site-header .nav-right {
+    margin-right: 20px;
+  }
+  .distill-site-header .title {
+    padding-left: 12px;
+  }
+}
+
+
+.distill-site-header .nav-toggle {
+  display: none;
+}
+
+.nav-dropdown {
+  display: inline-block;
+  position: relative;
+}
+
+.nav-dropdown .nav-dropbtn {
+  border: none;
+  outline: none;
+  color: rgba(255, 255, 255, 0.8);
+  padding: 16px 10px;
+  background-color: transparent;
+  font-family: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  margin: 0;
+  margin-top: 1px;
+  z-index: 2;
+}
+
+.nav-dropdown-content {
+  display: none;
+  position: absolute;
+  background-color: white;
+  min-width: 200px;
+  border: 1px solid rgba(0,0,0,0.15);
+  border-radius: 4px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.1);
+  z-index: 1;
+  margin-top: 2px;
+  white-space: nowrap;
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+.nav-dropdown-content hr {
+  margin-top: 4px;
+  margin-bottom: 4px;
+  border: none;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.nav-dropdown-active {
+  display: block;
+}
+
+.nav-dropdown-content a, .nav-dropdown-content .nav-dropdown-header {
+  color: black;
+  padding: 6px 24px;
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+
+.nav-dropdown-content .nav-dropdown-header {
+  display: block;
+  padding: 5px 24px;
+  padding-bottom: 0;
+  text-transform: uppercase;
+  font-size: 14px;
+  color: #999999;
+  white-space: nowrap;
+}
+
+.nav-dropdown:hover .nav-dropbtn {
+  color: white;
+}
+
+.nav-dropdown-content a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.nav-right .nav-dropdown-content {
+  margin-left: -45%;
+  right: 0;
+}
+
+@media screen and (max-width: 768px) {
+  .distill-site-header a, .distill-site-header .nav-dropdown  {display: none;}
+  .distill-site-header a.nav-toggle {
+    float: right;
+    display: block;
+  }
+  .distill-site-header .title {
+    margin-left: 0;
+  }
+  .distill-site-header .nav-right {
+    margin-right: 0;
+  }
+  .distill-site-header {
+    overflow: hidden;
+  }
+  .nav-right .nav-dropdown-content {
+    margin-left: 0;
+  }
+}
+
+
+@media screen and (max-width: 768px) {
+  .distill-site-header.responsive {position: relative; min-height: 500px; }
+  .distill-site-header.responsive a.nav-toggle {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+  .distill-site-header.responsive a,
+  .distill-site-header.responsive .nav-dropdown {
+    display: block;
+    text-align: left;
+  }
+  .distill-site-header.responsive .nav-left,
+  .distill-site-header.responsive .nav-right {
+    width: 100%;
+  }
+  .distill-site-header.responsive .nav-dropdown {float: none;}
+  .distill-site-header.responsive .nav-dropdown-content {position: relative;}
+  .distill-site-header.responsive .nav-dropdown .nav-dropbtn {
+    display: block;
+    width: 100%;
+    text-align: left;
+  }
+}
+
+/* Site Footer */
+
+.distill-site-footer {
+  width: 100%;
+  overflow: hidden;
+  box-sizing: border-box;
+  z-index: 3;
+  margin-top: 30px;
+  padding-top: 30px;
+  padding-bottom: 30px;
+  text-align: center;
+}
+
+/* Headroom */
+
+d-title {
+  padding-top: 6rem;
+}
+
+@media print {
+  d-title {
+    padding-top: 4rem;
+  }
+}
+
+.headroom {
+  z-index: 1000;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+.headroom--transition {
+  transition: all .4s ease-in-out;
+}
+
+.headroom--unpinned {
+  top: -100px;
+}
+
+.headroom--pinned {
+  top: 0;
+}
+
+/* adjust viewport for navbar height */
+/* helps vertically center bootstrap (non-distill) content */
+.min-vh-100 {
+  min-height: calc(100vh - 100px) !important;
+}
+
+</style>
+
+<script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<link href="../../site_libs/font-awesome-5.1.0/css/all.css" rel="stylesheet"/>
+<link href="../../site_libs/font-awesome-5.1.0/css/v4-shims.css" rel="stylesheet"/>
+<script src="../../site_libs/headroom-0.9.4/headroom.min.js"></script>
+<script src="../../site_libs/autocomplete-0.37.1/autocomplete.min.js"></script>
+<script src="../../site_libs/fuse-6.4.1/fuse.min.js"></script>
+
+<script type="application/javascript">
+
+function getMeta(metaName) {
+  var metas = document.getElementsByTagName('meta');
+  for (let i = 0; i < metas.length; i++) {
+    if (metas[i].getAttribute('name') === metaName) {
+      return metas[i].getAttribute('content');
+    }
+  }
+  return '';
+}
+
+function offsetURL(url) {
+  var offset = getMeta('distill:offset');
+  return offset ? offset + '/' + url : url;
+}
+
+function createFuseIndex() {
+
+  // create fuse index
+  var options = {
+    keys: [
+      { name: 'title', weight: 20 },
+      { name: 'categories', weight: 15 },
+      { name: 'description', weight: 10 },
+      { name: 'contents', weight: 5 },
+    ],
+    ignoreLocation: true,
+    threshold: 0
+  };
+  var fuse = new window.Fuse([], options);
+
+  // fetch the main search.json
+  return fetch(offsetURL('search.json'))
+    .then(function(response) {
+      if (response.status == 200) {
+        return response.json().then(function(json) {
+          // index main articles
+          json.articles.forEach(function(article) {
+            fuse.add(article);
+          });
+          // download collections and index their articles
+          return Promise.all(json.collections.map(function(collection) {
+            return fetch(offsetURL(collection)).then(function(response) {
+              if (response.status === 200) {
+                return response.json().then(function(articles) {
+                  articles.forEach(function(article) {
+                    fuse.add(article);
+                  });
+                })
+              } else {
+                return Promise.reject(
+                  new Error('Unexpected status from search index request: ' +
+                            response.status)
+                );
+              }
+            });
+          })).then(function() {
+            return fuse;
+          });
+        });
+
+      } else {
+        return Promise.reject(
+          new Error('Unexpected status from search index request: ' +
+                      response.status)
+        );
+      }
+    });
+}
+
+window.document.addEventListener("DOMContentLoaded", function (event) {
+
+  // get search element (bail if we don't have one)
+  var searchEl = window.document.getElementById('distill-search');
+  if (!searchEl)
+    return;
+
+  createFuseIndex()
+    .then(function(fuse) {
+
+      // make search box visible
+      searchEl.classList.remove('hidden');
+
+      // initialize autocomplete
+      var options = {
+        autoselect: true,
+        hint: false,
+        minLength: 2,
+      };
+      window.autocomplete(searchEl, options, [{
+        source: function(query, callback) {
+          const searchOptions = {
+            isCaseSensitive: false,
+            shouldSort: true,
+            minMatchCharLength: 2,
+            limit: 10,
+          };
+          var results = fuse.search(query, searchOptions);
+          callback(results
+            .map(function(result) { return result.item; })
+          );
+        },
+        templates: {
+          suggestion: function(suggestion) {
+            var img = suggestion.preview && Object.keys(suggestion.preview).length > 0
+              ? `<img src="${offsetURL(suggestion.preview)}"</img>`
+              : '';
+            var html = `
+              <div class="search-item">
+                <h3>${suggestion.title}</h3>
+                <div class="search-item-description">
+                  ${suggestion.description || ''}
+                </div>
+                <div class="search-item-preview">
+                  ${img}
+                </div>
+              </div>
+            `;
+            return html;
+          }
+        }
+      }]).on('autocomplete:selected', function(event, suggestion) {
+        window.location.href = offsetURL(suggestion.path);
+      });
+      // remove inline display style on autocompleter (we want to
+      // manage responsive display via css)
+      $('.algolia-autocomplete').css("display", "");
+    })
+    .catch(function(error) {
+      console.log(error);
+    });
+
+});
+
+</script>
+
+<style type="text/css">
+
+.nav-search {
+  font-size: x-small;
+}
+
+/* Algolioa Autocomplete */
+
+.algolia-autocomplete {
+  display: inline-block;
+  margin-left: 10px;
+  vertical-align: sub;
+  background-color: white;
+  color: black;
+  padding: 6px;
+  padding-top: 8px;
+  padding-bottom: 0;
+  border-radius: 6px;
+  border: 1px #0F2E3D solid;
+  width: 180px;
+}
+
+
+@media screen and (max-width: 768px) {
+  .distill-site-nav .algolia-autocomplete {
+    display: none;
+    visibility: hidden;
+  }
+  .distill-site-nav.responsive .algolia-autocomplete {
+    display: inline-block;
+    visibility: visible;
+  }
+  .distill-site-nav.responsive .algolia-autocomplete .aa-dropdown-menu {
+    margin-left: 0;
+    width: 400px;
+    max-height: 400px;
+  }
+}
+
+.algolia-autocomplete .aa-input, .algolia-autocomplete .aa-hint {
+  width: 90%;
+  outline: none;
+  border: none;
+}
+
+.algolia-autocomplete .aa-hint {
+  color: #999;
+}
+.algolia-autocomplete .aa-dropdown-menu {
+  width: 550px;
+  max-height: 70vh;
+  overflow-x: visible;
+  overflow-y: scroll;
+  padding: 5px;
+  margin-top: 3px;
+  margin-left: -150px;
+  background-color: #fff;
+  border-radius: 5px;
+  border: 1px solid #999;
+  border-top: none;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion {
+  cursor: pointer;
+  padding: 5px 4px;
+  border-bottom: 1px solid #eee;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion:last-of-type {
+  border-bottom: none;
+  margin-bottom: 2px;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item {
+  overflow: hidden;
+  font-size: 0.8em;
+  line-height: 1.4em;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item h3 {
+  font-size: 1rem;
+  margin-block-start: 0;
+  margin-block-end: 5px;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-description {
+  display: inline-block;
+  overflow: hidden;
+  height: 2.8em;
+  width: 80%;
+  margin-right: 4%;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview {
+  display: inline-block;
+  width: 15%;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img {
+  height: 3em;
+  width: auto;
+  display: none;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion .search-item-preview img[src] {
+  display: initial;
+}
+
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion.aa-cursor {
+  background-color: #eee;
+}
+.algolia-autocomplete .aa-dropdown-menu .aa-suggestion em {
+  font-weight: bold;
+  font-style: normal;
+}
+
+</style>
+
+
+<!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+
+<style type="text/css">
+
+body {
+  background-color: white;
+}
+
+.pandoc-table {
+  width: 100%;
+}
+
+.pandoc-table>caption {
+  margin-bottom: 10px;
+}
+
+.pandoc-table th:not([align]) {
+  text-align: left;
+}
+
+.pagedtable-footer {
+  font-size: 15px;
+}
+
+d-byline .byline {
+  grid-template-columns: 2fr 2fr;
+}
+
+d-byline .byline h3 {
+  margin-block-start: 1.5em;
+}
+
+d-byline .byline .authors-affiliations h3 {
+  margin-block-start: 0.5em;
+}
+
+.authors-affiliations .orcid-id {
+  width: 16px;
+  height:16px;
+  margin-left: 4px;
+  margin-right: 4px;
+  vertical-align: middle;
+  padding-bottom: 2px;
+}
+
+d-title .dt-tags {
+  margin-top: 1em;
+  grid-column: text;
+}
+
+.dt-tags .dt-tag {
+  text-decoration: none;
+  display: inline-block;
+  color: rgba(0,0,0,0.6);
+  padding: 0em 0.4em;
+  margin-right: 0.5em;
+  margin-bottom: 0.4em;
+  font-size: 70%;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+d-article table.gt_table td,
+d-article table.gt_table th {
+  border-bottom: none;
+}
+
+.html-widget {
+  margin-bottom: 2.0em;
+}
+
+.l-screen-inset {
+  padding-right: 16px;
+}
+
+.l-screen .caption {
+  margin-left: 10px;
+}
+
+.shaded {
+  background: rgb(247, 247, 247);
+  padding-top: 20px;
+  padding-bottom: 20px;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.shaded .html-widget {
+  margin-bottom: 0;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.shaded .shaded-content {
+  background: white;
+}
+
+.text-output {
+  margin-top: 0;
+  line-height: 1.5em;
+}
+
+.hidden {
+  display: none !important;
+}
+
+d-article {
+  padding-top: 2.5rem;
+  padding-bottom: 30px;
+}
+
+d-appendix {
+  padding-top: 30px;
+}
+
+d-article>p>img {
+  width: 100%;
+}
+
+d-article h2 {
+  margin: 1rem 0 1.5rem 0;
+}
+
+d-article h3 {
+  margin-top: 1.5rem;
+}
+
+d-article iframe {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  margin-bottom: 2.0em;
+  width: 100%;
+}
+
+/* Tweak code blocks */
+
+d-article div.sourceCode code,
+d-article pre code {
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+}
+
+d-article pre,
+d-article div.sourceCode,
+d-article div.sourceCode pre {
+  overflow: auto;
+}
+
+d-article div.sourceCode {
+  background-color: white;
+}
+
+d-article div.sourceCode pre {
+  padding-left: 10px;
+  font-size: 12px;
+  border-left: 2px solid rgba(0,0,0,0.1);
+}
+
+d-article pre {
+  font-size: 12px;
+  color: black;
+  background: none;
+  margin-top: 0;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+d-article pre a {
+  border-bottom: none;
+}
+
+d-article pre a:hover {
+  border-bottom: none;
+  text-decoration: underline;
+}
+
+d-article details {
+  grid-column: text;
+  margin-bottom: 0.8em;
+}
+
+@media(min-width: 768px) {
+
+d-article pre,
+d-article div.sourceCode,
+d-article div.sourceCode pre {
+  overflow: visible !important;
+}
+
+d-article div.sourceCode pre {
+  padding-left: 18px;
+  font-size: 14px;
+}
+
+d-article pre {
+  font-size: 14px;
+}
+
+}
+
+figure img.external {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+/* CSS for d-contents */
+
+.d-contents {
+  grid-column: text;
+  color: rgba(0,0,0,0.8);
+  font-size: 0.9em;
+  padding-bottom: 1em;
+  margin-bottom: 1em;
+  padding-bottom: 0.5em;
+  margin-bottom: 1em;
+  padding-left: 0.25em;
+  justify-self: start;
+}
+
+@media(min-width: 1000px) {
+  .d-contents.d-contents-float {
+    height: 0;
+    grid-column-start: 1;
+    grid-column-end: 4;
+    justify-self: center;
+    padding-right: 3em;
+    padding-left: 2em;
+  }
+}
+
+.d-contents nav h3 {
+  font-size: 18px;
+  margin-top: 0;
+  margin-bottom: 1em;
+}
+
+.d-contents li {
+  list-style-type: none
+}
+
+.d-contents nav > ul {
+  padding-left: 0;
+}
+
+.d-contents ul {
+  padding-left: 1em
+}
+
+.d-contents nav ul li {
+  margin-top: 0.6em;
+  margin-bottom: 0.2em;
+}
+
+.d-contents nav a {
+  font-size: 13px;
+  border-bottom: none;
+  text-decoration: none
+  color: rgba(0, 0, 0, 0.8);
+}
+
+.d-contents nav a:hover {
+  text-decoration: underline solid rgba(0, 0, 0, 0.6)
+}
+
+.d-contents nav > ul > li > a {
+  font-weight: 600;
+}
+
+.d-contents nav > ul > li > ul {
+  font-weight: inherit;
+}
+
+.d-contents nav > ul > li > ul > li {
+  margin-top: 0.2em;
+}
+
+
+.d-contents nav ul {
+  margin-top: 0;
+  margin-bottom: 0.25em;
+}
+
+.d-article-with-toc h2:nth-child(2) {
+  margin-top: 0;
+}
+
+
+/* Figure */
+
+.figure {
+  position: relative;
+  margin-bottom: 2.5em;
+  margin-top: 1.5em;
+}
+
+.figure img {
+  width: 100%;
+}
+
+.figure .caption {
+  color: rgba(0, 0, 0, 0.6);
+  font-size: 12px;
+  line-height: 1.5em;
+}
+
+.figure img.external {
+  background: white;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+  padding: 18px;
+  box-sizing: border-box;
+}
+
+.figure .caption a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.figure .caption b,
+.figure .caption strong, {
+  font-weight: 600;
+  color: rgba(0, 0, 0, 1.0);
+}
+
+/* Citations */
+
+d-article .citation {
+  color: inherit;
+  cursor: inherit;
+}
+
+div.hanging-indent{
+  margin-left: 1em; text-indent: -1em;
+}
+
+/* Citation hover box */
+
+.tippy-box[data-theme~=light-border] {
+  background-color: rgba(250, 250, 250, 0.95);
+}
+
+.tippy-content > p {
+  margin-bottom: 0;
+  padding: 2px;
+}
+
+
+/* Tweak 1000px media break to show more text */
+
+@media(min-width: 1000px) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+    grid-column-gap: 16px;
+  }
+
+  .grid {
+    grid-column-gap: 16px;
+  }
+
+  d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+  }
+  figure .caption, .figure .caption, figure figcaption {
+    font-size: 13px;
+  }
+}
+
+@media(min-width: 1180px) {
+  .base-grid,
+  distill-header,
+  d-title,
+  d-abstract,
+  d-article,
+  d-appendix,
+  distill-appendix,
+  d-byline,
+  d-footnote-list,
+  d-citation-list,
+  distill-footer {
+    grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+    grid-column-gap: 32px;
+  }
+
+  .grid {
+    grid-column-gap: 32px;
+  }
+}
+
+
+/* Get the citation styles for the appendix (not auto-injected on render since
+   we do our own rendering of the citation appendix) */
+
+d-appendix .citation-appendix,
+.d-appendix .citation-appendix {
+  font-size: 11px;
+  line-height: 15px;
+  border-left: 1px solid rgba(0, 0, 0, 0.1);
+  padding-left: 18px;
+  border: 1px solid rgba(0,0,0,0.1);
+  background: rgba(0, 0, 0, 0.02);
+  padding: 10px 18px;
+  border-radius: 3px;
+  color: rgba(150, 150, 150, 1);
+  overflow: hidden;
+  margin-top: -12px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+}
+
+/* Include appendix styles here so they can be overridden */
+
+d-appendix {
+  contain: layout style;
+  font-size: 0.8em;
+  line-height: 1.7em;
+  margin-top: 60px;
+  margin-bottom: 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+  color: rgba(0,0,0,0.5);
+  padding-top: 60px;
+  padding-bottom: 48px;
+}
+
+d-appendix h3 {
+  grid-column: page-start / text-start;
+  font-size: 15px;
+  font-weight: 500;
+  margin-top: 1em;
+  margin-bottom: 0;
+  color: rgba(0,0,0,0.65);
+}
+
+d-appendix h3 + * {
+  margin-top: 1em;
+}
+
+d-appendix ol {
+  padding: 0 0 0 15px;
+}
+
+@media (min-width: 768px) {
+  d-appendix ol {
+    padding: 0 0 0 30px;
+    margin-left: -30px;
+  }
+}
+
+d-appendix li {
+  margin-bottom: 1em;
+}
+
+d-appendix a {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+d-appendix > * {
+  grid-column: text;
+}
+
+d-appendix > d-footnote-list,
+d-appendix > d-citation-list,
+d-appendix > distill-appendix {
+  grid-column: screen;
+}
+
+/* Include footnote styles here so they can be overridden */
+
+d-footnote-list {
+  contain: layout style;
+}
+
+d-footnote-list > * {
+  grid-column: text;
+}
+
+d-footnote-list a.footnote-backlink {
+  color: rgba(0,0,0,0.3);
+  padding-left: 0.5em;
+}
+
+
+
+/* Anchor.js */
+
+.anchorjs-link {
+  /*transition: all .25s linear; */
+  text-decoration: none;
+  border-bottom: none;
+}
+*:hover > .anchorjs-link {
+  margin-left: -1.125em !important;
+  text-decoration: none;
+  border-bottom: none;
+}
+
+/* Social footer */
+
+.social_footer {
+  margin-top: 30px;
+  margin-bottom: 0;
+  color: rgba(0,0,0,0.67);
+}
+
+.disqus-comments {
+  margin-right: 30px;
+}
+
+.disqus-comment-count {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+}
+
+#disqus_thread {
+  margin-top: 30px;
+}
+
+.article-sharing a {
+  border-bottom: none;
+  margin-right: 8px;
+}
+
+.article-sharing a:hover {
+  border-bottom: none;
+}
+
+.sidebar-section.subscribe {
+  font-size: 12px;
+  line-height: 1.6em;
+}
+
+.subscribe p {
+  margin-bottom: 0.5em;
+}
+
+
+.article-footer .subscribe {
+  font-size: 15px;
+  margin-top: 45px;
+}
+
+
+.sidebar-section.custom {
+  font-size: 12px;
+  line-height: 1.6em;
+}
+
+.custom p {
+  margin-bottom: 0.5em;
+}
+
+/* Styles for listing layout (hide title) */
+.layout-listing d-title, .layout-listing .d-title {
+  display: none;
+}
+
+/* Styles for posts lists (not auto-injected) */
+
+
+.posts-with-sidebar {
+  padding-left: 45px;
+  padding-right: 45px;
+}
+
+.posts-list .description h2,
+.posts-list .description p {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+}
+
+.posts-list .description h2 {
+  font-weight: 700;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.posts-list h2.post-tag {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  padding-bottom: 12px;
+}
+.posts-list {
+  margin-top: 60px;
+  margin-bottom: 24px;
+}
+
+.posts-list .post-preview {
+  text-decoration: none;
+  overflow: hidden;
+  display: block;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  padding: 24px 0;
+}
+
+.post-preview-last {
+  border-bottom: none !important;
+}
+
+.posts-list .posts-list-caption {
+  grid-column: screen;
+  font-weight: 400;
+}
+
+.posts-list .post-preview h2 {
+  margin: 0 0 6px 0;
+  line-height: 1.2em;
+  font-style: normal;
+  font-size: 24px;
+}
+
+.posts-list .post-preview p {
+  margin: 0 0 12px 0;
+  line-height: 1.4em;
+  font-size: 16px;
+}
+
+.posts-list .post-preview .thumbnail {
+  box-sizing: border-box;
+  margin-bottom: 24px;
+  position: relative;
+  max-width: 500px;
+}
+.posts-list .post-preview img {
+  width: 100%;
+  display: block;
+}
+
+.posts-list .metadata {
+  font-size: 12px;
+  line-height: 1.4em;
+  margin-bottom: 18px;
+}
+
+.posts-list .metadata > * {
+  display: inline-block;
+}
+
+.posts-list .metadata .publishedDate {
+  margin-right: 2em;
+}
+
+.posts-list .metadata .dt-authors {
+  display: block;
+  margin-top: 0.3em;
+  margin-right: 2em;
+}
+
+.posts-list .dt-tags {
+  display: block;
+  line-height: 1em;
+}
+
+.posts-list .dt-tags .dt-tag {
+  display: inline-block;
+  color: rgba(0,0,0,0.6);
+  padding: 0.3em 0.4em;
+  margin-right: 0.2em;
+  margin-bottom: 0.4em;
+  font-size: 60%;
+  border: 1px solid rgba(0,0,0,0.2);
+  border-radius: 3px;
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.posts-list img {
+  opacity: 1;
+}
+
+.posts-list img[data-src] {
+  opacity: 0;
+}
+
+.posts-more {
+  clear: both;
+}
+
+
+.posts-sidebar {
+  font-size: 16px;
+}
+
+.posts-sidebar h3 {
+  font-size: 16px;
+  margin-top: 0;
+  margin-bottom: 0.5em;
+  font-weight: 400;
+  text-transform: uppercase;
+}
+
+.sidebar-section {
+  margin-bottom: 30px;
+}
+
+.categories ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+}
+
+.categories li {
+  color: rgba(0, 0, 0, 0.8);
+  margin-bottom: 0;
+}
+
+.categories li>a {
+  border-bottom: none;
+}
+
+.categories li>a:hover {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+}
+
+.categories .active {
+  font-weight: 600;
+}
+
+.categories .category-count {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+
+@media(min-width: 768px) {
+  .posts-list .post-preview h2 {
+    font-size: 26px;
+  }
+  .posts-list .post-preview .thumbnail {
+    float: right;
+    width: 30%;
+    margin-bottom: 0;
+  }
+  .posts-list .post-preview .description {
+    float: left;
+    width: 45%;
+  }
+  .posts-list .post-preview .metadata {
+    float: left;
+    width: 20%;
+    margin-top: 8px;
+  }
+  .posts-list .post-preview p {
+    margin: 0 0 12px 0;
+    line-height: 1.5em;
+    font-size: 16px;
+  }
+  .posts-with-sidebar .posts-list {
+    float: left;
+    width: 75%;
+  }
+  .posts-with-sidebar .posts-sidebar {
+    float: right;
+    width: 20%;
+    margin-top: 60px;
+    padding-top: 24px;
+    padding-bottom: 24px;
+  }
+}
+
+
+/* Improve display for browsers without grid (IE/Edge <= 15) */
+
+.downlevel {
+  line-height: 1.6em;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  margin: 0;
+}
+
+.downlevel .d-title {
+  padding-top: 6rem;
+  padding-bottom: 1.5rem;
+}
+
+.downlevel .d-title h1 {
+  font-size: 50px;
+  font-weight: 700;
+  line-height: 1.1em;
+  margin: 0 0 0.5rem;
+}
+
+.downlevel .d-title p {
+  font-weight: 300;
+  font-size: 1.2rem;
+  line-height: 1.55em;
+  margin-top: 0;
+}
+
+.downlevel .d-byline {
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  font-size: 0.8rem;
+  line-height: 1.8em;
+}
+
+.downlevel .section-separator {
+  border: none;
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.downlevel .d-article {
+  font-size: 1.06rem;
+  line-height: 1.7em;
+  padding-top: 1rem;
+  padding-bottom: 2rem;
+}
+
+
+.downlevel .d-appendix {
+  padding-left: 0;
+  padding-right: 0;
+  max-width: none;
+  font-size: 0.8em;
+  line-height: 1.7em;
+  margin-bottom: 0;
+  color: rgba(0,0,0,0.5);
+  padding-top: 40px;
+  padding-bottom: 48px;
+}
+
+.downlevel .footnotes ol {
+  padding-left: 13px;
+}
+
+.downlevel .base-grid,
+.downlevel .distill-header,
+.downlevel .d-title,
+.downlevel .d-abstract,
+.downlevel .d-article,
+.downlevel .d-appendix,
+.downlevel .distill-appendix,
+.downlevel .d-byline,
+.downlevel .d-footnote-list,
+.downlevel .d-citation-list,
+.downlevel .distill-footer,
+.downlevel .appendix-bottom,
+.downlevel .posts-container {
+  padding-left: 40px;
+  padding-right: 40px;
+}
+
+@media(min-width: 768px) {
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+  padding-left: 150px;
+  padding-right: 150px;
+  max-width: 900px;
+}
+}
+
+.downlevel pre code {
+  display: block;
+  border-left: 2px solid rgba(0, 0, 0, .1);
+  padding: 0 0 0 20px;
+  font-size: 14px;
+}
+
+.downlevel code, .downlevel pre {
+  color: black;
+  background: none;
+  font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  line-height: 1.5;
+
+  -moz-tab-size: 4;
+  -o-tab-size: 4;
+  tab-size: 4;
+
+  -webkit-hyphens: none;
+  -moz-hyphens: none;
+  -ms-hyphens: none;
+  hyphens: none;
+}
+
+.downlevel .posts-list .post-preview {
+  color: inherit;
+}
+
+
+
+</style>
+
+<script type="application/javascript">
+
+function is_downlevel_browser() {
+  if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                 window.navigator.userAgent)) {
+    return true;
+  } else {
+    return window.load_distill_framework === undefined;
+  }
+}
+
+// show body when load is complete
+function on_load_complete() {
+
+  // add anchors
+  if (window.anchors) {
+    window.anchors.options.placement = 'left';
+    window.anchors.add('d-article > h2, d-article > h3, d-article > h4, d-article > h5');
+  }
+
+
+  // set body to visible
+  document.body.style.visibility = 'visible';
+
+  // force redraw for leaflet widgets
+  if (window.HTMLWidgets) {
+    var maps = window.HTMLWidgets.findAll(".leaflet");
+    $.each(maps, function(i, el) {
+      var map = this.getMap();
+      map.invalidateSize();
+      map.eachLayer(function(layer) {
+        if (layer instanceof L.TileLayer)
+          layer.redraw();
+      });
+    });
+  }
+
+  // trigger 'shown' so htmlwidgets resize
+  $('d-article').trigger('shown');
+}
+
+function init_distill() {
+
+  init_common();
+
+  // create front matter
+  var front_matter = $('<d-front-matter></d-front-matter>');
+  $('#distill-front-matter').wrap(front_matter);
+
+  // create d-title
+  $('.d-title').changeElementType('d-title');
+
+  // create d-byline
+  var byline = $('<d-byline></d-byline>');
+  $('.d-byline').replaceWith(byline);
+
+  // create d-article
+  var article = $('<d-article></d-article>');
+  $('.d-article').wrap(article).children().unwrap();
+
+  // move posts container into article
+  $('.posts-container').appendTo($('d-article'));
+
+  // create d-appendix
+  $('.d-appendix').changeElementType('d-appendix');
+
+  // flag indicating that we have appendix items
+  var appendix = $('.appendix-bottom').children('h3').length > 0;
+
+  // replace footnotes with <d-footnote>
+  $('.footnote-ref').each(function(i, val) {
+    appendix = true;
+    var href = $(this).attr('href');
+    var id = href.replace('#', '');
+    var fn = $('#' + id);
+    var fn_p = $('#' + id + '>p');
+    fn_p.find('.footnote-back').remove();
+    var text = fn_p.html();
+    var dtfn = $('<d-footnote></d-footnote>');
+    dtfn.html(text);
+    $(this).replaceWith(dtfn);
+  });
+  // remove footnotes
+  $('.footnotes').remove();
+
+  // move refs into #references-listing
+  $('#references-listing').replaceWith($('#refs'));
+
+  $('h1.appendix, h2.appendix').each(function(i, val) {
+    $(this).changeElementType('h3');
+  });
+  $('h3.appendix').each(function(i, val) {
+    var id = $(this).attr('id');
+    $('.d-contents a[href="#' + id + '"]').parent().remove();
+    appendix = true;
+    $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+  });
+
+  // show d-appendix if we have appendix content
+  $("d-appendix").css('display', appendix ? 'grid' : 'none');
+
+  // localize layout chunks to just output
+  $('.layout-chunk').each(function(i, val) {
+
+    // capture layout
+    var layout = $(this).attr('data-layout');
+
+    // apply layout to markdown level block elements
+    var elements = $(this).children().not('details, div.sourceCode, pre, script');
+    elements.each(function(i, el) {
+      var layout_div = $('<div class="' + layout + '"></div>');
+      if (layout_div.hasClass('shaded')) {
+        var shaded_content = $('<div class="shaded-content"></div>');
+        $(this).wrap(shaded_content);
+        $(this).parent().wrap(layout_div);
+      } else {
+        $(this).wrap(layout_div);
+      }
+    });
+
+
+    // unwrap the layout-chunk div
+    $(this).children().unwrap();
+  });
+
+  // remove code block used to force  highlighting css
+  $('.distill-force-highlighting-css').parent().remove();
+
+  // remove empty line numbers inserted by pandoc when using a
+  // custom syntax highlighting theme
+  $('code.sourceCode a:empty').remove();
+
+  // load distill framework
+  load_distill_framework();
+
+  // wait for window.distillRunlevel == 4 to do post processing
+  function distill_post_process() {
+
+    if (!window.distillRunlevel || window.distillRunlevel < 4)
+      return;
+
+    // hide author/affiliations entirely if we have no authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+    if (!have_authors)
+      $('d-byline').addClass('hidden');
+
+    // article with toc class
+    $('.d-contents').parent().addClass('d-article-with-toc');
+
+    // strip links that point to #
+    $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+
+    // add orcid ids
+    $('.authors-affiliations').find('.author').each(function(i, el) {
+      var orcid_id = front_matter.authors[i].orcidID;
+      if (orcid_id) {
+        var a = $('<a></a>');
+        a.attr('href', 'https://orcid.org/' + orcid_id);
+        var img = $('<img></img>');
+        img.addClass('orcid-id');
+        img.attr('alt', 'ORCID ID');
+        img.attr('src','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==');
+        a.append(img);
+        $(this).append(a);
+      }
+    });
+
+    // hide elements of author/affiliations grid that have no value
+    function hide_byline_column(caption) {
+      $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+    }
+
+    // affiliations
+    var have_affiliations = false;
+    for (var i = 0; i<front_matter.authors.length; ++i) {
+      var author = front_matter.authors[i];
+      if (author.affiliation !== "&nbsp;") {
+        have_affiliations = true;
+        break;
+      }
+    }
+    if (!have_affiliations)
+      $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+
+    // published date
+    if (!front_matter.publishedDate)
+      hide_byline_column("Published");
+
+    // document object identifier
+    var doi = $('d-byline').find('h3:contains("DOI")');
+    var doi_p = doi.next().empty();
+    if (!front_matter.doi) {
+      // if we have a citation and valid citationText then link to that
+      if ($('#citation').length > 0 && front_matter.citationText) {
+        doi.html('Citation');
+        $('<a href="#citation"></a>')
+          .text(front_matter.citationText)
+          .appendTo(doi_p);
+      } else {
+        hide_byline_column("DOI");
+      }
+    } else {
+      $('<a></a>')
+         .attr('href', "https://doi.org/" + front_matter.doi)
+         .html(front_matter.doi)
+         .appendTo(doi_p);
+    }
+
+     // change plural form of authors/affiliations
+    if (front_matter.authors.length === 1) {
+      var grid = $('.authors-affiliations');
+      grid.children('h3:contains("Authors")').text('Author');
+      grid.children('h3:contains("Affiliations")').text('Affiliation');
+    }
+
+    // remove d-appendix and d-footnote-list local styles
+    $('d-appendix > style:first-child').remove();
+    $('d-footnote-list > style:first-child').remove();
+
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+
+    // hoverable references
+    $('span.citation[data-cites]').each(function() {
+      var refs = $(this).attr('data-cites').split(" ");
+      var refHtml = refs.map(function(ref) {
+        return "<p>" + $('#ref-' + ref).html() + "</p>";
+      }).join("\n");
+      window.tippy(this, {
+        allowHTML: true,
+        content: refHtml,
+        maxWidth: 500,
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'light-border',
+        placement: 'bottom-start'
+      });
+    });
+
+    // clear polling timer
+    clearInterval(tid);
+
+    // show body now that everything is ready
+    on_load_complete();
+  }
+
+  var tid = setInterval(distill_post_process, 50);
+  distill_post_process();
+
+}
+
+function init_downlevel() {
+
+  init_common();
+
+   // insert hr after d-title
+  $('.d-title').after($('<hr class="section-separator"/>'));
+
+  // check if we have authors
+  var front_matter = JSON.parse($("#distill-front-matter").html());
+  var have_authors = front_matter.authors && front_matter.authors.length > 0;
+
+  // manage byline/border
+  if (!have_authors)
+    $('.d-byline').remove();
+  $('.d-byline').after($('<hr class="section-separator"/>'));
+  $('.d-byline a').remove();
+
+  // remove toc
+  $('.d-contents').remove();
+
+  // move appendix elements
+  $('h1.appendix, h2.appendix').each(function(i, val) {
+    $(this).changeElementType('h3');
+  });
+  $('h3.appendix').each(function(i, val) {
+    $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+  });
+
+
+  // inject headers into references and footnotes
+  var refs_header = $('<h3></h3>');
+  refs_header.text('References');
+  $('#refs').prepend(refs_header);
+
+  var footnotes_header = $('<h3></h3');
+  footnotes_header.text('Footnotes');
+  $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+
+  // move appendix-bottom entries to the bottom
+  $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+  $('.appendix-bottom').remove();
+
+  // remove appendix if it's empty
+  if ($('.d-appendix').children().length === 0)
+    $('.d-appendix').remove();
+
+  // prepend separator above appendix
+  $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+
+  // trim code
+  $('pre>code').each(function(i, val) {
+    $(this).html($.trim($(this).html()));
+  });
+
+  // move posts-container right before article
+  $('.posts-container').insertBefore($('.d-article'));
+
+  $('body').addClass('downlevel');
+
+  on_load_complete();
+}
+
+
+function init_common() {
+
+  // jquery plugin to change element types
+  (function($) {
+    $.fn.changeElementType = function(newType) {
+      var attrs = {};
+
+      $.each(this[0].attributes, function(idx, attr) {
+        attrs[attr.nodeName] = attr.nodeValue;
+      });
+
+      this.replaceWith(function() {
+        return $("<" + newType + "/>", attrs).append($(this).contents());
+      });
+    };
+  })(jQuery);
+
+  // prevent underline for linked images
+  $('a > img').parent().css({'border-bottom' : 'none'});
+
+  // mark non-body figures created by knitr chunks as 100% width
+  $('.layout-chunk').each(function(i, val) {
+    var figures = $(this).find('img, .html-widget');
+    if ($(this).attr('data-layout') !== "l-body") {
+      figures.css('width', '100%');
+    } else {
+      figures.css('max-width', '100%');
+      figures.filter("[width]").each(function(i, val) {
+        var fig = $(this);
+        fig.css('width', fig.attr('width') + 'px');
+      });
+
+    }
+  });
+
+  // auto-append index.html to post-preview links in file: protocol
+  // and in rstudio ide preview
+  $('.post-preview').each(function(i, val) {
+    if (window.location.protocol === "file:")
+      $(this).attr('href', $(this).attr('href') + "index.html");
+  });
+
+  // get rid of index.html references in header
+  if (window.location.protocol !== "file:") {
+    $('.distill-site-header a[href]').each(function(i,val) {
+      $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+    });
+  }
+
+  // add class to pandoc style tables
+  $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+  $('.kable-table').children('table').addClass('pandoc-table');
+
+  // add figcaption style to table captions
+  $('caption').parent('table').addClass("figcaption");
+
+  // initialize posts list
+  if (window.init_posts_list)
+    window.init_posts_list();
+
+  // implmement disqus comment link
+  $('.disqus-comment-count').click(function() {
+    window.headroom_prevent_pin = true;
+    $('#disqus_thread').toggleClass('hidden');
+    if (!$('#disqus_thread').hasClass('hidden')) {
+      var offset = $(this).offset();
+      $(window).resize();
+      $('html, body').animate({
+        scrollTop: offset.top - 35
+      });
+    }
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  if (is_downlevel_browser())
+    init_downlevel();
+  else
+    window.addEventListener('WebComponentsReady', init_distill);
+});
+
+</script>
+
+<!--/radix_placeholder_distill-->
+  <script src="../../site_libs/header-attrs-2.13/header-attrs.js"></script>
+  <script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
+  <script src="../../site_libs/htmlwidgets-1.5.4/htmlwidgets.js"></script>
+  <script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <link href="../../site_libs/leaflet-1.3.1/leaflet.css" rel="stylesheet" />
+  <script src="../../site_libs/leaflet-1.3.1/leaflet.js"></script>
+  <link href="../../site_libs/leafletfix-1.0.0/leafletfix.css" rel="stylesheet" />
+  <script src="../../site_libs/proj4-2.6.2/proj4.min.js"></script>
+  <script src="../../site_libs/Proj4Leaflet-1.0.1/proj4leaflet.js"></script>
+  <link href="../../site_libs/rstudio_leaflet-1.3.1/rstudio_leaflet.css" rel="stylesheet" />
+  <script src="../../site_libs/leaflet-binding-2.1.1/leaflet.js"></script>
+  <script src="../../site_libs/leaflet-providers-1.9.0/leaflet-providers_1.9.0.js"></script>
+  <script src="../../site_libs/leaflet-providers-plugin-2.1.1/leaflet-providers-plugin.js"></script>
+  <script src="../../site_libs/popper-2.6.0/popper.min.js"></script>
+  <link href="../../site_libs/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="../../site_libs/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="../../site_libs/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="../../site_libs/anchor-4.2.2/anchor.min.js"></script>
+  <script src="../../site_libs/bowser-1.9.3/bowser.min.js"></script>
+  <script src="../../site_libs/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="../../site_libs/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+<!--/radix_placeholder_site_in_header-->
+
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi","description":"İBB Açık Veri Portalı'ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması.","authors":[{"author":"A. Uraz Akgül","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2022-06-11T00:00:00.000+03:00","citationText":"Akgül, 2022"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<header class="header header--fixed" role="banner">
+<nav class="distill-site-nav distill-site-header">
+<div class="nav-left">
+<a href="../../index.html" class="title">R blog</a>
+<input id="distill-search" class="nav-search hidden" type="text" placeholder="Search..."/>
+</div>
+<div class="nav-right">
+<a href="../../index.html">Home</a>
+<a href="../../about.html">About</a>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+Books
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="https://rpydaneogrendim.github.io/rEkonometri/">R'da Ekonometri Uygulamaları</a>
+<a href="https://rpydaneogrendim.github.io/rViz/">R'da Veri Görselleştirme</a>
+</div>
+</div>
+<div class="nav-dropdown">
+<button class="nav-dropbtn">
+Packages
+ 
+<span class="down-arrow">&#x25BE;</span>
+</button>
+<div class="nav-dropdown-content">
+<a href="https://github.com/rpydaneogrendim/TCMB">TCMB</a>
+<a href="https://github.com/rpydaneogrendim/isyhisse">isyhisse</a>
+</div>
+</div>
+<a href="https://twitter.com/rpydaneogrendim">
+<i class="fab fa-twitter" aria-hidden="true"></i>
+</a>
+<a href="https://github.com/rpydaneogrendim">
+<i class="fab fa-github" aria-hidden="true"></i>
+</a>
+<a href="javascript:void(0);" class="nav-toggle">&#9776;</a>
+</div>
+</nav>
+</header>
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi</h1>
+<!--radix_placeholder_categories-->
+<div class="dt-tags">
+  <a href="../../index.html#category:Web" class="dt-tag">Web</a>
+  <a href="../../index.html#category:Map" class="dt-tag">Map</a>
+</div>
+<!--/radix_placeholder_categories-->
+<p><p>İBB Açık Veri Portalı’ndaki JSON formatındaki bir veri setinin
+çekilmesi ve haritalandırılması.</p></p>
+</div>
+
+<div class="d-byline">
+  A. Uraz Akgül  
+  
+<br/>2022-06-11
+</div>
+
+<div class="d-article">
+<p>2020 yılının Ocak ayında İBB, <a
+href="https://data.ibb.gov.tr/dataset">Açık Veri Portalı</a>’nı hizmete
+sundu. Geçen sürede 253 veri seti paylaşmışlar. Bu veri setlerinin çoğu
+xlsx, csv gibi formatlardan oluşuyor. Her ne kadar bu formatlar yaygın
+olarak kullanılsa da direkt web üzerinden verilere ulaşabileceğimiz
+yollar da var. Daha çok kullanılması dileğiyle demek isterim.</p>
+<p>Bu uygulamada hem JSON formatını tanıyacağız hem de çektiğimiz
+veriler üzerinden bir haritalandırma yapacağız.</p>
+<p>Uygulamaya konu İBB WiFi Yeni Kullanıcı Verisi, <em>İstanbul Büyük
+Şehir Belediyesi tarafından sağlanan kablosuz internet hizmetini
+kullanan kullanıcı verilerini içermektedir. İşbu veri kaynağının
+içerisinde, Abonelik tarihi, Abone olunan ilçe, Abonenin Yerli/Yabancı,
+Abone olunan lokasyon bilgisi ve kullanıcı sayısı bilgilerini
+içerir.</em> -İBB</p>
+<p>Bu veri setinin 6 tane değişkeni bulunmaktadır.</p>
+<ul>
+<li><p>SUBSCRIPTION_DATE: Aboneliğin gerçekleştiği tarih bilgisini
+içerir.</p></li>
+<li><p>SUBSCRIPTION_COUNTY: Aboneliğin gerçekleştiği ilçe bilgisini
+içerir.</p></li>
+<li><p>SUBSCRIBER_DOMESTIC_FOREIGN: Abonenin Türk vatandaşı ise yerli,
+değilse yabancı bilgisini içerir.</p></li>
+<li><p>LONGITUDE: Aboneliğin gerçekleştiği boylam bilgisini
+içerir.</p></li>
+<li><p>LATITUDE: Aboneliğin gerçekleştiği enlem bilgisini
+içerir.</p></li>
+<li><p>NUMBER_OF_SUBSCRIBER: İlgili tarihteki abone sayısı bilgisini
+içerir.</p></li>
+</ul>
+<p><em>Veri API</em> butonuna tıklarsak eğer karşımıza aşağıdaki ekran
+çıkacaktır.</p>
+<p><img src="img1.PNG" /></p>
+<p>API, iki yazılım ve bir sunucunun olduğu yerde bağlantı kurma görevi
+üstlenen bir protokoldür. Biz bu API’ı kullanarak talebimizi sunucuya
+aktarıyoruz. Talebi alan sunucu kaynağa başvuruyor. Başvurduğu kaynak
+sunucuya geri dönüş sağlıyor. Sunucu gelen bu geri dönüşü API ile
+kullanıcıya iletiyor.</p>
+<figure>
+<img src="img2.PNG"
+alt="https://www.altexsoft.com/blog/engineering/what-is-api-definition-types-specifications-documentation/" />
+<figcaption aria-hidden="true"><a
+href="https://www.altexsoft.com/blog/engineering/what-is-api-definition-types-specifications-documentation/"
+class="uri">https://www.altexsoft.com/blog/engineering/what-is-api-definition-types-specifications-documentation/</a></figcaption>
+</figure>
+<p>Endpointler, API üzerinde belli bir amaca yönelik oluşturulmuş
+metotlardır.</p>
+<p>İlk görselde <em>Sorgulama</em> başlığını görüyoruz. Buraya tıklarsak
+eğer <em>OData örneği (ilk 5 sonuç, OData JSON’ı olarak dön)</em> alt
+başlığını göreceğiz. Open Data Protocol anlamına gelen OData, veri
+kaynaklarına HTTP (sunucu ve istemci arasındaki haberleşme protokolü)
+üzerinden sorgu atılmasını sağlar. Yani HTTP tabanlı olması, tüm
+sorguların url (web sitesi erişiminde kullanılan adres) üzerinden
+gerçekleştirilmesidir.</p>
+<p>Son olarak, JavaScript Object Notation’ın kısaltması olan JSON,
+verileri depolamak ve veri alışverişi yapmak için kullanılan kolay ve
+hafif bir yapıdır. JSON, veriyi okuyabilmemizi sağlar. Nasıl?</p>
+<p>Gelin R’da örnek bir JSON yapısı oluşturalım. Bunun için
+<em>jsonlite</em> paketini kullanacağız. <em>rjson</em> da kullandığım
+paketler arasındadır.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://rstudio.github.io/leaflet/'>leaflet</a></span><span class='op'>)</span> <span class='co'># harita</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://httr.r-lib.org/'>httr</a></span><span class='op'>)</span> <span class='co'># API</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://arxiv.org/abs/1403.2805'>jsonlite</a></span><span class='op'>)</span> <span class='co'># JSON</span>
+
+<span class='va'>id</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>100</span>,<span class='fl'>101</span>,<span class='fl'>102</span><span class='op'>)</span>
+<span class='va'>title</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"X"</span>,<span class='st'>"Y"</span>,<span class='st'>"Z"</span><span class='op'>)</span>
+
+<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='va'>id</span>, <span class='va'>title</span><span class='op'>)</span>
+<span class='va'>somedata</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>Category_A <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"1"</span>,<span class='st'>"0"</span>,<span class='st'>"0"</span><span class='op'>)</span>,
+                       Category_B <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"0"</span>,<span class='st'>"0"</span>,<span class='st'>"1"</span><span class='op'>)</span>,
+                       Category_C <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"1"</span>,<span class='st'>"1"</span>,<span class='st'>"1"</span><span class='op'>)</span><span class='op'>)</span>
+<span class='va'>df</span><span class='op'>$</span><span class='va'>somedata</span> <span class='op'>&lt;-</span> <span class='va'>somedata</span>
+
+<span class='fu'><a href='https://rdrr.io/pkg/jsonlite/man/fromJSON.html'>toJSON</a></span><span class='op'>(</span><span class='va'>df</span>, pretty <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[
+  {
+    &quot;id&quot;: 100,
+    &quot;title&quot;: &quot;X&quot;,
+    &quot;somedata&quot;: {
+      &quot;Category_A&quot;: &quot;1&quot;,
+      &quot;Category_B&quot;: &quot;0&quot;,
+      &quot;Category_C&quot;: &quot;1&quot;
+    }
+  },
+  {
+    &quot;id&quot;: 101,
+    &quot;title&quot;: &quot;Y&quot;,
+    &quot;somedata&quot;: {
+      &quot;Category_A&quot;: &quot;0&quot;,
+      &quot;Category_B&quot;: &quot;0&quot;,
+      &quot;Category_C&quot;: &quot;1&quot;
+    }
+  },
+  {
+    &quot;id&quot;: 102,
+    &quot;title&quot;: &quot;Z&quot;,
+    &quot;somedata&quot;: {
+      &quot;Category_A&quot;: &quot;0&quot;,
+      &quot;Category_B&quot;: &quot;1&quot;,
+      &quot;Category_C&quot;: &quot;1&quot;
+    }
+  }
+] </code></pre>
+</div>
+<p>API ile çalışırken <em>httr</em> paketini kullanacağız.</p>
+<p>İlk fonksiyon <em>GET()</em>, veri çekmek için kullanılır.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>res</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://httr.r-lib.org/reference/GET.html'>GET</a></span><span class='op'>(</span>
+  url <span class='op'>=</span> <span class='st'>"https://data.ibb.gov.tr/en/datastore/odata3.0/12f5bc23-224a-43cb-b60d-3f36f83ffd33?$format=json"</span>
+<span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Yukarıda oluşturduğumuz <em>res</em> değişkeni (response), API
+sunucusunun isteğimize verdiği yanıtı içerir.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>res</span>
+</code></pre>
+</div>
+<pre><code>Response [https://data.ibb.gov.tr/en/datastore/odata3.0/12f5bc23-224a-43cb-b60d-3f36f83ffd33?$format=json]
+  Date: 2022-06-11 11:19
+  Status: 200
+  Content-Type: text/html; charset=utf-8
+  Size: 92.3 kB</code></pre>
+</div>
+<p><em>Status</em>’ın 200 olması yanıtın başarılı olduğunu gösterir.
+Yani, istemci ile sunucu arasındaki iletişim herhangi bir hata olmadan
+gerçekleşmiştir.</p>
+<figure>
+<img src="img3.PNG"
+alt="https://dev.to/bisrategebriel/http-status-codes-101-6jh" />
+<figcaption aria-hidden="true"><a
+href="https://dev.to/bisrategebriel/http-status-codes-101-6jh"
+class="uri">https://dev.to/bisrategebriel/http-status-codes-101-6jh</a></figcaption>
+</figure>
+<p>İçeriği aşağıdaki gibi JSON formatına çevirmemiz gerekiyor.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># rawToChar(res$content)</span>
+</code></pre>
+</div>
+</div>
+<p>Her ne kadar dağınık görünse de aslında JSON formatına çevirmiş olduk
+ancak bu format character yapısında oldu. Bu formatı list yapısına
+çevirebiliriz.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>dt</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/jsonlite/man/fromJSON.html'>fromJSON</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/rawConversion.html'>rawToChar</a></span><span class='op'>(</span><span class='va'>res</span><span class='op'>$</span><span class='va'>content</span><span class='op'>)</span><span class='op'>)</span>
+<span class='fu'><a href='https://rdrr.io/r/base/names.html'>names</a></span><span class='op'>(</span><span class='va'>dt</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] &quot;odata.metadata&quot; &quot;value&quot;         </code></pre>
+</div>
+<p>İhtiyacımız olan veriler <em>value</em>’nun içindedir. Koordinat
+bazlı haritalandırma yapacağımız için kullanacağımız değişkenler
+SUBSCRIBER_DOMESTIC_FOREIGN, LONGITUDE, LATITUDE ve NUMBER_OF_SUBSCRIBER
+olacaktır.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master</span> <span class='op'>&lt;-</span> <span class='va'>dt</span><span class='op'>$</span><span class='va'>value</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+SUBSCRIBER_DOMESTIC_FOREIGN
+</th>
+<th style="text-align:right;">
+LONGITUDE
+</th>
+<th style="text-align:right;">
+LATITUDE
+</th>
+<th style="text-align:right;">
+NUMBER_OF_SUBSCRIBER
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+YabancÄ±
+</td>
+<td style="text-align:right;">
+29.02325
+</td>
+<td style="text-align:right;">
+40.99270
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.10552
+</td>
+<td style="text-align:right;">
+41.01701
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.08863
+</td>
+<td style="text-align:right;">
+40.95404
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.09082
+</td>
+<td style="text-align:right;">
+41.24324
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.14665
+</td>
+<td style="text-align:right;">
+40.90128
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.65662
+</td>
+<td style="text-align:right;">
+41.00984
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.11825
+</td>
+<td style="text-align:right;">
+41.04074
+</td>
+<td style="text-align:right;">
+32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.94929
+</td>
+<td style="text-align:right;">
+41.01124
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.72508
+</td>
+<td style="text-align:right;">
+40.98418
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+YabancÄ±
+</td>
+<td style="text-align:right;">
+28.97837
+</td>
+<td style="text-align:right;">
+41.00851
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Boom!</p>
+<p>Küçük bir düzeltme yapmamız gerekiyor. SUBSCRIBER_DOMESTIC_FOREIGN
+değişkenine ait değerlerde Yabancı yerine YabancÄ± yazılmış. Bunu
+<em>gsub()</em> fonksiyonu ile aşağıdaki gibi düzeltebiliriz.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master</span> <span class='op'>&lt;-</span> <span class='va'>master</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>
+    SUBSCRIBER_DOMESTIC_FOREIGN <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"YabancÄ±"</span>,<span class='st'>"Yabancı"</span>,<span class='va'>SUBSCRIBER_DOMESTIC_FOREIGN</span><span class='op'>)</span>
+  <span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+SUBSCRIBER_DOMESTIC_FOREIGN
+</th>
+<th style="text-align:right;">
+LONGITUDE
+</th>
+<th style="text-align:right;">
+LATITUDE
+</th>
+<th style="text-align:right;">
+NUMBER_OF_SUBSCRIBER
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+Yabancı
+</td>
+<td style="text-align:right;">
+29.02325
+</td>
+<td style="text-align:right;">
+40.99270
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.10552
+</td>
+<td style="text-align:right;">
+41.01701
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.08863
+</td>
+<td style="text-align:right;">
+40.95404
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.09082
+</td>
+<td style="text-align:right;">
+41.24324
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.14665
+</td>
+<td style="text-align:right;">
+40.90128
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.65662
+</td>
+<td style="text-align:right;">
+41.00984
+</td>
+<td style="text-align:right;">
+1
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+29.11825
+</td>
+<td style="text-align:right;">
+41.04074
+</td>
+<td style="text-align:right;">
+32
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.94929
+</td>
+<td style="text-align:right;">
+41.01124
+</td>
+<td style="text-align:right;">
+3
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yerli
+</td>
+<td style="text-align:right;">
+28.72508
+</td>
+<td style="text-align:right;">
+40.98418
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Yabancı
+</td>
+<td style="text-align:right;">
+28.97837
+</td>
+<td style="text-align:right;">
+41.00851
+</td>
+<td style="text-align:right;">
+2
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Haritaya geçebiliriz.</p>
+<p>Bu bölümde JavaScript’in bir kütüphanesi olan ve web tabanlı
+interaktif haritalamada tercih edilebilecek <em>leaflet</em>’i
+kullanacağız. En basit haliyle aşağıdaki gibi bir örnek verebiliriz.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/leaflet.html'>leaflet</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/map-layers.html'>addTiles</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/map-layers.html'>addMarkers</a></span><span class='op'>(</span>lng <span class='op'>=</span> <span class='fl'>32.836944</span>, lat <span class='op'>=</span> <span class='fl'>39.925</span>, popup <span class='op'>=</span> <span class='st'>"Anıtkabir"</span><span class='op'>)</span>
+</code></pre>
+</div>
+<div id="htmlwidget-6fd563aaabda97d72fd9" style="width:624px;height:384px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-6fd563aaabda97d72fd9">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addMarkers","args":[39.925,32.836944,null,null,null,{"interactive":true,"draggable":false,"keyboard":true,"title":"","alt":"","zIndexOffset":0,"opacity":1,"riseOnHover":false,"riseOffset":250},"Anıtkabir",null,null,null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null]}],"limits":{"lat":[39.925,39.925],"lng":[32.836944,32.836944]}},"evals":[],"jsHooks":[]}</script>
+</div>
+<p>Çektiğimiz verileri artık haritaya aktarabiliriz.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>palet</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/colorNumeric.html'>colorFactor</a></span><span class='op'>(</span>palette <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"gray"</span>,<span class='st'>"orange"</span>,<span class='st'>"red"</span><span class='op'>)</span>,
+                     domain <span class='op'>=</span> <span class='va'>master</span><span class='op'>$</span><span class='va'>SUBSCRIBER_DOMESTIC_FOREIGN</span><span class='op'>)</span> <span class='co'># renklendirme</span>
+
+<span class='va'>master</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/leaflet.html'>leaflet</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/map-layers.html'>addTiles</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/addProviderTiles.html'>addProviderTiles</a></span><span class='op'>(</span>provider <span class='op'>=</span> <span class='va'>providers</span><span class='op'>$</span><span class='va'>CartoDB.DarkMatterNoLabels</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> <span class='co'># harita tipi</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/map-layers.html'>addCircles</a></span><span class='op'>(</span>lng <span class='op'>=</span> <span class='op'>~</span><span class='va'>LONGITUDE</span>,
+             lat <span class='op'>=</span> <span class='op'>~</span><span class='va'>LATITUDE</span>,
+             weight <span class='op'>=</span> <span class='fl'>3</span>,
+             color <span class='op'>=</span> <span class='op'>~</span><span class='fu'>palet</span><span class='op'>(</span><span class='va'>SUBSCRIBER_DOMESTIC_FOREIGN</span><span class='op'>)</span>,
+             popup<span class='op'>=</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste</a></span><span class='op'>(</span><span class='st'>"Abonelik Tarihi:"</span>, <span class='va'>master</span><span class='op'>$</span><span class='va'>SUBSCRIPTION_DATE</span>, <span class='st'>"&lt;br&gt;"</span>,
+                         <span class='st'>"Abone Tipi:"</span>, <span class='va'>master</span><span class='op'>$</span><span class='va'>SUBSCRIBER_DOMESTIC_FOREIGN</span>, <span class='st'>"&lt;br&gt;"</span>, 
+                         <span class='st'>"Abone Sayısı:"</span>, <span class='va'>master</span><span class='op'>$</span><span class='va'>NUMBER_OF_SUBSCRIBER</span>, <span class='st'>"&lt;br&gt;"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://rdrr.io/pkg/leaflet/man/leaflet-imports.html'>%&gt;%</a></span> <span class='co'># nokta</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/leaflet/man/addLegend.html'>addLegend</a></span><span class='op'>(</span>position <span class='op'>=</span> <span class='st'>"bottomright"</span>,
+            pal <span class='op'>=</span> <span class='va'>palet</span>,
+            values <span class='op'>=</span> <span class='va'>master</span><span class='op'>$</span><span class='va'>SUBSCRIBER_DOMESTIC_FOREIGN</span>,
+            title <span class='op'>=</span> <span class='st'>""</span>,
+            opacity <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span> <span class='co'># lejant</span>
+</code></pre>
+</div>
+<div id="htmlwidget-8a72d2868ad873551722" style="width:624px;height:384px;" class="leaflet html-widget"></div>
+<script type="application/json" data-for="htmlwidget-8a72d2868ad873551722">{"x":{"options":{"crs":{"crsClass":"L.CRS.EPSG3857","code":null,"proj4def":null,"projectedBounds":null,"options":{}}},"calls":[{"method":"addTiles","args":["https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",null,null,{"minZoom":0,"maxZoom":18,"tileSize":256,"subdomains":"abc","errorTileUrl":"","tms":false,"noWrap":false,"zoomOffset":0,"zoomReverse":false,"opacity":1,"zIndex":1,"detectRetina":false,"attribution":"&copy; <a href=\"https://openstreetmap.org\">OpenStreetMap<\/a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA<\/a>"}]},{"method":"addProviderTiles","args":["CartoDB.DarkMatterNoLabels",null,null,{"errorTileUrl":"","noWrap":false,"detectRetina":false}]},{"method":"addCircles","args":[[40.9927,41.017006,40.954044,41.243239,40.90128,41.009845,41.040737,41.01124,40.984185,41.008506,41.037058,41.068341,40.978551,41.044715,40.98844,41.008841,41.011242,40.978484,41.01762,41.029178,40.892454,40.96082,41.08589,40.96995,40.9999,41.041025,41.010555,41.034462,40.92453,41.0176,40.990604,41.00019,40.99213,41.0085,41.04874,41.00683,40.98075,41.057795,41.02604,41.1341,40.96544,40.975596,41.108199,41.0101,40.98656,41.16718,41.0081,40.99213,40.988251,41.029852,41.029178,41.080041,41.03932,40.920918,41.02985,41.00884,41.04638,40.978551,41.007712,41.082908,41.041218,41.02727,41.021925,41.047359,41.00894,40.929618,40.960154,41.018207,41.10443,40.985936,41.021925,40.978484,41.01418,40.91249,40.868536,41.072225,41.053895,41.05301,40.99545,41.10459,41.392387,41.00683,41.01231,41.03172,41.01475,41.024939,40.99253,41.104596,41.040605,41.005342,40.978551,41.017514,41.09774,41.09255,41.01181,41.040117,41.03908,41.053895,41.035982,41.013451,40.88494,41.067514,41.003475,41.00894,40.99213,41.03274,40.892454,40.992707,41.068341,41.01411,40.978551,41.183378,41.02055,40.985878,41.0536,40.98687,41.075281,40.978484,40.924531,41.02727,40.99353,41.035648,40.99203,41.037058,40.892454,41.072225,41.105707,40.96714,41.0182,41.017572,41.00249,41.06751,41.01552,41.243239,41.022063,41.055284,40.9906,41.002993,41.039082,41.061808,40.992531,41.080041,41.00148,41.015653,41.02979,41.07742,40.98844,41.057795,41.108199,40.999602,41.01496,41.01565,41.04744,41.017609,41.030498,40.99213,40.992755,41.068341,41.01758,41.002499,41.02224,41.06034,41.001919,40.901284,41.01757,40.968617,41.082908,41.06409,41.0536,41.03834,41.00788,41.04477,41.087819,41.00919,41.02224,41.075095,41.010197,41.00683,40.987307,41.048105,40.978484,41.108199,40.93897,41.0696,41.050219,41.01285,41.009663,41.0176,41.0081,41.014892,41.00683,41.00919,40.978551,41.036929,41.02881,41.011816,41.012278,41.060332,41.01181,40.90657,41.014079,40.978551,41.009331,41.022246,41.051604,40.975509,41.104805,40.96024,41.02556,41.0182,41.047359,41.02396,40.963136,41.00012,41.038348,41.143438,41.058001,41.053734,41.082908,41.064094,40.97088,40.992531,40.978551,41.01211,41.037058,41.024776,41.064094,41.05983,41.01751,41.17954,41.04121,41.01211,40.892454,40.99353,41.027853,41.07324,41.065278,41.22773,40.892454,41.1057,41.187223,40.99453,41.10402,41.061599,40.99213,40.892454,40.978551,41.083861,41.02371,41.054031,41.0182,41.031331,41.310704,41.1075,41.047446,40.99845,41.162284,41.004253,41.0118,41.031331,41.0118,41.03274,40.593952,41.008899,40.924531,41.00148,41.07407,41.057795,41.064818,40.947455,40.954044,40.912915,40.995034,40.9927,40.999602,41.10119,41.0118,41.01654,41.056851,41.03992,41.01019,41.080995,41.1341,41.083861,40.593952,41.083861,40.91249,41.017758,41.207132,41.179543,41.08854,41.007323,40.99845,41.01475,41.08781,41.017572,41.01654,41.01654,41.03423,41.00534,40.905838,41.03345,41.107116,41.0696,41.009543,40.99017,41.068341,40.978484,41.01489,41.03148,40.990178,40.990178,40.988449,41.097747,40.96219,41.046827,41.04725,41.03274,41.00956,41.028811,41.035648,40.995149,41.049054,41.047359,40.99048,40.978551,41.068341,41.047446,41.012684,41.014079,41.01124,40.980151,40.93462,40.954095,41.06481,41.04744,41.044715,41.080041,41.02206,41.017609,41.027275,40.995052,41.01654,41.014188,41.082908,41.034326,41.00191,41.048105,40.97979,41.03697,41.111189,41.048207,41.01758,41.00954,40.924531,40.92091,41.015525,40.89103,40.99048,40.99537,41.0081,41.000016,41.064094,41.09806,40.96024,40.87441,41.0182,41.068858,40.960824,40.995034,41.083861,41.0274,41.03368,41.108199,41.105707,41.01418,41.04638,41.033384,41.031482,41.03404,41.032534,41.02949,41.080041,41.085679,41.044715,41.01552,40.888024,41.016151,41.00683,41.00534,41.048105,41.03432,41.047359,41.01751,40.97643,41.243239,40.93897,41.009561,41.033193,41.058,41.033458,41.07914,41.02917,41.04247,41.059831,41.02558,40.967629,41.06409,41.04725,41.01285,41.04644,40.978484,41.069605,41.0696,41.028379,41.029331,41.00683,41.031331,41.015149,41.03432,41.0518,40.960154,41.023941,41.04247,40.99704,41.03329,41.13554,41.033384,40.99203,40.99253,41.082908,41.083861,41.032315,41.16003,40.892454,41.007712,41.0696,41.0331,41.14402,41.047359,41.09394,41.03345,40.999602,41.047359,40.969123,40.920918,41.01489,41.082908,40.963136,41.0081,41.082908,41.02689,41.00012,41.017758,41.03705,41.00001,41.155494,41.04007,41.007712,40.88982,41.0182,41.01171,41.01418,40.977902,41.07254,40.978551,41.009197,40.83319,41.024776,41.01418,41.04725,41.033458,41.066865,41.080041,40.95253,41.072875,40.888024,40.994132,41.04644,41.009485,41.0573,41.097747,41.00805,40.96861,41.083229,41.03253,41.07914,40.924531,41.0101,40.888024,41.035648,41.02036,40.976437,40.994532,41.024225,41.01345,41.012137,41.037058,41.012535,40.97848],[29.02325,29.105516,29.08863,29.090822,29.14665,28.656623,29.118248,28.94929,28.725085,28.978365,28.985666,28.981998,28.820556,28.796872,28.78062,28.657735,28.949292,29.233057,29.04378,28.86084,29.189967,28.80734,28.96352,29.05786,28.7653,28.896005,28.909518,28.856627,29.12119,28.97397,28.77166,28.95307,29.02399,28.97836,28.88683,28.97778,28.79174,28.989035,28.93474,29.09185,29.1044,29.099479,29.053011,28.94658,28.86382,29.05751,28.97549,29.023992,28.790419,28.9668,28.86084,29.011473,28.89344,29.16611,28.9668,28.65773,28.98871,28.820556,28.972482,28.948922,29.00736,29.01488,29.063421,28.933511,28.97119,29.145264,28.812574,28.972923,28.78554,28.786787,29.063421,29.233057,28.58272,29.18304,29.256022,28.72489,28.873136,28.87899,28.86388,28.86224,28.453073,28.97778,28.86444,28.79054,29.24496,29.008469,29.22955,28.862245,28.894728,28.976958,28.820556,28.973529,28.8767,28.92277,28.97821,28.893607,28.98954,28.873136,28.59289,28.955328,29.20128,29.044642,28.922089,28.97119,29.02399,28.860657,29.189967,28.59777,28.981998,28.82949,28.820556,29.456303,29.1164,28.896656,28.75983,29.22317,29.138382,29.233057,29.121198,29.01488,28.71296,28.573054,28.845483,28.985666,29.189967,28.72489,28.860871,29.266654,28.97292,28.970257,28.96279,29.04464,28.95411,29.090822,28.921655,28.949284,28.77166,28.890811,28.989542,28.994621,29.229558,29.011473,28.89022,28.932981,28.96927,29.33885,28.78062,28.989035,29.053011,28.884828,29.03821,28.93298,29.02574,28.973976,28.951463,29.02399,28.835378,28.981998,28.97389,28.962793,28.97478,28.912558,28.767776,29.146659,28.97025,29.258734,28.948922,28.99246,28.75983,28.88197,28.8977,28.79624,28.944987,28.96677,28.97478,29.798666,28.97256,28.97778,28.788922,28.932298,29.233057,29.053011,29.31137,28.97888,29.053364,28.81876,28.945011,28.97397,28.97549,28.956406,28.977784,28.96677,28.820556,28.985969,28.93199,28.97821,29.074823,28.987285,28.97821,29.18905,29.190271,28.820556,28.966282,28.974782,28.976831,28.858946,29.073978,28.80753,28.93176,28.97292,28.933511,28.969,28.80068,28.95117,28.881976,29.055617,28.919846,28.932578,28.948922,28.992465,29.05788,29.229558,28.820556,29.011697,28.985666,28.929394,28.992465,29.00767,28.97352,28.75104,29.00736,29.011697,29.189967,28.71296,29.069071,28.25016,28.994942,28.45338,29.189967,28.86087,29.471361,28.90399,28.80075,28.902185,29.02399,29.189967,28.820556,28.926066,28.86374,28.867578,28.97292,28.989684,28.612294,28.80125,29.025741,29.05554,28.88337,28.922037,28.94026,28.989684,28.94026,28.860657,29.023297,29.020952,29.121198,28.89022,28.80074,28.989035,28.886847,29.10161,29.08863,29.188055,28.705535,29.02325,28.884828,28.9942,28.94026,28.951,28.907544,28.46788,28.97256,28.921595,29.09185,28.926066,29.023297,28.926066,29.18304,28.941171,29.131822,28.751046,28.76499,28.843902,29.05554,29.24496,28.94498,28.970257,28.951006,28.951006,29.15253,29.196707,29.161455,28.97738,28.876316,28.97888,28.953944,28.9037,28.981998,29.233057,28.9564,28.98943,28.9037,28.9037,28.780627,28.876702,28.80794,29.051149,28.94027,28.86065,28.95976,28.931995,28.573054,28.706011,29.015456,28.933511,28.92595,28.820556,28.981998,29.025741,28.938473,29.190271,28.94929,28.731161,29.15512,29.276736,28.88684,29.02574,28.796872,29.011473,28.92165,28.973976,29.014881,28.863467,28.951,28.98077,28.948922,28.992646,28.76777,28.932298,29.10319,28.92342,28.858182,28.990258,28.97389,28.95394,29.121198,29.16611,28.954114,29.25202,28.92595,29.06317,28.975497,28.888716,28.992465,28.87652,28.80753,29.12765,28.97292,28.897455,28.807347,28.705535,28.926066,29.0679,28.92817,29.053011,28.860871,28.58272,28.98871,28.870054,28.989436,28.63119,29.026143,28.930938,29.011473,28.982117,28.796872,28.87721,29.187151,28.971066,28.97778,29.1967,28.932298,28.99264,28.933511,28.97352,28.74381,29.090822,29.31137,28.959765,28.912704,28.91984,28.977381,28.89354,28.86084,29.00768,29.007671,28.92922,29.053326,28.99246,28.94027,28.81876,28.9328,29.233057,28.978885,28.97888,28.982257,28.77561,28.97778,28.989684,28.933466,28.99264,28.88765,28.812574,28.921474,29.00768,28.82524,28.86979,28.466635,28.870054,28.845483,29.22955,28.948922,28.926066,29.02601,29.0389,29.189967,28.972482,28.97888,28.472931,28.46099,28.933511,28.905229,28.97738,28.884828,28.933511,29.266941,29.16611,28.9564,28.948922,28.80068,28.975497,28.948922,28.98061,28.95117,28.941171,28.98566,28.88871,29.025047,28.88419,28.972482,29.18934,28.97292,28.650483,28.58272,29.147233,29.01554,28.820556,28.966779,29.29923,28.929394,28.98077,28.94027,28.977381,28.991766,29.011473,29.27685,29.455337,29.187151,29.026507,28.9328,28.965208,28.99127,28.876702,28.79335,29.25873,29.066626,29.02614,28.89354,29.121198,28.946583,29.187151,28.573054,28.57817,28.743816,28.903993,28.960271,28.95532,29.254897,28.985666,28.649426,29.23305],10,null,null,{"interactive":true,"className":"","stroke":true,"color":["#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#BEBEBE","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000"],"weight":3,"opacity":0.5,"fill":true,"fillColor":["#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#BEBEBE","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FFA500","#FFA500","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FF0000","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000","#FFA500","#FF0000","#FF0000"],"fillOpacity":0.2},["Abonelik Tarihi: 2020-12-27 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-01-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-03-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 32 <br>","Abonelik Tarihi: 2021-02-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-22 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-06-30 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-02-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2019-08-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2020-11-30 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 11 <br>","Abonelik Tarihi: 2018-05-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-01-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-11-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-11-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 18 <br>","Abonelik Tarihi: 2021-01-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-03-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 32 <br>","Abonelik Tarihi: 2021-02-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-03-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2020-11-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-07-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-10-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 16 <br>","Abonelik Tarihi: 2021-03-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-28 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-04-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-08-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-10-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2017-10-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 9 <br>","Abonelik Tarihi: 2019-03-08 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-03-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-04-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2018-11-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-01-24 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-10-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-11-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-07-22 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-07-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 67 <br>","Abonelik Tarihi: 2021-06-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-07-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 11 <br>","Abonelik Tarihi: 2021-01-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-13 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-02-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2021-06-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-24 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-07-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-30 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-01 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2020-12-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-02-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-05-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-02-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-06-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-09-12 <br> Abone Tipi: Bilinmiyor <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-02-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-06-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-09-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-09-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 44 <br>","Abonelik Tarihi: 2020-12-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2016-08-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-07-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 9 <br>","Abonelik Tarihi: 2021-06-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2019-10-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-05-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-11-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 12 <br>","Abonelik Tarihi: 2021-01-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-06 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-11-16 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-06-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-13 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-04-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-10-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-10-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2019-04-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 26 <br>","Abonelik Tarihi: 2019-12-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-12-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-22 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2021-05-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-07-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-12-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-03-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-12-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-26 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-06-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-09 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-05-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-01-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2021-04-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-03-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2020-11-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2021-02-02 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-31 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 51 <br>","Abonelik Tarihi: 2019-05-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2018-04-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2020-12-28 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-05-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-09-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-13 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-16 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 64 <br>","Abonelik Tarihi: 2020-11-29 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 11 <br>","Abonelik Tarihi: 2018-05-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2021-06-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-26 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-31 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-02-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-03-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-05-09 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-04-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 17 <br>","Abonelik Tarihi: 2021-05-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2021-06-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2018-08-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-01-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-07-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-01-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 18 <br>","Abonelik Tarihi: 2020-02-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-05-31 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2017-10-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-24 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-03-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2018-11-24 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-05-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-07-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-04-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 20 <br>","Abonelik Tarihi: 2021-02-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-03-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2021-05-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2018-07-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2020-12-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-08-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2020-12-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-02-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 11 <br>","Abonelik Tarihi: 2019-05-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2018-09-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-10-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-03-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-29 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 12 <br>","Abonelik Tarihi: 2018-01-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-11-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-05-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-08-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2015-12-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-12 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-10-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-10-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-09-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-07 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-05-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-11-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-03-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2017-04-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-03-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-02-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-10-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-02-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-10-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 22 <br>","Abonelik Tarihi: 2021-04-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-05-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 26 <br>","Abonelik Tarihi: 2019-10-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-11-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 34 <br>","Abonelik Tarihi: 2021-07-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-12-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-04-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2020-10-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 9 <br>","Abonelik Tarihi: 2019-05-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2018-03-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-03-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 9 <br>","Abonelik Tarihi: 2021-07-10 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-04-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-04-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-01-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2017-01-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-04-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 14 <br>","Abonelik Tarihi: 2021-02-01 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-07-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-02-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-22 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-10-28 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-10-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2019-09-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-10-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-10 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2020-01-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2019-05-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-19 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-06-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2021-07-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-08-14 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-17 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-05-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 19 <br>","Abonelik Tarihi: 2020-11-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-17 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-29 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-01-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-06-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-07-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-10-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-12-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-11 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-07-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-08-23 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-05-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2021-04-27 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-06-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-04-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-03-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2020-11-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2017-09-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-02-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-10-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 14 <br>","Abonelik Tarihi: 2021-07-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-03-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-04-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-06-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 13 <br>","Abonelik Tarihi: 2021-03-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-05 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-04-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2020-12-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2018-12-27 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-03-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2020-11-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-12 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-29 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 140 <br>","Abonelik Tarihi: 2018-04-07 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-05-20 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-11-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-03-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2021-05-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-02-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-11 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-08-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-05-31 <br> Abone Tipi: Yerli <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2020-11-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2017-11-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-07-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-01 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-08-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2017-12-31 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-30 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-06 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-29 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2019-08-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-21 <br> Abone Tipi: Yerli <br> Abone Sayısı: 9 <br>","Abonelik Tarihi: 2018-05-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 6 <br>","Abonelik Tarihi: 2018-12-21 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-06-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-01-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-01-26 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-06-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2021-04-14 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 8 <br>","Abonelik Tarihi: 2018-08-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-03-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2018-06-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-02-18 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 17 <br>","Abonelik Tarihi: 2021-05-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-25 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-07-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-12-31 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-05-25 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-04-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-06-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-03-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-07-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-01-07 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-24 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-02-17 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-02-16 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-09 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 16 <br>","Abonelik Tarihi: 2021-07-09 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2019-12-15 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-11-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 3 <br>","Abonelik Tarihi: 2021-07-10 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2018-09-21 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-07-07 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 7 <br>","Abonelik Tarihi: 2021-06-05 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2020-11-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-04-16 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-02-22 <br> Abone Tipi: Yerli <br> Abone Sayısı: 4 <br>","Abonelik Tarihi: 2021-01-23 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-03 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-13 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-06-24 <br> Abone Tipi: Yerli <br> Abone Sayısı: 26 <br>","Abonelik Tarihi: 2021-04-30 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-02-08 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2019-12-18 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2020-11-17 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-04-19 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-12 <br> Abone Tipi: Yerli <br> Abone Sayısı: 5 <br>","Abonelik Tarihi: 2021-07-03 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-01-04 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2021-06-28 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>","Abonelik Tarihi: 2021-05-09 <br> Abone Tipi: Yabancı <br> Abone Sayısı: 10 <br>","Abonelik Tarihi: 2021-06-30 <br> Abone Tipi: Yerli <br> Abone Sayısı: 2 <br>","Abonelik Tarihi: 2020-12-02 <br> Abone Tipi: Yerli <br> Abone Sayısı: 1 <br>"],null,null,{"interactive":false,"permanent":false,"direction":"auto","opacity":1,"offset":[0,0],"textsize":"10px","textOnly":false,"className":"","sticky":true},null,null]},{"method":"addLegend","args":[{"colors":["#BEBEBE","#FFA500","#FF0000"],"labels":["Bilinmiyor","Yabancı","Yerli"],"na_color":null,"na_label":"NA","opacity":1,"position":"bottomright","type":"factor","title":"","extra":null,"layerId":null,"className":"info legend","group":null}]}],"limits":{"lat":[40.593952,41.392387],"lng":[28.25016,29.798666]}},"evals":[],"jsHooks":[]}</script>
+</div>
+<p>Yukarıdaki harita zoomlanabilir; haritadan noktaların üzerine
+tıklanarak bilgi alınabilir.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom"></div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>

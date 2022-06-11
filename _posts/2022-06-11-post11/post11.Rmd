@@ -1,0 +1,202 @@
+---
+title: "JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi"
+description: |
+  İBB Açık Veri Portalı'ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması.
+author:
+  - name: A. Uraz Akgül
+date: 2022-06-11
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Web
+  - Map
+preview: img4.png
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+2020 yılının Ocak ayında İBB, [Açık Veri Portalı](https://data.ibb.gov.tr/dataset)'nı hizmete sundu. Geçen sürede 253 veri seti paylaşmışlar. Bu veri setlerinin çoğu xlsx, csv gibi formatlardan oluşuyor. Her ne kadar bu formatlar yaygın olarak kullanılsa da direkt web üzerinden verilere ulaşabileceğimiz yollar da var. Daha çok kullanılması dileğiyle demek isterim.
+
+Bu uygulamada hem JSON formatını tanıyacağız hem de çektiğimiz veriler üzerinden bir haritalandırma yapacağız.
+
+Uygulamaya konu İBB WiFi Yeni Kullanıcı Verisi, *İstanbul Büyük Şehir Belediyesi tarafından sağlanan kablosuz internet hizmetini kullanan kullanıcı verilerini içermektedir. İşbu veri kaynağının içerisinde, Abonelik tarihi, Abone olunan ilçe, Abonenin Yerli/Yabancı, Abone olunan lokasyon bilgisi ve kullanıcı sayısı bilgilerini içerir.* -İBB
+
+Bu veri setinin 6 tane değişkeni bulunmaktadır.
+
+* SUBSCRIPTION_DATE: Aboneliğin gerçekleştiği tarih bilgisini içerir.
+
+* SUBSCRIPTION_COUNTY: Aboneliğin gerçekleştiği ilçe bilgisini içerir.
+
+* SUBSCRIBER_DOMESTIC_FOREIGN: Abonenin Türk vatandaşı ise yerli, değilse yabancı bilgisini içerir.
+
+* LONGITUDE: Aboneliğin gerçekleştiği boylam bilgisini içerir.
+
+* LATITUDE: Aboneliğin gerçekleştiği enlem bilgisini içerir.
+
+* NUMBER_OF_SUBSCRIBER: İlgili tarihteki abone sayısı bilgisini içerir.
+
+*Veri API* butonuna tıklarsak eğer karşımıza aşağıdaki ekran çıkacaktır.
+
+![](img1.png)
+
+API, iki yazılım ve bir sunucunun olduğu yerde bağlantı kurma görevi üstlenen bir protokoldür. Biz bu API'ı kullanarak talebimizi sunucuya aktarıyoruz. Talebi alan sunucu kaynağa başvuruyor. Başvurduğu kaynak sunucuya geri dönüş sağlıyor. Sunucu gelen bu geri dönüşü API ile kullanıcıya iletiyor.
+
+![https://www.altexsoft.com/blog/engineering/what-is-api-definition-types-specifications-documentation/](img2.png)
+
+Endpointler, API üzerinde belli bir amaca yönelik oluşturulmuş metotlardır.
+
+İlk görselde *Sorgulama* başlığını görüyoruz. Buraya tıklarsak eğer *OData örneği (ilk 5 sonuç, OData JSON’ı olarak dön)* alt başlığını göreceğiz. Open Data Protocol anlamına gelen OData, veri kaynaklarına HTTP (sunucu ve istemci arasındaki haberleşme protokolü) üzerinden sorgu atılmasını sağlar. Yani HTTP tabanlı olması, tüm sorguların url (web sitesi erişiminde kullanılan adres) üzerinden gerçekleştirilmesidir.
+
+Son olarak, JavaScript Object Notation'ın kısaltması olan JSON, verileri depolamak ve veri alışverişi yapmak için kullanılan kolay ve hafif bir yapıdır. JSON, veriyi okuyabilmemizi sağlar. Nasıl?
+
+Gelin R'da örnek bir JSON yapısı oluşturalım. Bunun için *jsonlite* paketini kullanacağız. *rjson* da kullandığım paketler arasındadır.
+
+```{r}
+
+library(tidyverse)
+library(leaflet) # harita
+library(httr) # API
+
+```
+
+```{r}
+
+library(jsonlite) # JSON
+
+id <- c(100,101,102)
+title <- c("X","Y","Z")
+
+df <- data.frame(id, title)
+somedata <- data.frame(Category_A = c("1","0","0"),
+                       Category_B = c("0","0","1"),
+                       Category_C = c("1","1","1"))
+df$somedata <- somedata
+
+toJSON(df, pretty = TRUE)
+
+```
+
+API ile çalışırken *httr* paketini kullanacağız.
+
+İlk fonksiyon *GET()*, veri çekmek için kullanılır.
+
+```{r}
+
+res <- GET(
+  url = "https://data.ibb.gov.tr/en/datastore/odata3.0/12f5bc23-224a-43cb-b60d-3f36f83ffd33?$format=json"
+)
+
+```
+
+Yukarıda oluşturduğumuz *res* değişkeni (response), API sunucusunun isteğimize verdiği yanıtı içerir.
+
+```{r}
+
+res
+
+```
+
+*Status*'ın 200 olması yanıtın başarılı olduğunu gösterir. Yani, istemci ile sunucu arasındaki iletişim herhangi bir hata olmadan gerçekleşmiştir.
+
+![https://dev.to/bisrategebriel/http-status-codes-101-6jh](img3.png)
+
+İçeriği aşağıdaki gibi JSON formatına çevirmemiz gerekiyor.
+
+```{r}
+
+# rawToChar(res$content)
+
+```
+
+Her ne kadar dağınık görünse de aslında JSON formatına çevirmiş olduk ancak bu format character yapısında oldu. Bu formatı list yapısına çevirebiliriz.
+
+```{r}
+
+dt <- fromJSON(rawToChar(res$content))
+names(dt)
+
+```
+
+İhtiyacımız olan veriler *value*'nun içindedir. Koordinat bazlı haritalandırma yapacağımız için kullanacağımız değişkenler SUBSCRIBER_DOMESTIC_FOREIGN, LONGITUDE, LATITUDE ve NUMBER_OF_SUBSCRIBER olacaktır.
+
+```{r}
+
+master <- dt$value
+
+```
+
+```{r echo=FALSE}
+
+master %>% 
+  select(SUBSCRIBER_DOMESTIC_FOREIGN, LONGITUDE, LATITUDE, NUMBER_OF_SUBSCRIBER) %>% 
+  head(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Boom!
+
+Küçük bir düzeltme yapmamız gerekiyor. SUBSCRIBER_DOMESTIC_FOREIGN değişkenine ait değerlerde Yabancı yerine YabancÄ± yazılmış. Bunu *gsub()* fonksiyonu ile aşağıdaki gibi düzeltebiliriz.
+
+```{r}
+
+master <- master %>% 
+  mutate(
+    SUBSCRIBER_DOMESTIC_FOREIGN = gsub("YabancÄ±","Yabancı",SUBSCRIBER_DOMESTIC_FOREIGN)
+  )
+
+```
+
+```{r echo=FALSE}
+
+master %>% 
+  select(SUBSCRIBER_DOMESTIC_FOREIGN, LONGITUDE, LATITUDE, NUMBER_OF_SUBSCRIBER) %>% 
+  head(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Haritaya geçebiliriz.
+
+Bu bölümde JavaScript'in bir kütüphanesi olan ve web tabanlı interaktif haritalamada tercih edilebilecek *leaflet*'i kullanacağız. En basit haliyle aşağıdaki gibi bir örnek verebiliriz.
+
+```{r}
+
+leaflet() %>% 
+  addTiles() %>% 
+  addMarkers(lng = 32.836944, lat = 39.925, popup = "Anıtkabir")
+
+```
+
+Çektiğimiz verileri artık haritaya aktarabiliriz.
+
+```{r}
+
+palet <- colorFactor(palette = c("gray","orange","red"),
+                     domain = master$SUBSCRIBER_DOMESTIC_FOREIGN) # renklendirme
+
+master %>% 
+  leaflet() %>% 
+  addTiles() %>% 
+  addProviderTiles(provider = providers$CartoDB.DarkMatterNoLabels) %>% # harita tipi
+  addCircles(lng = ~LONGITUDE,
+             lat = ~LATITUDE,
+             weight = 3,
+             color = ~palet(SUBSCRIBER_DOMESTIC_FOREIGN),
+             popup=paste("Abonelik Tarihi:", master$SUBSCRIPTION_DATE, "<br>",
+                         "Abone Tipi:", master$SUBSCRIBER_DOMESTIC_FOREIGN, "<br>", 
+                         "Abone Sayısı:", master$NUMBER_OF_SUBSCRIBER, "<br>")) %>% # nokta
+  addLegend(position = "bottomright",
+            pal = palet,
+            values = master$SUBSCRIBER_DOMESTIC_FOREIGN,
+            title = "",
+            opacity = 1) # lejant
+
+```
+
+Yukarıdaki harita zoomlanabilir; haritadan noktaların üzerine tıklanarak bilgi alınabilir.
