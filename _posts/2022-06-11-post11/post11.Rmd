@@ -2,6 +2,7 @@
 title: "JSON Formatındaki Veriye Ulaşmak: İBB WiFi Yeni Kullanıcı Verisi"
 description: |
   İBB Açık Veri Portalı'ndaki JSON formatındaki bir veri setinin çekilmesi ve haritalandırılması.
+preview: img4.png
 author:
   - name: A. Uraz Akgül
 date: 2022-06-11
@@ -199,7 +200,3 @@ master %>%
 ```
 
 Yukarıdaki harita zoomlanabilir; haritadan noktaların üzerine tıklanarak bilgi alınabilir.
-
-```{r preview=TRUE, out.width='100%', echo=FALSE}
-knitr::include_graphics("img4.png")
-```
