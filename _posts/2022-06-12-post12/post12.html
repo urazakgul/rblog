@@ -1,0 +1,5115 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml" lang="" xml:lang="">
+
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1"/>
+  <meta name="generator" content="distill" />
+
+  <style type="text/css">
+  /* Hide doc at startup (prevent jankiness while JS renders/transforms) */
+  body {
+    visibility: hidden;
+  }
+  </style>
+
+ <!--radix_placeholder_import_source-->
+ <!--/radix_placeholder_import_source-->
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ad0000; } /* Alert */
+code span.an { color: #5e5e5e; } /* Annotation */
+code span.at { } /* Attribute */
+code span.bn { color: #ad0000; } /* BaseN */
+code span.bu { } /* BuiltIn */
+code span.cf { color: #007ba5; } /* ControlFlow */
+code span.ch { color: #20794d; } /* Char */
+code span.cn { color: #8f5902; } /* Constant */
+code span.co { color: #5e5e5e; } /* Comment */
+code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+code span.dt { color: #ad0000; } /* DataType */
+code span.dv { color: #ad0000; } /* DecVal */
+code span.er { color: #ad0000; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #ad0000; } /* Float */
+code span.fu { color: #4758ab; } /* Function */
+code span.im { } /* Import */
+code span.in { color: #5e5e5e; } /* Information */
+code span.kw { color: #007ba5; } /* Keyword */
+code span.op { color: #5e5e5e; } /* Operator */
+code span.ot { color: #007ba5; } /* Other */
+code span.pp { color: #ad0000; } /* Preprocessor */
+code span.sc { color: #5e5e5e; } /* SpecialChar */
+code span.ss { color: #20794d; } /* SpecialString */
+code span.st { color: #20794d; } /* String */
+code span.va { color: #111111; } /* Variable */
+code span.vs { color: #20794d; } /* VerbatimString */
+code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+</style>
+
+
+  <!--radix_placeholder_meta_tags-->
+  <title>Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği</title>
+
+  <meta property="description" itemprop="description" content="Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile ölçülmesi."/>
+
+
+  <!--  https://schema.org/Article -->
+  <meta property="article:published" itemprop="datePublished" content="2022-06-12"/>
+  <meta property="article:created" itemprop="dateCreated" content="2022-06-12"/>
+  <meta name="article:author" content="A. Uraz Akgül"/>
+
+  <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
+  <meta property="og:title" content="Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği"/>
+  <meta property="og:type" content="article"/>
+  <meta property="og:description" content="Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile ölçülmesi."/>
+  <meta property="og:locale" content="en_US"/>
+
+  <!--  https://dev.twitter.com/cards/types/summary -->
+  <meta property="twitter:card" content="summary"/>
+  <meta property="twitter:title" content="Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği"/>
+  <meta property="twitter:description" content="Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile ölçülmesi."/>
+
+  <!--/radix_placeholder_meta_tags-->
+  <!--radix_placeholder_rmarkdown_metadata-->
+
+  <script type="text/json" id="radix-rmarkdown-metadata">
+  {"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","categories"]}},"value":[{"type":"character","attributes":{},"value":["Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği"]},{"type":"character","attributes":{},"value":["Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile ölçülmesi.\n"]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["A. Uraz Akgül"]}]}]},{"type":"character","attributes":{},"value":["2022-06-12"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["Machine Learning","Text","Social Media"]}]}
+  </script>
+  <!--/radix_placeholder_rmarkdown_metadata-->
+  
+  <script type="text/json" id="radix-resource-manifest">
+  {"type":"character","attributes":{},"value":["post12_files/anchor-4.2.2/anchor.min.js","post12_files/bowser-1.9.3/bowser.min.js","post12_files/distill-2.2.21/template.v2.js","post12_files/figure-html5/unnamed-chunk-15-1.png","post12_files/figure-html5/unnamed-chunk-16-1.png","post12_files/header-attrs-2.13/header-attrs.js","post12_files/jquery-3.6.0/jquery-3.6.0.js","post12_files/jquery-3.6.0/jquery-3.6.0.min.js","post12_files/jquery-3.6.0/jquery-3.6.0.min.map","post12_files/kePrint-0.0.1/kePrint.js","post12_files/lightable-0.0.1/lightable.css","post12_files/popper-2.6.0/popper.min.js","post12_files/tippy-6.2.7/tippy-bundle.umd.min.js","post12_files/tippy-6.2.7/tippy-light-border.css","post12_files/tippy-6.2.7/tippy.css","post12_files/tippy-6.2.7/tippy.umd.min.js","post12_files/webcomponents-2.0.0/webcomponents.js","result.PNG","tweets.xlsx"]}
+  </script>
+  <!--radix_placeholder_navigation_in_header-->
+  <!--/radix_placeholder_navigation_in_header-->
+  <!--radix_placeholder_distill-->
+
+  <style type="text/css">
+
+  body {
+    background-color: white;
+  }
+
+  .pandoc-table {
+    width: 100%;
+  }
+
+  .pandoc-table>caption {
+    margin-bottom: 10px;
+  }
+
+  .pandoc-table th:not([align]) {
+    text-align: left;
+  }
+
+  .pagedtable-footer {
+    font-size: 15px;
+  }
+
+  d-byline .byline {
+    grid-template-columns: 2fr 2fr;
+  }
+
+  d-byline .byline h3 {
+    margin-block-start: 1.5em;
+  }
+
+  d-byline .byline .authors-affiliations h3 {
+    margin-block-start: 0.5em;
+  }
+
+  .authors-affiliations .orcid-id {
+    width: 16px;
+    height:16px;
+    margin-left: 4px;
+    margin-right: 4px;
+    vertical-align: middle;
+    padding-bottom: 2px;
+  }
+
+  d-title .dt-tags {
+    margin-top: 1em;
+    grid-column: text;
+  }
+
+  .dt-tags .dt-tag {
+    text-decoration: none;
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0em 0.4em;
+    margin-right: 0.5em;
+    margin-bottom: 0.4em;
+    font-size: 70%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  d-article table.gt_table td,
+  d-article table.gt_table th {
+    border-bottom: none;
+  }
+
+  .html-widget {
+    margin-bottom: 2.0em;
+  }
+
+  .l-screen-inset {
+    padding-right: 16px;
+  }
+
+  .l-screen .caption {
+    margin-left: 10px;
+  }
+
+  .shaded {
+    background: rgb(247, 247, 247);
+    padding-top: 20px;
+    padding-bottom: 20px;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .shaded .html-widget {
+    margin-bottom: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .shaded .shaded-content {
+    background: white;
+  }
+
+  .text-output {
+    margin-top: 0;
+    line-height: 1.5em;
+  }
+
+  .hidden {
+    display: none !important;
+  }
+
+  d-article {
+    padding-top: 2.5rem;
+    padding-bottom: 30px;
+  }
+
+  d-appendix {
+    padding-top: 30px;
+  }
+
+  d-article>p>img {
+    width: 100%;
+  }
+
+  d-article h2 {
+    margin: 1rem 0 1.5rem 0;
+  }
+
+  d-article h3 {
+    margin-top: 1.5rem;
+  }
+
+  d-article iframe {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    margin-bottom: 2.0em;
+    width: 100%;
+  }
+
+  /* Tweak code blocks */
+
+  d-article div.sourceCode code,
+  d-article pre code {
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+  }
+
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: auto;
+  }
+
+  d-article div.sourceCode {
+    background-color: white;
+  }
+
+  d-article div.sourceCode pre {
+    padding-left: 10px;
+    font-size: 12px;
+    border-left: 2px solid rgba(0,0,0,0.1);
+  }
+
+  d-article pre {
+    font-size: 12px;
+    color: black;
+    background: none;
+    margin-top: 0;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+
+  d-article pre a {
+    border-bottom: none;
+  }
+
+  d-article pre a:hover {
+    border-bottom: none;
+    text-decoration: underline;
+  }
+
+  d-article details {
+    grid-column: text;
+    margin-bottom: 0.8em;
+  }
+
+  @media(min-width: 768px) {
+
+  d-article pre,
+  d-article div.sourceCode,
+  d-article div.sourceCode pre {
+    overflow: visible !important;
+  }
+
+  d-article div.sourceCode pre {
+    padding-left: 18px;
+    font-size: 14px;
+  }
+
+  d-article pre {
+    font-size: 14px;
+  }
+
+  }
+
+  figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  /* CSS for d-contents */
+
+  .d-contents {
+    grid-column: text;
+    color: rgba(0,0,0,0.8);
+    font-size: 0.9em;
+    padding-bottom: 1em;
+    margin-bottom: 1em;
+    padding-bottom: 0.5em;
+    margin-bottom: 1em;
+    padding-left: 0.25em;
+    justify-self: start;
+  }
+
+  @media(min-width: 1000px) {
+    .d-contents.d-contents-float {
+      height: 0;
+      grid-column-start: 1;
+      grid-column-end: 4;
+      justify-self: center;
+      padding-right: 3em;
+      padding-left: 2em;
+    }
+  }
+
+  .d-contents nav h3 {
+    font-size: 18px;
+    margin-top: 0;
+    margin-bottom: 1em;
+  }
+
+  .d-contents li {
+    list-style-type: none
+  }
+
+  .d-contents nav > ul {
+    padding-left: 0;
+  }
+
+  .d-contents ul {
+    padding-left: 1em
+  }
+
+  .d-contents nav ul li {
+    margin-top: 0.6em;
+    margin-bottom: 0.2em;
+  }
+
+  .d-contents nav a {
+    font-size: 13px;
+    border-bottom: none;
+    text-decoration: none
+    color: rgba(0, 0, 0, 0.8);
+  }
+
+  .d-contents nav a:hover {
+    text-decoration: underline solid rgba(0, 0, 0, 0.6)
+  }
+
+  .d-contents nav > ul > li > a {
+    font-weight: 600;
+  }
+
+  .d-contents nav > ul > li > ul {
+    font-weight: inherit;
+  }
+
+  .d-contents nav > ul > li > ul > li {
+    margin-top: 0.2em;
+  }
+
+
+  .d-contents nav ul {
+    margin-top: 0;
+    margin-bottom: 0.25em;
+  }
+
+  .d-article-with-toc h2:nth-child(2) {
+    margin-top: 0;
+  }
+
+
+  /* Figure */
+
+  .figure {
+    position: relative;
+    margin-bottom: 2.5em;
+    margin-top: 1.5em;
+  }
+
+  .figure img {
+    width: 100%;
+  }
+
+  .figure .caption {
+    color: rgba(0, 0, 0, 0.6);
+    font-size: 12px;
+    line-height: 1.5em;
+  }
+
+  .figure img.external {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 0 1px 8px rgba(0, 0, 0, 0.1);
+    padding: 18px;
+    box-sizing: border-box;
+  }
+
+  .figure .caption a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .figure .caption b,
+  .figure .caption strong, {
+    font-weight: 600;
+    color: rgba(0, 0, 0, 1.0);
+  }
+
+  /* Citations */
+
+  d-article .citation {
+    color: inherit;
+    cursor: inherit;
+  }
+
+  div.hanging-indent{
+    margin-left: 1em; text-indent: -1em;
+  }
+
+  /* Citation hover box */
+
+  .tippy-box[data-theme~=light-border] {
+    background-color: rgba(250, 250, 250, 0.95);
+  }
+
+  .tippy-content > p {
+    margin-bottom: 0;
+    padding: 2px;
+  }
+
+
+  /* Tweak 1000px media break to show more text */
+
+  @media(min-width: 1000px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 80px [middle-start] 50px [text-start kicker-end] 65px 65px 65px 65px 65px 65px 65px 65px [text-end gutter-start] 65px [middle-end] 65px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 16px;
+    }
+
+    .grid {
+      grid-column-gap: 16px;
+    }
+
+    d-article {
+      font-size: 1.06rem;
+      line-height: 1.7em;
+    }
+    figure .caption, .figure .caption, figure figcaption {
+      font-size: 13px;
+    }
+  }
+
+  @media(min-width: 1180px) {
+    .base-grid,
+    distill-header,
+    d-title,
+    d-abstract,
+    d-article,
+    d-appendix,
+    distill-appendix,
+    d-byline,
+    d-footnote-list,
+    d-citation-list,
+    distill-footer {
+      grid-template-columns: [screen-start] 1fr [page-start kicker-start] 60px [middle-start] 60px [text-start kicker-end] 60px 60px 60px 60px 60px 60px 60px 60px [text-end gutter-start] 60px [middle-end] 60px [page-end gutter-end] 1fr [screen-end];
+      grid-column-gap: 32px;
+    }
+
+    .grid {
+      grid-column-gap: 32px;
+    }
+  }
+
+
+  /* Get the citation styles for the appendix (not auto-injected on render since
+     we do our own rendering of the citation appendix) */
+
+  d-appendix .citation-appendix,
+  .d-appendix .citation-appendix {
+    font-size: 11px;
+    line-height: 15px;
+    border-left: 1px solid rgba(0, 0, 0, 0.1);
+    padding-left: 18px;
+    border: 1px solid rgba(0,0,0,0.1);
+    background: rgba(0, 0, 0, 0.02);
+    padding: 10px 18px;
+    border-radius: 3px;
+    color: rgba(150, 150, 150, 1);
+    overflow: hidden;
+    margin-top: -12px;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+  }
+
+  /* Include appendix styles here so they can be overridden */
+
+  d-appendix {
+    contain: layout style;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-top: 60px;
+    margin-bottom: 0;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+    color: rgba(0,0,0,0.5);
+    padding-top: 60px;
+    padding-bottom: 48px;
+  }
+
+  d-appendix h3 {
+    grid-column: page-start / text-start;
+    font-size: 15px;
+    font-weight: 500;
+    margin-top: 1em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.65);
+  }
+
+  d-appendix h3 + * {
+    margin-top: 1em;
+  }
+
+  d-appendix ol {
+    padding: 0 0 0 15px;
+  }
+
+  @media (min-width: 768px) {
+    d-appendix ol {
+      padding: 0 0 0 30px;
+      margin-left: -30px;
+    }
+  }
+
+  d-appendix li {
+    margin-bottom: 1em;
+  }
+
+  d-appendix a {
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  d-appendix > * {
+    grid-column: text;
+  }
+
+  d-appendix > d-footnote-list,
+  d-appendix > d-citation-list,
+  d-appendix > distill-appendix {
+    grid-column: screen;
+  }
+
+  /* Include footnote styles here so they can be overridden */
+
+  d-footnote-list {
+    contain: layout style;
+  }
+
+  d-footnote-list > * {
+    grid-column: text;
+  }
+
+  d-footnote-list a.footnote-backlink {
+    color: rgba(0,0,0,0.3);
+    padding-left: 0.5em;
+  }
+
+
+
+  /* Anchor.js */
+
+  .anchorjs-link {
+    /*transition: all .25s linear; */
+    text-decoration: none;
+    border-bottom: none;
+  }
+  *:hover > .anchorjs-link {
+    margin-left: -1.125em !important;
+    text-decoration: none;
+    border-bottom: none;
+  }
+
+  /* Social footer */
+
+  .social_footer {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.67);
+  }
+
+  .disqus-comments {
+    margin-right: 30px;
+  }
+
+  .disqus-comment-count {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+    cursor: pointer;
+  }
+
+  #disqus_thread {
+    margin-top: 30px;
+  }
+
+  .article-sharing a {
+    border-bottom: none;
+    margin-right: 8px;
+  }
+
+  .article-sharing a:hover {
+    border-bottom: none;
+  }
+
+  .sidebar-section.subscribe {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+
+  .subscribe p {
+    margin-bottom: 0.5em;
+  }
+
+
+  .article-footer .subscribe {
+    font-size: 15px;
+    margin-top: 45px;
+  }
+
+
+  .sidebar-section.custom {
+    font-size: 12px;
+    line-height: 1.6em;
+  }
+
+  .custom p {
+    margin-bottom: 0.5em;
+  }
+
+  /* Styles for listing layout (hide title) */
+  .layout-listing d-title, .layout-listing .d-title {
+    display: none;
+  }
+
+  /* Styles for posts lists (not auto-injected) */
+
+
+  .posts-with-sidebar {
+    padding-left: 45px;
+    padding-right: 45px;
+  }
+
+  .posts-list .description h2,
+  .posts-list .description p {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  .posts-list .description h2 {
+    font-weight: 700;
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .posts-list h2.post-tag {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+    padding-bottom: 12px;
+  }
+  .posts-list {
+    margin-top: 60px;
+    margin-bottom: 24px;
+  }
+
+  .posts-list .post-preview {
+    text-decoration: none;
+    overflow: hidden;
+    display: block;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding: 24px 0;
+  }
+
+  .post-preview-last {
+    border-bottom: none !important;
+  }
+
+  .posts-list .posts-list-caption {
+    grid-column: screen;
+    font-weight: 400;
+  }
+
+  .posts-list .post-preview h2 {
+    margin: 0 0 6px 0;
+    line-height: 1.2em;
+    font-style: normal;
+    font-size: 24px;
+  }
+
+  .posts-list .post-preview p {
+    margin: 0 0 12px 0;
+    line-height: 1.4em;
+    font-size: 16px;
+  }
+
+  .posts-list .post-preview .thumbnail {
+    box-sizing: border-box;
+    margin-bottom: 24px;
+    position: relative;
+    max-width: 500px;
+  }
+  .posts-list .post-preview img {
+    width: 100%;
+    display: block;
+  }
+
+  .posts-list .metadata {
+    font-size: 12px;
+    line-height: 1.4em;
+    margin-bottom: 18px;
+  }
+
+  .posts-list .metadata > * {
+    display: inline-block;
+  }
+
+  .posts-list .metadata .publishedDate {
+    margin-right: 2em;
+  }
+
+  .posts-list .metadata .dt-authors {
+    display: block;
+    margin-top: 0.3em;
+    margin-right: 2em;
+  }
+
+  .posts-list .dt-tags {
+    display: block;
+    line-height: 1em;
+  }
+
+  .posts-list .dt-tags .dt-tag {
+    display: inline-block;
+    color: rgba(0,0,0,0.6);
+    padding: 0.3em 0.4em;
+    margin-right: 0.2em;
+    margin-bottom: 0.4em;
+    font-size: 60%;
+    border: 1px solid rgba(0,0,0,0.2);
+    border-radius: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .posts-list img {
+    opacity: 1;
+  }
+
+  .posts-list img[data-src] {
+    opacity: 0;
+  }
+
+  .posts-more {
+    clear: both;
+  }
+
+
+  .posts-sidebar {
+    font-size: 16px;
+  }
+
+  .posts-sidebar h3 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 0.5em;
+    font-weight: 400;
+    text-transform: uppercase;
+  }
+
+  .sidebar-section {
+    margin-bottom: 30px;
+  }
+
+  .categories ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .categories li {
+    color: rgba(0, 0, 0, 0.8);
+    margin-bottom: 0;
+  }
+
+  .categories li>a {
+    border-bottom: none;
+  }
+
+  .categories li>a:hover {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.4);
+  }
+
+  .categories .active {
+    font-weight: 600;
+  }
+
+  .categories .category-count {
+    color: rgba(0, 0, 0, 0.4);
+  }
+
+
+  @media(min-width: 768px) {
+    .posts-list .post-preview h2 {
+      font-size: 26px;
+    }
+    .posts-list .post-preview .thumbnail {
+      float: right;
+      width: 30%;
+      margin-bottom: 0;
+    }
+    .posts-list .post-preview .description {
+      float: left;
+      width: 45%;
+    }
+    .posts-list .post-preview .metadata {
+      float: left;
+      width: 20%;
+      margin-top: 8px;
+    }
+    .posts-list .post-preview p {
+      margin: 0 0 12px 0;
+      line-height: 1.5em;
+      font-size: 16px;
+    }
+    .posts-with-sidebar .posts-list {
+      float: left;
+      width: 75%;
+    }
+    .posts-with-sidebar .posts-sidebar {
+      float: right;
+      width: 20%;
+      margin-top: 60px;
+      padding-top: 24px;
+      padding-bottom: 24px;
+    }
+  }
+
+
+  /* Improve display for browsers without grid (IE/Edge <= 15) */
+
+  .downlevel {
+    line-height: 1.6em;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+  }
+
+  .downlevel .d-title {
+    padding-top: 6rem;
+    padding-bottom: 1.5rem;
+  }
+
+  .downlevel .d-title h1 {
+    font-size: 50px;
+    font-weight: 700;
+    line-height: 1.1em;
+    margin: 0 0 0.5rem;
+  }
+
+  .downlevel .d-title p {
+    font-weight: 300;
+    font-size: 1.2rem;
+    line-height: 1.55em;
+    margin-top: 0;
+  }
+
+  .downlevel .d-byline {
+    padding-top: 0.8em;
+    padding-bottom: 0.8em;
+    font-size: 0.8rem;
+    line-height: 1.8em;
+  }
+
+  .downlevel .section-separator {
+    border: none;
+    border-top: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .downlevel .d-article {
+    font-size: 1.06rem;
+    line-height: 1.7em;
+    padding-top: 1rem;
+    padding-bottom: 2rem;
+  }
+
+
+  .downlevel .d-appendix {
+    padding-left: 0;
+    padding-right: 0;
+    max-width: none;
+    font-size: 0.8em;
+    line-height: 1.7em;
+    margin-bottom: 0;
+    color: rgba(0,0,0,0.5);
+    padding-top: 40px;
+    padding-bottom: 48px;
+  }
+
+  .downlevel .footnotes ol {
+    padding-left: 13px;
+  }
+
+  .downlevel .base-grid,
+  .downlevel .distill-header,
+  .downlevel .d-title,
+  .downlevel .d-abstract,
+  .downlevel .d-article,
+  .downlevel .d-appendix,
+  .downlevel .distill-appendix,
+  .downlevel .d-byline,
+  .downlevel .d-footnote-list,
+  .downlevel .d-citation-list,
+  .downlevel .distill-footer,
+  .downlevel .appendix-bottom,
+  .downlevel .posts-container {
+    padding-left: 40px;
+    padding-right: 40px;
+  }
+
+  @media(min-width: 768px) {
+    .downlevel .base-grid,
+    .downlevel .distill-header,
+    .downlevel .d-title,
+    .downlevel .d-abstract,
+    .downlevel .d-article,
+    .downlevel .d-appendix,
+    .downlevel .distill-appendix,
+    .downlevel .d-byline,
+    .downlevel .d-footnote-list,
+    .downlevel .d-citation-list,
+    .downlevel .distill-footer,
+    .downlevel .appendix-bottom,
+    .downlevel .posts-container {
+    padding-left: 150px;
+    padding-right: 150px;
+    max-width: 900px;
+  }
+  }
+
+  .downlevel pre code {
+    display: block;
+    border-left: 2px solid rgba(0, 0, 0, .1);
+    padding: 0 0 0 20px;
+    font-size: 14px;
+  }
+
+  .downlevel code, .downlevel pre {
+    color: black;
+    background: none;
+    font-family: Consolas, Monaco, 'Andale Mono', 'Ubuntu Mono', monospace;
+    text-align: left;
+    white-space: pre;
+    word-spacing: normal;
+    word-break: normal;
+    word-wrap: normal;
+    line-height: 1.5;
+
+    -moz-tab-size: 4;
+    -o-tab-size: 4;
+    tab-size: 4;
+
+    -webkit-hyphens: none;
+    -moz-hyphens: none;
+    -ms-hyphens: none;
+    hyphens: none;
+  }
+
+  .downlevel .posts-list .post-preview {
+    color: inherit;
+  }
+
+
+
+  </style>
+
+  <script type="application/javascript">
+
+  function is_downlevel_browser() {
+    if (bowser.isUnsupportedBrowser({ msie: "12", msedge: "16"},
+                                   window.navigator.userAgent)) {
+      return true;
+    } else {
+      return window.load_distill_framework === undefined;
+    }
+  }
+
+  // show body when load is complete
+  function on_load_complete() {
+
+    // add anchors
+    if (window.anchors) {
+      window.anchors.options.placement = 'left';
+      window.anchors.add('d-article > h2, d-article > h3, d-article > h4, d-article > h5');
+    }
+
+
+    // set body to visible
+    document.body.style.visibility = 'visible';
+
+    // force redraw for leaflet widgets
+    if (window.HTMLWidgets) {
+      var maps = window.HTMLWidgets.findAll(".leaflet");
+      $.each(maps, function(i, el) {
+        var map = this.getMap();
+        map.invalidateSize();
+        map.eachLayer(function(layer) {
+          if (layer instanceof L.TileLayer)
+            layer.redraw();
+        });
+      });
+    }
+
+    // trigger 'shown' so htmlwidgets resize
+    $('d-article').trigger('shown');
+  }
+
+  function init_distill() {
+
+    init_common();
+
+    // create front matter
+    var front_matter = $('<d-front-matter></d-front-matter>');
+    $('#distill-front-matter').wrap(front_matter);
+
+    // create d-title
+    $('.d-title').changeElementType('d-title');
+
+    // create d-byline
+    var byline = $('<d-byline></d-byline>');
+    $('.d-byline').replaceWith(byline);
+
+    // create d-article
+    var article = $('<d-article></d-article>');
+    $('.d-article').wrap(article).children().unwrap();
+
+    // move posts container into article
+    $('.posts-container').appendTo($('d-article'));
+
+    // create d-appendix
+    $('.d-appendix').changeElementType('d-appendix');
+
+    // flag indicating that we have appendix items
+    var appendix = $('.appendix-bottom').children('h3').length > 0;
+
+    // replace footnotes with <d-footnote>
+    $('.footnote-ref').each(function(i, val) {
+      appendix = true;
+      var href = $(this).attr('href');
+      var id = href.replace('#', '');
+      var fn = $('#' + id);
+      var fn_p = $('#' + id + '>p');
+      fn_p.find('.footnote-back').remove();
+      var text = fn_p.html();
+      var dtfn = $('<d-footnote></d-footnote>');
+      dtfn.html(text);
+      $(this).replaceWith(dtfn);
+    });
+    // remove footnotes
+    $('.footnotes').remove();
+
+    // move refs into #references-listing
+    $('#references-listing').replaceWith($('#refs'));
+
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      var id = $(this).attr('id');
+      $('.d-contents a[href="#' + id + '"]').parent().remove();
+      appendix = true;
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('d-appendix'));
+    });
+
+    // show d-appendix if we have appendix content
+    $("d-appendix").css('display', appendix ? 'grid' : 'none');
+
+    // localize layout chunks to just output
+    $('.layout-chunk').each(function(i, val) {
+
+      // capture layout
+      var layout = $(this).attr('data-layout');
+
+      // apply layout to markdown level block elements
+      var elements = $(this).children().not('details, div.sourceCode, pre, script');
+      elements.each(function(i, el) {
+        var layout_div = $('<div class="' + layout + '"></div>');
+        if (layout_div.hasClass('shaded')) {
+          var shaded_content = $('<div class="shaded-content"></div>');
+          $(this).wrap(shaded_content);
+          $(this).parent().wrap(layout_div);
+        } else {
+          $(this).wrap(layout_div);
+        }
+      });
+
+
+      // unwrap the layout-chunk div
+      $(this).children().unwrap();
+    });
+
+    // remove code block used to force  highlighting css
+    $('.distill-force-highlighting-css').parent().remove();
+
+    // remove empty line numbers inserted by pandoc when using a
+    // custom syntax highlighting theme
+    $('code.sourceCode a:empty').remove();
+
+    // load distill framework
+    load_distill_framework();
+
+    // wait for window.distillRunlevel == 4 to do post processing
+    function distill_post_process() {
+
+      if (!window.distillRunlevel || window.distillRunlevel < 4)
+        return;
+
+      // hide author/affiliations entirely if we have no authors
+      var front_matter = JSON.parse($("#distill-front-matter").html());
+      var have_authors = front_matter.authors && front_matter.authors.length > 0;
+      if (!have_authors)
+        $('d-byline').addClass('hidden');
+
+      // article with toc class
+      $('.d-contents').parent().addClass('d-article-with-toc');
+
+      // strip links that point to #
+      $('.authors-affiliations').find('a[href="#"]').removeAttr('href');
+
+      // add orcid ids
+      $('.authors-affiliations').find('.author').each(function(i, el) {
+        var orcid_id = front_matter.authors[i].orcidID;
+        if (orcid_id) {
+          var a = $('<a></a>');
+          a.attr('href', 'https://orcid.org/' + orcid_id);
+          var img = $('<img></img>');
+          img.addClass('orcid-id');
+          img.attr('alt', 'ORCID ID');
+          img.attr('src','data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAAGXRFWHRTb2Z0d2FyZQBBZG9iZSBJbWFnZVJlYWR5ccllPAAAA2ZpVFh0WE1MOmNvbS5hZG9iZS54bXAAAAAAADw/eHBhY2tldCBiZWdpbj0i77u/IiBpZD0iVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkIj8+IDx4OnhtcG1ldGEgeG1sbnM6eD0iYWRvYmU6bnM6bWV0YS8iIHg6eG1wdGs9IkFkb2JlIFhNUCBDb3JlIDUuMC1jMDYwIDYxLjEzNDc3NywgMjAxMC8wMi8xMi0xNzozMjowMCAgICAgICAgIj4gPHJkZjpSREYgeG1sbnM6cmRmPSJodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjIj4gPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9IiIgeG1sbnM6eG1wTU09Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC9tbS8iIHhtbG5zOnN0UmVmPSJodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvc1R5cGUvUmVzb3VyY2VSZWYjIiB4bWxuczp4bXA9Imh0dHA6Ly9ucy5hZG9iZS5jb20veGFwLzEuMC8iIHhtcE1NOk9yaWdpbmFsRG9jdW1lbnRJRD0ieG1wLmRpZDo1N0NEMjA4MDI1MjA2ODExOTk0QzkzNTEzRjZEQTg1NyIgeG1wTU06RG9jdW1lbnRJRD0ieG1wLmRpZDozM0NDOEJGNEZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wTU06SW5zdGFuY2VJRD0ieG1wLmlpZDozM0NDOEJGM0ZGNTcxMUUxODdBOEVCODg2RjdCQ0QwOSIgeG1wOkNyZWF0b3JUb29sPSJBZG9iZSBQaG90b3Nob3AgQ1M1IE1hY2ludG9zaCI+IDx4bXBNTTpEZXJpdmVkRnJvbSBzdFJlZjppbnN0YW5jZUlEPSJ4bXAuaWlkOkZDN0YxMTc0MDcyMDY4MTE5NUZFRDc5MUM2MUUwNEREIiBzdFJlZjpkb2N1bWVudElEPSJ4bXAuZGlkOjU3Q0QyMDgwMjUyMDY4MTE5OTRDOTM1MTNGNkRBODU3Ii8+IDwvcmRmOkRlc2NyaXB0aW9uPiA8L3JkZjpSREY+IDwveDp4bXBtZXRhPiA8P3hwYWNrZXQgZW5kPSJyIj8+84NovQAAAR1JREFUeNpiZEADy85ZJgCpeCB2QJM6AMQLo4yOL0AWZETSqACk1gOxAQN+cAGIA4EGPQBxmJA0nwdpjjQ8xqArmczw5tMHXAaALDgP1QMxAGqzAAPxQACqh4ER6uf5MBlkm0X4EGayMfMw/Pr7Bd2gRBZogMFBrv01hisv5jLsv9nLAPIOMnjy8RDDyYctyAbFM2EJbRQw+aAWw/LzVgx7b+cwCHKqMhjJFCBLOzAR6+lXX84xnHjYyqAo5IUizkRCwIENQQckGSDGY4TVgAPEaraQr2a4/24bSuoExcJCfAEJihXkWDj3ZAKy9EJGaEo8T0QSxkjSwORsCAuDQCD+QILmD1A9kECEZgxDaEZhICIzGcIyEyOl2RkgwAAhkmC+eAm0TAAAAABJRU5ErkJggg==');
+          a.append(img);
+          $(this).append(a);
+        }
+      });
+
+      // hide elements of author/affiliations grid that have no value
+      function hide_byline_column(caption) {
+        $('d-byline').find('h3:contains("' + caption + '")').parent().css('visibility', 'hidden');
+      }
+
+      // affiliations
+      var have_affiliations = false;
+      for (var i = 0; i<front_matter.authors.length; ++i) {
+        var author = front_matter.authors[i];
+        if (author.affiliation !== "&nbsp;") {
+          have_affiliations = true;
+          break;
+        }
+      }
+      if (!have_affiliations)
+        $('d-byline').find('h3:contains("Affiliations")').css('visibility', 'hidden');
+
+      // published date
+      if (!front_matter.publishedDate)
+        hide_byline_column("Published");
+
+      // document object identifier
+      var doi = $('d-byline').find('h3:contains("DOI")');
+      var doi_p = doi.next().empty();
+      if (!front_matter.doi) {
+        // if we have a citation and valid citationText then link to that
+        if ($('#citation').length > 0 && front_matter.citationText) {
+          doi.html('Citation');
+          $('<a href="#citation"></a>')
+            .text(front_matter.citationText)
+            .appendTo(doi_p);
+        } else {
+          hide_byline_column("DOI");
+        }
+      } else {
+        $('<a></a>')
+           .attr('href', "https://doi.org/" + front_matter.doi)
+           .html(front_matter.doi)
+           .appendTo(doi_p);
+      }
+
+       // change plural form of authors/affiliations
+      if (front_matter.authors.length === 1) {
+        var grid = $('.authors-affiliations');
+        grid.children('h3:contains("Authors")').text('Author');
+        grid.children('h3:contains("Affiliations")').text('Affiliation');
+      }
+
+      // remove d-appendix and d-footnote-list local styles
+      $('d-appendix > style:first-child').remove();
+      $('d-footnote-list > style:first-child').remove();
+
+      // move appendix-bottom entries to the bottom
+      $('.appendix-bottom').appendTo('d-appendix').children().unwrap();
+      $('.appendix-bottom').remove();
+
+      // hoverable references
+      $('span.citation[data-cites]').each(function() {
+        var refs = $(this).attr('data-cites').split(" ");
+        var refHtml = refs.map(function(ref) {
+          return "<p>" + $('#ref-' + ref).html() + "</p>";
+        }).join("\n");
+        window.tippy(this, {
+          allowHTML: true,
+          content: refHtml,
+          maxWidth: 500,
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'light-border',
+          placement: 'bottom-start'
+        });
+      });
+
+      // clear polling timer
+      clearInterval(tid);
+
+      // show body now that everything is ready
+      on_load_complete();
+    }
+
+    var tid = setInterval(distill_post_process, 50);
+    distill_post_process();
+
+  }
+
+  function init_downlevel() {
+
+    init_common();
+
+     // insert hr after d-title
+    $('.d-title').after($('<hr class="section-separator"/>'));
+
+    // check if we have authors
+    var front_matter = JSON.parse($("#distill-front-matter").html());
+    var have_authors = front_matter.authors && front_matter.authors.length > 0;
+
+    // manage byline/border
+    if (!have_authors)
+      $('.d-byline').remove();
+    $('.d-byline').after($('<hr class="section-separator"/>'));
+    $('.d-byline a').remove();
+
+    // remove toc
+    $('.d-contents').remove();
+
+    // move appendix elements
+    $('h1.appendix, h2.appendix').each(function(i, val) {
+      $(this).changeElementType('h3');
+    });
+    $('h3.appendix').each(function(i, val) {
+      $(this).nextUntil($('h1, h2, h3')).addBack().appendTo($('.d-appendix'));
+    });
+
+
+    // inject headers into references and footnotes
+    var refs_header = $('<h3></h3>');
+    refs_header.text('References');
+    $('#refs').prepend(refs_header);
+
+    var footnotes_header = $('<h3></h3');
+    footnotes_header.text('Footnotes');
+    $('.footnotes').children('hr').first().replaceWith(footnotes_header);
+
+    // move appendix-bottom entries to the bottom
+    $('.appendix-bottom').appendTo('.d-appendix').children().unwrap();
+    $('.appendix-bottom').remove();
+
+    // remove appendix if it's empty
+    if ($('.d-appendix').children().length === 0)
+      $('.d-appendix').remove();
+
+    // prepend separator above appendix
+    $('.d-appendix').before($('<hr class="section-separator" style="clear: both"/>'));
+
+    // trim code
+    $('pre>code').each(function(i, val) {
+      $(this).html($.trim($(this).html()));
+    });
+
+    // move posts-container right before article
+    $('.posts-container').insertBefore($('.d-article'));
+
+    $('body').addClass('downlevel');
+
+    on_load_complete();
+  }
+
+
+  function init_common() {
+
+    // jquery plugin to change element types
+    (function($) {
+      $.fn.changeElementType = function(newType) {
+        var attrs = {};
+
+        $.each(this[0].attributes, function(idx, attr) {
+          attrs[attr.nodeName] = attr.nodeValue;
+        });
+
+        this.replaceWith(function() {
+          return $("<" + newType + "/>", attrs).append($(this).contents());
+        });
+      };
+    })(jQuery);
+
+    // prevent underline for linked images
+    $('a > img').parent().css({'border-bottom' : 'none'});
+
+    // mark non-body figures created by knitr chunks as 100% width
+    $('.layout-chunk').each(function(i, val) {
+      var figures = $(this).find('img, .html-widget');
+      if ($(this).attr('data-layout') !== "l-body") {
+        figures.css('width', '100%');
+      } else {
+        figures.css('max-width', '100%');
+        figures.filter("[width]").each(function(i, val) {
+          var fig = $(this);
+          fig.css('width', fig.attr('width') + 'px');
+        });
+
+      }
+    });
+
+    // auto-append index.html to post-preview links in file: protocol
+    // and in rstudio ide preview
+    $('.post-preview').each(function(i, val) {
+      if (window.location.protocol === "file:")
+        $(this).attr('href', $(this).attr('href') + "index.html");
+    });
+
+    // get rid of index.html references in header
+    if (window.location.protocol !== "file:") {
+      $('.distill-site-header a[href]').each(function(i,val) {
+        $(this).attr('href', $(this).attr('href').replace("index.html", "./"));
+      });
+    }
+
+    // add class to pandoc style tables
+    $('tr.header').parent('thead').parent('table').addClass('pandoc-table');
+    $('.kable-table').children('table').addClass('pandoc-table');
+
+    // add figcaption style to table captions
+    $('caption').parent('table').addClass("figcaption");
+
+    // initialize posts list
+    if (window.init_posts_list)
+      window.init_posts_list();
+
+    // implmement disqus comment link
+    $('.disqus-comment-count').click(function() {
+      window.headroom_prevent_pin = true;
+      $('#disqus_thread').toggleClass('hidden');
+      if (!$('#disqus_thread').hasClass('hidden')) {
+        var offset = $(this).offset();
+        $(window).resize();
+        $('html, body').animate({
+          scrollTop: offset.top - 35
+        });
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    if (is_downlevel_browser())
+      init_downlevel();
+    else
+      window.addEventListener('WebComponentsReady', init_distill);
+  });
+
+  </script>
+
+  <!--/radix_placeholder_distill-->
+  <script src="post12_files/header-attrs-2.13/header-attrs.js"></script>
+  <script src="post12_files/kePrint-0.0.1/kePrint.js"></script>
+  <link href="post12_files/lightable-0.0.1/lightable.css" rel="stylesheet" />
+  <script src="post12_files/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+  <script src="post12_files/popper-2.6.0/popper.min.js"></script>
+  <link href="post12_files/tippy-6.2.7/tippy.css" rel="stylesheet" />
+  <link href="post12_files/tippy-6.2.7/tippy-light-border.css" rel="stylesheet" />
+  <script src="post12_files/tippy-6.2.7/tippy.umd.min.js"></script>
+  <script src="post12_files/anchor-4.2.2/anchor.min.js"></script>
+  <script src="post12_files/bowser-1.9.3/bowser.min.js"></script>
+  <script src="post12_files/webcomponents-2.0.0/webcomponents.js"></script>
+  <script src="post12_files/distill-2.2.21/template.v2.js"></script>
+  <!--radix_placeholder_site_in_header-->
+  <!--/radix_placeholder_site_in_header-->
+
+
+</head>
+
+<body>
+
+<!--radix_placeholder_front_matter-->
+
+<script id="distill-front-matter" type="text/json">
+{"title":"Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği","description":"Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile ölçülmesi.","authors":[{"author":"A. Uraz Akgül","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2022-06-12T00:00:00.000+03:00","citationText":"Akgül, 2022"}
+</script>
+
+<!--/radix_placeholder_front_matter-->
+<!--radix_placeholder_navigation_before_body-->
+<!--/radix_placeholder_navigation_before_body-->
+<!--radix_placeholder_site_before_body-->
+<!--/radix_placeholder_site_before_body-->
+
+<div class="d-title">
+<h1>Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği</h1>
+<!--radix_placeholder_categories-->
+<div class="dt-tags">
+<div class="dt=tag">Machine Learning</div>
+<div class="dt=tag">Text</div>
+<div class="dt=tag">Social Media</div>
+</div>
+<!--/radix_placeholder_categories-->
+<p><p>Haber paylaşımı yapan Twitter hesaplarının kosinüs benzerliği ile
+ölçülmesi.</p></p>
+</div>
+
+<div class="d-byline">
+  A. Uraz Akgül  
+  
+<br/>2022-06-12
+</div>
+
+<div class="d-article">
+<p>Uygulama için belirlemiş olduğum haber paylaşımı yapan 25 adet
+Twitter hesabının benzerlik sonuçları aşağıdaki gibidir.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="result.PNG" width="496" /></p>
+</div>
+<p>Twitter hesaplarının benzerliğini ölçmek için atılan tweetleri ve
+yöntem olarak da kosinüs benzerliğini kullandım.</p>
+<p><strong>Kosinüs Benzerliği</strong></p>
+<p>Kosinüs benzerliği, metinler arasındaki vektörel uzaklığı ölçer.
+Kosinüs benzerliği yöntemi ile aslında trigonometrideki kosinüs
+fonksiyonu kullanılıyor. Metinler birer vektör olarak dikkate alınıyor
+ve iki vektörün birbirleri ile olan açısı ölçülüyor. Bu benzerlik, iki
+vektörün çarpımının iki vektörün boylarının çarpımına oranı olarak
+hesaplanır.</p>
+<p><span class="math inline">\(cos(\theta) = \frac{x.y}{||x||||y||} =
+\frac{\sum_{i=1}^{n}x_iy_i}{\sqrt{\sum_{i=1}^{n}x_i^2}\sqrt{\sum_{i=1}^{n}y_i^2}}\)</span></p>
+<p>Basit bir örnek ile nasıl hesaplandığına bakalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>x</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>4</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>
+<span class='va'>y</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>3</span>,<span class='fl'>4</span>,<span class='fl'>4</span>,<span class='fl'>8</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p><span class="math inline">\(x.y = 3*3 + 4*4 + 1*4 + 0*8 =
+29\)</span></p>
+<p><span class="math inline">\(||x|| = \sqrt{3^2 + 4^2 + 1^2 + 0^2} =
+5.09902\)</span></p>
+<p><span class="math inline">\(||y|| = \sqrt{3^2 + 4^2 + 4^2 + 8^2} =
+10.24695\)</span></p>
+<p><span class="math inline">\(cos(x,y) = cos(\theta) =
+\frac{29}{5.09902*10.24695} = 0.5550303\)</span></p>
+<p>Kosinüs açısı 0 olursa (<span class="math inline">\(cos(\theta) =
+0\)</span>), iki vektör arasında tam benzerlik vardır (<span
+class="math inline">\(cos(0) = 1\)</span>).</p>
+<p>Kosinüs açısı 90 olursa (<span class="math inline">\(cos(\theta) =
+90\)</span>), iki vektör arasında benzerlik yoktur (<span
+class="math inline">\(cos(90) = 0\)</span>).</p>
+<p>Manuel yapmak yerine R’da <em>lsa</em> paketi yardımıyla da kosinüs
+benzerliği bulunabilir.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'>lsa</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/lsa/man/cosine.html'>cosine</a></span><span class='op'>(</span><span class='va'>x</span>,<span class='va'>y</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] 0.5550303</code></pre>
+</div>
+<p>Peki, metinlerde bu benzerlik nasıl hesaplanıyor? Kısa cevabı kelime
+frekansları ile. Bir örnek ile inceleyelim.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>text1</span> <span class='op'>&lt;-</span> <span class='st'>"R programlama dilini öğreniyorum"</span>
+<span class='va'>text2</span> <span class='op'>&lt;-</span> <span class='st'>"Python programalama dilini öğreniyorum"</span>
+</code></pre>
+</div>
+</div>
+<p>Yukarıdaki örnekte <em>dilini, öğreniyorum, programlama</em>
+kelimeleri ortak; Python ve R kelimeleri farklıdır. Kelime frekanslarını
+birbirine denk gelecek şekilde yazarsak;</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='co'># dilini, öğreniyorum, programlama, Python, R</span>
+
+<span class='va'>text1_n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>0</span>,<span class='fl'>1</span><span class='op'>)</span>
+<span class='va'>text2_n</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>
+
+<span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='fu'>lsa</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/lsa/man/cosine.html'>cosine</a></span><span class='op'>(</span><span class='va'>text1_n</span>,<span class='va'>text2_n</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+<pre><code>[1] 0.75</code></pre>
+</div>
+<p>Görüldüğü üzere kosinüs benzerliği 0.75 ya da 75% çıkmıştır.</p>
+<p><strong>Uygulama</strong></p>
+<p>25 adet Twitter hesabına ait tweetlere (<em>post12.xlsx</em>) <a
+href="https://github.com/rpydaneogrendim/rblog/tree/main/data">GitHub
+hesabımdan</a> ulaşabilirsiniz. İlgili veri setinde sadece hesap adı ve
+atılan tweetler bulunmaktadır. Retweetler ise çıkarılmıştır.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>accounts</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span>
+  <span class='st'>"@Ahaber"</span>,
+  <span class='st'>"@Haberturk"</span>,
+  <span class='st'>"@ntv"</span>,
+  <span class='st'>"@cnnturk"</span>,
+  <span class='st'>"@BirGun_Gazetesi"</span>,
+  <span class='st'>"@t24comtr"</span>,
+  <span class='st'>"@cumhuriyetgzt"</span>,
+  <span class='st'>"@yeniakit"</span>,
+  <span class='st'>"@yenisafak"</span>,
+  <span class='st'>"@Sabah"</span>,
+  <span class='st'>"@trthaber"</span>,
+  <span class='st'>"@anadoluajansi"</span>,
+  <span class='st'>"@halktvcomtr"</span>,
+  <span class='st'>"@tele1comtr"</span>,
+  <span class='st'>"@bbcturkce"</span>,
+  <span class='st'>"@FOXhaber"</span>,
+  <span class='st'>"@gazetesozcu"</span>,
+  <span class='st'>"@tgrthabertv"</span>,
+  <span class='st'>"@gazeteduvar"</span>,
+  <span class='st'>"@euronews_tr"</span>,
+  <span class='st'>"@sputnik_TR"</span>,
+  <span class='st'>"@dw_turkce"</span>,
+  <span class='st'>"@Hurriyet"</span>,
+  <span class='st'>"@solhaberportali"</span>,
+  <span class='st'>"@DikenComTr"</span>
+<span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Veriler aşağıdaki gibi çekilmiştir.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://CRAN.R-project.org/package=rtweet'>rtweet</a></span><span class='op'>)</span> <span class='co'># tweet</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/juliasilge/tidytext'>tidytext</a></span><span class='op'>)</span> <span class='co'># düzenli veri formatı</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/quanteda/stopwords'>stopwords</a></span><span class='op'>)</span> <span class='co'># Türkçe stop wordler</span>
+<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/dgrtwo/widyr'>widyr</a></span><span class='op'>)</span> <span class='co'># tf-idf, kosinüs benzerliği</span>
+
+<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='op'>)</span>
+
+<span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/length.html'>length</a></span><span class='op'>(</span><span class='va'>accounts</span><span class='op'>)</span><span class='op'>)</span><span class='op'>{</span>
+  
+  <span class='co'># n = Inf ile maksimum tweet sayısı çekilmiştir ki bu da 3250'dir.</span>
+  <span class='co'># include_rts parametresi FALSE yapılarak retweetler analiz dışı bırakılmıştır.</span>
+  
+  <span class='va'>timeline</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/rtweet/man/get_timeline.html'>get_timeline</a></span><span class='op'>(</span>
+    user <span class='op'>=</span> <span class='va'>accounts</span><span class='op'>[</span><span class='va'>i</span><span class='op'>]</span>, n <span class='op'>=</span> <span class='cn'>Inf</span>, include_rts <span class='op'>=</span> <span class='cn'>FALSE</span>
+  <span class='op'>)</span>
+  
+  <span class='va'>df</span> <span class='op'>&lt;-</span> <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+    <span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span><span class='op'>(</span><span class='va'>timeline</span><span class='op'>)</span>
+  
+  <span class='fu'><a href='https://rdrr.io/r/base/print.html'>print</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>accounts</span><span class='op'>[</span><span class='va'>i</span><span class='op'>]</span>,<span class='st'>" hesabından "</span>,<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>timeline</span><span class='op'>)</span>,<span class='st'>" adet tweet çekildi."</span><span class='op'>)</span><span class='op'>)</span>
+  
+  <span class='fu'><a href='https://rdrr.io/r/base/Sys.sleep.html'>Sys.sleep</a></span><span class='op'>(</span>time <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>
+  
+<span class='op'>}</span>
+
+<span class='va'>master</span> <span class='op'>&lt;-</span> <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>screen_name</span>,<span class='va'>text</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Tekrar çalıştırmamak için (73930 satırlık bir veri seti) kaydettiğim
+veri setini kullanıyorum.</p>
+<div class="layout-chunk" data-layout="l-body">
+
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master</span> <span class='op'>&lt;-</span> <span class='fu'>readxl</span><span class='fu'>::</span><span class='fu'><a href='https://readxl.tidyverse.org/reference/read_excel.html'>read_excel</a></span><span class='op'>(</span><span class='st'>"tweets.xlsx"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Bu veri setinden url’leri (http’li) çıkaracağız.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master</span> <span class='op'>&lt;-</span> <span class='va'>master</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>text <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>gsub</a></span><span class='op'>(</span><span class='st'>"http.+"</span>,<span class='st'>""</span>,<span class='va'>text</span><span class='op'>)</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Aynı zamanda, türkçe stop wordleri de çıkarmak faydalı olabilir. Stop
+wordler etkisiz kelimelerdir. Sık kullanılan kelimeleri de kapsar desek
+yanlış olmaz sanırım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>tr_sw</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/pkg/stopwords/man/stopwords.html'>stopwords</a></span><span class='op'>(</span>language <span class='op'>=</span> <span class='st'>"tr"</span>, source <span class='op'>=</span> <span class='st'>"stopwords-iso"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p>Kosinüs benzerliğini iki yöntemi baz alarak hesaplayacağız: Kelime
+frekansları ve TF-IDF.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master</span> <span class='op'>&lt;-</span> <span class='va'>master</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/tidytext/man/unnest_tokens.html'>unnest_tokens</a></span><span class='op'>(</span>output <span class='op'>=</span> <span class='st'>"word"</span>, input <span class='op'>=</span> <span class='st'>"text"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># kelimeler ayıklandı</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='op'>!</span><span class='op'>(</span><span class='va'>word</span> <span class='op'><a href='https://rdrr.io/r/base/match.html'>%in%</a></span> <span class='va'>tr_sw</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># stop wordler kaldırıldı</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/count.html'>count</a></span><span class='op'>(</span><span class='va'>word</span>, <span class='va'>screen_name</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># kelimeler hesaplara göre saydırıldı</span>
+  <span class='fu'><a href='https://rdrr.io/pkg/tidytext/man/bind_tf_idf.html'>bind_tf_idf</a></span><span class='op'>(</span><span class='va'>word</span>, <span class='va'>screen_name</span>, <span class='va'>n</span><span class='op'>)</span> <span class='co'># TF-IDF hesaplandı</span>
+</code></pre>
+</div>
+</div>
+<p><strong>Kosinüs Benzerliği - Kelime Frekansları</strong></p>
+<p>Yukarıda da örneğini gördüğümüz üzere bu başlık altında kosinüs
+benzerliği kelimelerin frekansları kullanılarak bulunmuştur.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master_freq</span> <span class='op'>&lt;-</span> <span class='va'>master</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/widyr/man/pairwise_similarity.html'>pairwise_similarity</a></span><span class='op'>(</span><span class='va'>screen_name</span>, <span class='va'>word</span>, <span class='va'>n</span>, upper <span class='op'>=</span> <span class='cn'>FALSE</span>, sort <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># n seçildi</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>item <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>item1</span>,<span class='st'>"-"</span>,<span class='va'>item2</span><span class='op'>)</span>, .before <span class='op'>=</span> <span class='va'>similarity</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>item1</span>,<span class='va'>item2</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span><span class='st'>"similarity_freq"</span><span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p><strong>Kosinüs Benzerliği - TF-IDF</strong></p>
+<p>Term Frequency-Inverse Document Frequency’nin kısaltması olan TF-IDF
+için Terim Frekansı-Ters Doküman Frekansı diyebiliriz. Bu hesaplama, bir
+kelimenin doküman içerisindeki önemini gösteriyor. TF-IDF, TF ile IDF’in
+çarpımından oluşuyor.</p>
+<p>TF: Kelimenin dokümandaki tekrar sayısının dokümandaki toplam kelime
+sayısına oranıdır.</p>
+<p>IDF: Toplam doküman sayısının seçilen kelimenin geçtiği toplam
+doküman sayısına oranının logaritmasıdır. İlgili kelimenin diğer
+dokümanlardaki sıklığının artması DF değerini artırır; IDF değerini
+azaltır.</p>
+<p><span class="math inline">\(w_{i,j} = tf_{i,j}\ x\
+log(\frac{N}{df_i})\)</span></p>
+<p><span class="math inline">\(tf_{i,j}:\)</span> i’nin j’de geçme
+oranı</p>
+<p><span class="math inline">\(df_i:\)</span> i içeren doküman
+sayısı</p>
+<p><span class="math inline">\(N:\)</span> Doküman sayısı</p>
+<p>Örnek: “çalarsaat” kelimesini inceleyelim. FOXhaber’in 30,402
+kelimesi vardır. Seçtiğimiz kelime ise 261 defa geçmiştir. Bu durumda TF
+değeri 261/30,402 = 0.008584962 olur. 25 adet Twitter hesabı olduğu için
+25 adet doküman vardır. Seçtiğimiz kelime sadece 1 dokümanda (~hesapta)
+geçmektedir. Bu durumda IDF değeri log(25/1) = 3.218876 olur. TF-IDF ise
+TF ile IDF’in çarpımıydı. Yani, 0.008584962 * 3.218876 = 0.02763393
+sonucuna ulaşılır.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>master_tf_idf</span> <span class='op'>&lt;-</span> <span class='va'>master</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://rdrr.io/pkg/widyr/man/pairwise_similarity.html'>pairwise_similarity</a></span><span class='op'>(</span><span class='va'>screen_name</span>, <span class='va'>word</span>, <span class='va'>tf_idf</span>, upper <span class='op'>=</span> <span class='cn'>FALSE</span>, sort <span class='op'>=</span> <span class='cn'>TRUE</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># tf-idf seçildi</span>
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>item <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>item1</span>,<span class='st'>"-"</span>,<span class='va'>item2</span><span class='op'>)</span>, .before <span class='op'>=</span> <span class='va'>similarity</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='va'>item1</span>,<span class='va'>item2</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span><span class='st'>"similarity_tf_idf"</span><span class='op'>=</span><span class='fl'>2</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<p><strong>Sonuç</strong></p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df_result</span> <span class='op'>&lt;-</span> <span class='va'>master_freq</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>inner_join</a></span><span class='op'>(</span><span class='va'>master_tf_idf</span>, by <span class='op'>=</span> <span class='st'>"item"</span><span class='op'>)</span>
+</code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>df_result</span>,
+       <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>similarity_freq</span>, y <span class='op'>=</span> <span class='va'>similarity_tf_idf</span>, color  <span class='op'>=</span> <span class='va'>similarity_freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_point.html'>geom_point</a></span><span class='op'>(</span>alpha <span class='op'>=</span> <span class='fl'>.2</span>, size <span class='op'>=</span> <span class='fl'>4</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'>ggrepel</span><span class='fu'>::</span><span class='fu'><a href='https://rdrr.io/pkg/ggrepel/man/geom_text_repel.html'>geom_text_repel</a></span><span class='op'>(</span>
+    data <span class='op'>=</span> <span class='va'>df_result</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='fu'><a href='https://dplyr.tidyverse.org/reference/desc.html'>desc</a></span><span class='op'>(</span><span class='va'>similarity_freq</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
+      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>1</span><span class='op'>:</span><span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span>,
+    <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='va'>item</span><span class='op'>)</span>, size <span class='op'>=</span> <span class='fl'>3</span>
+  <span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>plot.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"bold"</span>, hjust <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span>,
+        plot.caption <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"italic"</span><span class='op'>)</span>,
+        legend.position <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_gradient.html'>scale_color_gradient</a></span><span class='op'>(</span>low <span class='op'>=</span> <span class='st'>"orange"</span>, high <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span> <span class='op'>+</span>
+  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>
+    title <span class='op'>=</span> <span class='st'>"Haber Paylaşımı Yapan Twitter Hesaplarının Benzerliği"</span>,
+    caption <span class='op'>=</span> <span class='st'>"Top 10 gösterilmiştir.\nSağ-üst köşeye gittikçe benzerlik artmaktadır."</span>,
+    x <span class='op'>=</span> <span class='st'>"Kelime Frekansları"</span>,
+    y <span class='op'>=</span> <span class='st'>"TF-IDF"</span>
+  <span class='op'>)</span>
+</code></pre>
+</div>
+<p><img src="post12_files/figure-html5/unnamed-chunk-16-1.png" width="624" data-distill-preview=1 /></p>
+</div>
+<p>Listenin tamamına aşağıdan ulaşılabilir. Liste, benzerlik oranı en
+yüksekten en düşüğe doğru kelime frekansına göre hesaplanan benzerliğe
+göre sıralanmıştır. En yüksek benzerliğe sahip hesaplar ~81% ile
+trthaber ve anadoluajansi; en düşük benzerliğe sahip hesaplar ise ~19%
+ile DikenComTr ve tgrthabertv olmuştur. Kelime frekanslarına göre
+benzerliğin yanında TF-IDF’i de hesaplamıştık. Buna göre, en yüksek
+benzerliğe sahip hesaplar ~21% ile Sabah ve yenisafak; en düşük
+benzerliğe sahip hesaplar ise ~0.15% ile FOXhaber ve DikenComTr
+olmuştur.</p>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Hesaplar
+</th>
+<th style="text-align:right;">
+KelimeFrekansı_Benzerlik
+</th>
+<th style="text-align:right;">
+TF-IDF_Benzerlik
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+trthaber-anadoluajansi
+</td>
+<td style="text-align:right;">
+0.8106289
+</td>
+<td style="text-align:right;">
+0.1943405
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-yenisafak
+</td>
+<td style="text-align:right;">
+0.8063759
+</td>
+<td style="text-align:right;">
+0.1123132
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-Sabah
+</td>
+<td style="text-align:right;">
+0.8051288
+</td>
+<td style="text-align:right;">
+0.2083826
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-Hurriyet
+</td>
+<td style="text-align:right;">
+0.8027018
+</td>
+<td style="text-align:right;">
+0.0912925
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-t24comtr
+</td>
+<td style="text-align:right;">
+0.7787305
+</td>
+<td style="text-align:right;">
+0.1335979
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.7663677
+</td>
+<td style="text-align:right;">
+0.1918478
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-yenisafak
+</td>
+<td style="text-align:right;">
+0.7654727
+</td>
+<td style="text-align:right;">
+0.1761566
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.7629162
+</td>
+<td style="text-align:right;">
+0.0656842
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-euronews_tr
+</td>
+<td style="text-align:right;">
+0.7596030
+</td>
+<td style="text-align:right;">
+0.0562945
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cnnturk-Hurriyet
+</td>
+<td style="text-align:right;">
+0.7585064
+</td>
+<td style="text-align:right;">
+0.0940787
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-yenisafak
+</td>
+<td style="text-align:right;">
+0.7548191
+</td>
+<td style="text-align:right;">
+0.1543507
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-solhaberportali
+</td>
+<td style="text-align:right;">
+0.7538519
+</td>
+<td style="text-align:right;">
+0.1639537
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-yenisafak
+</td>
+<td style="text-align:right;">
+0.7436745
+</td>
+<td style="text-align:right;">
+0.2103621
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-Haberturk
+</td>
+<td style="text-align:right;">
+0.7422488
+</td>
+<td style="text-align:right;">
+0.0855117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-yenisafak
+</td>
+<td style="text-align:right;">
+0.7409369
+</td>
+<td style="text-align:right;">
+0.0847340
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-euronews_tr
+</td>
+<td style="text-align:right;">
+0.7355193
+</td>
+<td style="text-align:right;">
+0.0948756
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-solhaberportali
+</td>
+<td style="text-align:right;">
+0.7351738
+</td>
+<td style="text-align:right;">
+0.1626351
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-t24comtr
+</td>
+<td style="text-align:right;">
+0.7346799
+</td>
+<td style="text-align:right;">
+0.1221117
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-t24comtr
+</td>
+<td style="text-align:right;">
+0.7337696
+</td>
+<td style="text-align:right;">
+0.1520996
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-bbcturkce
+</td>
+<td style="text-align:right;">
+0.7332175
+</td>
+<td style="text-align:right;">
+0.0477881
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.7298423
+</td>
+<td style="text-align:right;">
+0.0537881
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.7272367
+</td>
+<td style="text-align:right;">
+0.1105421
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.7272345
+</td>
+<td style="text-align:right;">
+0.0463835
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.7268729
+</td>
+<td style="text-align:right;">
+0.0603327
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-cnnturk
+</td>
+<td style="text-align:right;">
+0.7229869
+</td>
+<td style="text-align:right;">
+0.0285233
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-t24comtr
+</td>
+<td style="text-align:right;">
+0.7229612
+</td>
+<td style="text-align:right;">
+0.0836858
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+yenisafak-Hurriyet
+</td>
+<td style="text-align:right;">
+0.7130531
+</td>
+<td style="text-align:right;">
+0.1291871
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-Haberturk
+</td>
+<td style="text-align:right;">
+0.7054939
+</td>
+<td style="text-align:right;">
+0.0832394
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-t24comtr
+</td>
+<td style="text-align:right;">
+0.7049415
+</td>
+<td style="text-align:right;">
+0.0687628
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-Sabah
+</td>
+<td style="text-align:right;">
+0.6978937
+</td>
+<td style="text-align:right;">
+0.0976829
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6973590
+</td>
+<td style="text-align:right;">
+0.0408761
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-cnnturk
+</td>
+<td style="text-align:right;">
+0.6966393
+</td>
+<td style="text-align:right;">
+0.0410796
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-yeniakit
+</td>
+<td style="text-align:right;">
+0.6953032
+</td>
+<td style="text-align:right;">
+0.0675983
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6948125
+</td>
+<td style="text-align:right;">
+0.0503384
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazetesozcu-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6938015
+</td>
+<td style="text-align:right;">
+0.0728135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-Sabah
+</td>
+<td style="text-align:right;">
+0.6937281
+</td>
+<td style="text-align:right;">
+0.1585761
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6930919
+</td>
+<td style="text-align:right;">
+0.1003859
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6929987
+</td>
+<td style="text-align:right;">
+0.0655192
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.6917629
+</td>
+<td style="text-align:right;">
+0.1115391
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.6901779
+</td>
+<td style="text-align:right;">
+0.0439020
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.6901495
+</td>
+<td style="text-align:right;">
+0.0693958
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6890468
+</td>
+<td style="text-align:right;">
+0.0305955
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-ntv
+</td>
+<td style="text-align:right;">
+0.6888448
+</td>
+<td style="text-align:right;">
+0.0713711
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cnnturk-yeniakit
+</td>
+<td style="text-align:right;">
+0.6846588
+</td>
+<td style="text-align:right;">
+0.0549831
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-ntv
+</td>
+<td style="text-align:right;">
+0.6830790
+</td>
+<td style="text-align:right;">
+0.0366840
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-cnnturk
+</td>
+<td style="text-align:right;">
+0.6825293
+</td>
+<td style="text-align:right;">
+0.0552654
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.6774125
+</td>
+<td style="text-align:right;">
+0.0711323
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6766720
+</td>
+<td style="text-align:right;">
+0.1530826
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-yeniakit
+</td>
+<td style="text-align:right;">
+0.6758222
+</td>
+<td style="text-align:right;">
+0.0397374
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-t24comtr
+</td>
+<td style="text-align:right;">
+0.6714056
+</td>
+<td style="text-align:right;">
+0.0911134
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-bbcturkce
+</td>
+<td style="text-align:right;">
+0.6707776
+</td>
+<td style="text-align:right;">
+0.0823790
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-cnnturk
+</td>
+<td style="text-align:right;">
+0.6704460
+</td>
+<td style="text-align:right;">
+0.0276909
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6704114
+</td>
+<td style="text-align:right;">
+0.0696720
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6695873
+</td>
+<td style="text-align:right;">
+0.0816854
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-cnnturk
+</td>
+<td style="text-align:right;">
+0.6676695
+</td>
+<td style="text-align:right;">
+0.0797012
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6674735
+</td>
+<td style="text-align:right;">
+0.0532219
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6642287
+</td>
+<td style="text-align:right;">
+0.0781847
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-yenisafak
+</td>
+<td style="text-align:right;">
+0.6632437
+</td>
+<td style="text-align:right;">
+0.0754914
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6618473
+</td>
+<td style="text-align:right;">
+0.0634015
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+yenisafak-cnnturk
+</td>
+<td style="text-align:right;">
+0.6605355
+</td>
+<td style="text-align:right;">
+0.0708626
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-ntv
+</td>
+<td style="text-align:right;">
+0.6577930
+</td>
+<td style="text-align:right;">
+0.0467949
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.6545151
+</td>
+<td style="text-align:right;">
+0.0697620
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-Haberturk
+</td>
+<td style="text-align:right;">
+0.6528864
+</td>
+<td style="text-align:right;">
+0.0382478
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-solhaberportali
+</td>
+<td style="text-align:right;">
+0.6506590
+</td>
+<td style="text-align:right;">
+0.1014805
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Hurriyet-yeniakit
+</td>
+<td style="text-align:right;">
+0.6480956
+</td>
+<td style="text-align:right;">
+0.0748645
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-ntv
+</td>
+<td style="text-align:right;">
+0.6480399
+</td>
+<td style="text-align:right;">
+0.0479609
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-yenisafak
+</td>
+<td style="text-align:right;">
+0.6479050
+</td>
+<td style="text-align:right;">
+0.0682962
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-t24comtr
+</td>
+<td style="text-align:right;">
+0.6477091
+</td>
+<td style="text-align:right;">
+0.0832924
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-t24comtr
+</td>
+<td style="text-align:right;">
+0.6471755
+</td>
+<td style="text-align:right;">
+0.0524686
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.6457721
+</td>
+<td style="text-align:right;">
+0.1196845
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-yenisafak
+</td>
+<td style="text-align:right;">
+0.6439317
+</td>
+<td style="text-align:right;">
+0.0717316
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-t24comtr
+</td>
+<td style="text-align:right;">
+0.6432950
+</td>
+<td style="text-align:right;">
+0.0339556
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-yeniakit
+</td>
+<td style="text-align:right;">
+0.6432487
+</td>
+<td style="text-align:right;">
+0.0619541
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6421443
+</td>
+<td style="text-align:right;">
+0.0522538
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-cnnturk
+</td>
+<td style="text-align:right;">
+0.6413744
+</td>
+<td style="text-align:right;">
+0.0456347
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-Sabah
+</td>
+<td style="text-align:right;">
+0.6388411
+</td>
+<td style="text-align:right;">
+0.0855551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-Haberturk
+</td>
+<td style="text-align:right;">
+0.6387961
+</td>
+<td style="text-align:right;">
+0.0517547
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-t24comtr
+</td>
+<td style="text-align:right;">
+0.6385868
+</td>
+<td style="text-align:right;">
+0.0646894
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-bbcturkce
+</td>
+<td style="text-align:right;">
+0.6382396
+</td>
+<td style="text-align:right;">
+0.0677710
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6375017
+</td>
+<td style="text-align:right;">
+0.0436395
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-ntv
+</td>
+<td style="text-align:right;">
+0.6365525
+</td>
+<td style="text-align:right;">
+0.0336408
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-ntv
+</td>
+<td style="text-align:right;">
+0.6358817
+</td>
+<td style="text-align:right;">
+0.0342174
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-Haberturk
+</td>
+<td style="text-align:right;">
+0.6323996
+</td>
+<td style="text-align:right;">
+0.0482418
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-cnnturk
+</td>
+<td style="text-align:right;">
+0.6315114
+</td>
+<td style="text-align:right;">
+0.0386135
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.6285823
+</td>
+<td style="text-align:right;">
+0.0579139
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-Sabah
+</td>
+<td style="text-align:right;">
+0.6280131
+</td>
+<td style="text-align:right;">
+0.1232532
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-t24comtr
+</td>
+<td style="text-align:right;">
+0.6272307
+</td>
+<td style="text-align:right;">
+0.0342632
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-yeniakit
+</td>
+<td style="text-align:right;">
+0.6267010
+</td>
+<td style="text-align:right;">
+0.0458171
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-Hurriyet
+</td>
+<td style="text-align:right;">
+0.6257641
+</td>
+<td style="text-align:right;">
+0.0641389
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-yenisafak
+</td>
+<td style="text-align:right;">
+0.6244915
+</td>
+<td style="text-align:right;">
+0.0516657
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-yeniakit
+</td>
+<td style="text-align:right;">
+0.6213267
+</td>
+<td style="text-align:right;">
+0.0469178
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-Sabah
+</td>
+<td style="text-align:right;">
+0.6211794
+</td>
+<td style="text-align:right;">
+0.0582493
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.6146793
+</td>
+<td style="text-align:right;">
+0.0434032
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-cnnturk
+</td>
+<td style="text-align:right;">
+0.6084926
+</td>
+<td style="text-align:right;">
+0.0340565
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-cnnturk
+</td>
+<td style="text-align:right;">
+0.6080996
+</td>
+<td style="text-align:right;">
+0.0276098
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-yeniakit
+</td>
+<td style="text-align:right;">
+0.6076181
+</td>
+<td style="text-align:right;">
+0.0930308
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.6067541
+</td>
+<td style="text-align:right;">
+0.0772375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-yenisafak
+</td>
+<td style="text-align:right;">
+0.6064737
+</td>
+<td style="text-align:right;">
+0.0489489
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-yenisafak
+</td>
+<td style="text-align:right;">
+0.6063298
+</td>
+<td style="text-align:right;">
+0.0940432
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-yeniakit
+</td>
+<td style="text-align:right;">
+0.6053319
+</td>
+<td style="text-align:right;">
+0.0400433
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-euronews_tr
+</td>
+<td style="text-align:right;">
+0.6052005
+</td>
+<td style="text-align:right;">
+0.0775859
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-cnnturk
+</td>
+<td style="text-align:right;">
+0.6013539
+</td>
+<td style="text-align:right;">
+0.0247482
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-Haberturk
+</td>
+<td style="text-align:right;">
+0.6003299
+</td>
+<td style="text-align:right;">
+0.0381220
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.5992940
+</td>
+<td style="text-align:right;">
+0.0550906
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.5981839
+</td>
+<td style="text-align:right;">
+0.0730252
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-t24comtr
+</td>
+<td style="text-align:right;">
+0.5979022
+</td>
+<td style="text-align:right;">
+0.0476076
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-trthaber
+</td>
+<td style="text-align:right;">
+0.5975492
+</td>
+<td style="text-align:right;">
+0.0404801
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-t24comtr
+</td>
+<td style="text-align:right;">
+0.5971600
+</td>
+<td style="text-align:right;">
+0.0620738
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-t24comtr
+</td>
+<td style="text-align:right;">
+0.5969724
+</td>
+<td style="text-align:right;">
+0.0477570
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-yeniakit
+</td>
+<td style="text-align:right;">
+0.5969629
+</td>
+<td style="text-align:right;">
+0.0377484
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-Sabah
+</td>
+<td style="text-align:right;">
+0.5960016
+</td>
+<td style="text-align:right;">
+0.0588932
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.5957208
+</td>
+<td style="text-align:right;">
+0.0663263
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5949732
+</td>
+<td style="text-align:right;">
+0.0308396
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazetesozcu-yeniakit
+</td>
+<td style="text-align:right;">
+0.5942259
+</td>
+<td style="text-align:right;">
+0.0638034
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.5931553
+</td>
+<td style="text-align:right;">
+0.0793969
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-Sabah
+</td>
+<td style="text-align:right;">
+0.5925846
+</td>
+<td style="text-align:right;">
+0.0886826
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-yenisafak
+</td>
+<td style="text-align:right;">
+0.5920227
+</td>
+<td style="text-align:right;">
+0.0892231
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.5889909
+</td>
+<td style="text-align:right;">
+0.0551861
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-anadoluajansi
+</td>
+<td style="text-align:right;">
+0.5876155
+</td>
+<td style="text-align:right;">
+0.0369139
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-t24comtr
+</td>
+<td style="text-align:right;">
+0.5872263
+</td>
+<td style="text-align:right;">
+0.0490416
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5868224
+</td>
+<td style="text-align:right;">
+0.0508068
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-yenisafak
+</td>
+<td style="text-align:right;">
+0.5864419
+</td>
+<td style="text-align:right;">
+0.0284972
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-yeniakit
+</td>
+<td style="text-align:right;">
+0.5846644
+</td>
+<td style="text-align:right;">
+0.0541077
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-Haberturk
+</td>
+<td style="text-align:right;">
+0.5836692
+</td>
+<td style="text-align:right;">
+0.0443140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5834627
+</td>
+<td style="text-align:right;">
+0.0216584
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.5831984
+</td>
+<td style="text-align:right;">
+0.0450597
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.5818368
+</td>
+<td style="text-align:right;">
+0.0547193
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-Haberturk
+</td>
+<td style="text-align:right;">
+0.5798512
+</td>
+<td style="text-align:right;">
+0.0253730
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5775730
+</td>
+<td style="text-align:right;">
+0.0491491
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5768975
+</td>
+<td style="text-align:right;">
+0.0267129
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-Haberturk
+</td>
+<td style="text-align:right;">
+0.5767789
+</td>
+<td style="text-align:right;">
+0.0161725
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-t24comtr
+</td>
+<td style="text-align:right;">
+0.5766286
+</td>
+<td style="text-align:right;">
+0.0281784
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5765503
+</td>
+<td style="text-align:right;">
+0.0450955
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.5763907
+</td>
+<td style="text-align:right;">
+0.0488487
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-Haberturk
+</td>
+<td style="text-align:right;">
+0.5761907
+</td>
+<td style="text-align:right;">
+0.0273289
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-yeniakit
+</td>
+<td style="text-align:right;">
+0.5759016
+</td>
+<td style="text-align:right;">
+0.0419655
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5742517
+</td>
+<td style="text-align:right;">
+0.0550270
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5722210
+</td>
+<td style="text-align:right;">
+0.0396403
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5716931
+</td>
+<td style="text-align:right;">
+0.0602841
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5713483
+</td>
+<td style="text-align:right;">
+0.0293130
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.5694263
+</td>
+<td style="text-align:right;">
+0.0557753
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-cnnturk
+</td>
+<td style="text-align:right;">
+0.5664703
+</td>
+<td style="text-align:right;">
+0.0347852
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5664411
+</td>
+<td style="text-align:right;">
+0.0584761
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-trthaber
+</td>
+<td style="text-align:right;">
+0.5659846
+</td>
+<td style="text-align:right;">
+0.0719299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-euronews_tr
+</td>
+<td style="text-align:right;">
+0.5652975
+</td>
+<td style="text-align:right;">
+0.0691299
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-euronews_tr
+</td>
+<td style="text-align:right;">
+0.5637798
+</td>
+<td style="text-align:right;">
+0.0590051
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.5635129
+</td>
+<td style="text-align:right;">
+0.0248399
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-cnnturk
+</td>
+<td style="text-align:right;">
+0.5633697
+</td>
+<td style="text-align:right;">
+0.0359805
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-BirGun_Gazetesi
+</td>
+<td style="text-align:right;">
+0.5626208
+</td>
+<td style="text-align:right;">
+0.0392925
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.5552218
+</td>
+<td style="text-align:right;">
+0.0238154
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazetesozcu-cnnturk
+</td>
+<td style="text-align:right;">
+0.5546777
+</td>
+<td style="text-align:right;">
+0.0318466
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5522672
+</td>
+<td style="text-align:right;">
+0.0292085
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5477599
+</td>
+<td style="text-align:right;">
+0.0539274
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5470097
+</td>
+<td style="text-align:right;">
+0.0384828
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-ntv
+</td>
+<td style="text-align:right;">
+0.5460006
+</td>
+<td style="text-align:right;">
+0.0334140
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-cnnturk
+</td>
+<td style="text-align:right;">
+0.5397424
+</td>
+<td style="text-align:right;">
+0.0160335
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.5379678
+</td>
+<td style="text-align:right;">
+0.0563175
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5325830
+</td>
+<td style="text-align:right;">
+0.0245928
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tgrthabertv-yenisafak
+</td>
+<td style="text-align:right;">
+0.5317700
+</td>
+<td style="text-align:right;">
+0.0356498
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.5316974
+</td>
+<td style="text-align:right;">
+0.0447653
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.5315661
+</td>
+<td style="text-align:right;">
+0.0441302
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-ntv
+</td>
+<td style="text-align:right;">
+0.5305560
+</td>
+<td style="text-align:right;">
+0.0154338
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-Sabah
+</td>
+<td style="text-align:right;">
+0.5305229
+</td>
+<td style="text-align:right;">
+0.0332714
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-Hurriyet
+</td>
+<td style="text-align:right;">
+0.5286587
+</td>
+<td style="text-align:right;">
+0.0207836
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5278540
+</td>
+<td style="text-align:right;">
+0.0533354
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-Sabah
+</td>
+<td style="text-align:right;">
+0.5275381
+</td>
+<td style="text-align:right;">
+0.0671365
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5255846
+</td>
+<td style="text-align:right;">
+0.0786883
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-tele1comtr
+</td>
+<td style="text-align:right;">
+0.5253747
+</td>
+<td style="text-align:right;">
+0.0327451
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-yeniakit
+</td>
+<td style="text-align:right;">
+0.5241909
+</td>
+<td style="text-align:right;">
+0.0385380
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-yeniakit
+</td>
+<td style="text-align:right;">
+0.5237885
+</td>
+<td style="text-align:right;">
+0.0558375
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.5223739
+</td>
+<td style="text-align:right;">
+0.0181744
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-cnnturk
+</td>
+<td style="text-align:right;">
+0.5220954
+</td>
+<td style="text-align:right;">
+0.0141125
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+yenisafak-yeniakit
+</td>
+<td style="text-align:right;">
+0.5215068
+</td>
+<td style="text-align:right;">
+0.0657442
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.5205275
+</td>
+<td style="text-align:right;">
+0.0270762
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-Sabah
+</td>
+<td style="text-align:right;">
+0.5197517
+</td>
+<td style="text-align:right;">
+0.0264668
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-Ahaber
+</td>
+<td style="text-align:right;">
+0.5190580
+</td>
+<td style="text-align:right;">
+0.0140692
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.5172236
+</td>
+<td style="text-align:right;">
+0.0408893
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-yeniakit
+</td>
+<td style="text-align:right;">
+0.5156929
+</td>
+<td style="text-align:right;">
+0.0153667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-yeniakit
+</td>
+<td style="text-align:right;">
+0.5156580
+</td>
+<td style="text-align:right;">
+0.0405285
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-yenisafak
+</td>
+<td style="text-align:right;">
+0.5152230
+</td>
+<td style="text-align:right;">
+0.0772845
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-solhaberportali
+</td>
+<td style="text-align:right;">
+0.5114312
+</td>
+<td style="text-align:right;">
+0.0228503
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazetesozcu-yenisafak
+</td>
+<td style="text-align:right;">
+0.5113475
+</td>
+<td style="text-align:right;">
+0.0752942
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5080183
+</td>
+<td style="text-align:right;">
+0.0267702
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.5075900
+</td>
+<td style="text-align:right;">
+0.0515435
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-yenisafak
+</td>
+<td style="text-align:right;">
+0.5070632
+</td>
+<td style="text-align:right;">
+0.0449267
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-yeniakit
+</td>
+<td style="text-align:right;">
+0.5064414
+</td>
+<td style="text-align:right;">
+0.0397979
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-ntv
+</td>
+<td style="text-align:right;">
+0.5035523
+</td>
+<td style="text-align:right;">
+0.0346341
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-bbcturkce
+</td>
+<td style="text-align:right;">
+0.5016460
+</td>
+<td style="text-align:right;">
+0.0244870
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-bbcturkce
+</td>
+<td style="text-align:right;">
+0.4999610
+</td>
+<td style="text-align:right;">
+0.0193332
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-anadoluajansi
+</td>
+<td style="text-align:right;">
+0.4996122
+</td>
+<td style="text-align:right;">
+0.0421809
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.4983784
+</td>
+<td style="text-align:right;">
+0.0254060
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-ntv
+</td>
+<td style="text-align:right;">
+0.4914800
+</td>
+<td style="text-align:right;">
+0.0138667
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-yeniakit
+</td>
+<td style="text-align:right;">
+0.4862986
+</td>
+<td style="text-align:right;">
+0.0243008
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-euronews_tr
+</td>
+<td style="text-align:right;">
+0.4830498
+</td>
+<td style="text-align:right;">
+0.0500718
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-cnnturk
+</td>
+<td style="text-align:right;">
+0.4825188
+</td>
+<td style="text-align:right;">
+0.0115618
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-yeniakit
+</td>
+<td style="text-align:right;">
+0.4801900
+</td>
+<td style="text-align:right;">
+0.0305528
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-ntv
+</td>
+<td style="text-align:right;">
+0.4792814
+</td>
+<td style="text-align:right;">
+0.0248216
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.4784038
+</td>
+<td style="text-align:right;">
+0.0415197
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-solhaberportali
+</td>
+<td style="text-align:right;">
+0.4775124
+</td>
+<td style="text-align:right;">
+0.0278770
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-solhaberportali
+</td>
+<td style="text-align:right;">
+0.4775024
+</td>
+<td style="text-align:right;">
+0.0302210
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-cumhuriyetgzt
+</td>
+<td style="text-align:right;">
+0.4771810
+</td>
+<td style="text-align:right;">
+0.0362971
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.4740713
+</td>
+<td style="text-align:right;">
+0.0489467
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-Ahaber
+</td>
+<td style="text-align:right;">
+0.4708324
+</td>
+<td style="text-align:right;">
+0.0291057
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4689181
+</td>
+<td style="text-align:right;">
+0.0068348
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-solhaberportali
+</td>
+<td style="text-align:right;">
+0.4648964
+</td>
+<td style="text-align:right;">
+0.0169447
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-solhaberportali
+</td>
+<td style="text-align:right;">
+0.4646816
+</td>
+<td style="text-align:right;">
+0.0306466
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-bbcturkce
+</td>
+<td style="text-align:right;">
+0.4639462
+</td>
+<td style="text-align:right;">
+0.0186551
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-Sabah
+</td>
+<td style="text-align:right;">
+0.4572505
+</td>
+<td style="text-align:right;">
+0.0343725
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.4535852
+</td>
+<td style="text-align:right;">
+0.0350991
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-Sabah
+</td>
+<td style="text-align:right;">
+0.4528567
+</td>
+<td style="text-align:right;">
+0.0369867
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-trthaber
+</td>
+<td style="text-align:right;">
+0.4516245
+</td>
+<td style="text-align:right;">
+0.0185267
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-Hurriyet
+</td>
+<td style="text-align:right;">
+0.4508242
+</td>
+<td style="text-align:right;">
+0.0306197
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-yenisafak
+</td>
+<td style="text-align:right;">
+0.4498436
+</td>
+<td style="text-align:right;">
+0.0439440
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-cnnturk
+</td>
+<td style="text-align:right;">
+0.4476540
+</td>
+<td style="text-align:right;">
+0.0150541
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4460957
+</td>
+<td style="text-align:right;">
+0.0184105
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.4450478
+</td>
+<td style="text-align:right;">
+0.0196793
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-Haberturk
+</td>
+<td style="text-align:right;">
+0.4442116
+</td>
+<td style="text-align:right;">
+0.0155230
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.4429511
+</td>
+<td style="text-align:right;">
+0.0307758
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.4427018
+</td>
+<td style="text-align:right;">
+0.0171524
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-Ahaber
+</td>
+<td style="text-align:right;">
+0.4394215
+</td>
+<td style="text-align:right;">
+0.0115221
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4335623
+</td>
+<td style="text-align:right;">
+0.0429504
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-ntv
+</td>
+<td style="text-align:right;">
+0.4329672
+</td>
+<td style="text-align:right;">
+0.0128951
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.4310360
+</td>
+<td style="text-align:right;">
+0.0170058
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-euronews_tr
+</td>
+<td style="text-align:right;">
+0.4306591
+</td>
+<td style="text-align:right;">
+0.0283555
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-halktvcomtr
+</td>
+<td style="text-align:right;">
+0.4268255
+</td>
+<td style="text-align:right;">
+0.0103629
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-yenisafak
+</td>
+<td style="text-align:right;">
+0.4254835
+</td>
+<td style="text-align:right;">
+0.0300456
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-t24comtr
+</td>
+<td style="text-align:right;">
+0.4253660
+</td>
+<td style="text-align:right;">
+0.0076325
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-sputnik_TR
+</td>
+<td style="text-align:right;">
+0.4252895
+</td>
+<td style="text-align:right;">
+0.0063732
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-anadoluajansi
+</td>
+<td style="text-align:right;">
+0.4249324
+</td>
+<td style="text-align:right;">
+0.0157424
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-cnnturk
+</td>
+<td style="text-align:right;">
+0.4239025
+</td>
+<td style="text-align:right;">
+0.0169703
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tgrthabertv-Hurriyet
+</td>
+<td style="text-align:right;">
+0.4223124
+</td>
+<td style="text-align:right;">
+0.0299972
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.4198134
+</td>
+<td style="text-align:right;">
+0.0288717
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.4183067
+</td>
+<td style="text-align:right;">
+0.0332509
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-DikenComTr
+</td>
+<td style="text-align:right;">
+0.4168956
+</td>
+<td style="text-align:right;">
+0.0223397
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tgrthabertv-cnnturk
+</td>
+<td style="text-align:right;">
+0.4167897
+</td>
+<td style="text-align:right;">
+0.0186526
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+t24comtr-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4116710
+</td>
+<td style="text-align:right;">
+0.0189317
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-tele1comtr
+</td>
+<td style="text-align:right;">
+0.4111918
+</td>
+<td style="text-align:right;">
+0.0109860
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4089963
+</td>
+<td style="text-align:right;">
+0.0156813
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4073556
+</td>
+<td style="text-align:right;">
+0.0255372
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-DikenComTr
+</td>
+<td style="text-align:right;">
+0.4065819
+</td>
+<td style="text-align:right;">
+0.0238453
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.4058075
+</td>
+<td style="text-align:right;">
+0.0229085
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-trthaber
+</td>
+<td style="text-align:right;">
+0.4057580
+</td>
+<td style="text-align:right;">
+0.0174285
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-FOXhaber
+</td>
+<td style="text-align:right;">
+0.4021386
+</td>
+<td style="text-align:right;">
+0.0027647
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-euronews_tr
+</td>
+<td style="text-align:right;">
+0.3983322
+</td>
+<td style="text-align:right;">
+0.0156261
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3962450
+</td>
+<td style="text-align:right;">
+0.0098530
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-yenisafak
+</td>
+<td style="text-align:right;">
+0.3960814
+</td>
+<td style="text-align:right;">
+0.0090183
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3929745
+</td>
+<td style="text-align:right;">
+0.0123792
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3923173
+</td>
+<td style="text-align:right;">
+0.0137057
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tgrthabertv-yeniakit
+</td>
+<td style="text-align:right;">
+0.3909191
+</td>
+<td style="text-align:right;">
+0.0227032
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3896238
+</td>
+<td style="text-align:right;">
+0.0132043
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3848416
+</td>
+<td style="text-align:right;">
+0.0101080
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+bbcturkce-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3846752
+</td>
+<td style="text-align:right;">
+0.0064830
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3827390
+</td>
+<td style="text-align:right;">
+0.0243898
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-Haberturk
+</td>
+<td style="text-align:right;">
+0.3781859
+</td>
+<td style="text-align:right;">
+0.0056567
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+BirGun_Gazetesi-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3772591
+</td>
+<td style="text-align:right;">
+0.0213794
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3702974
+</td>
+<td style="text-align:right;">
+0.0086941
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.3690939
+</td>
+<td style="text-align:right;">
+0.0297316
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3661290
+</td>
+<td style="text-align:right;">
+0.0183070
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-anadoluajansi
+</td>
+<td style="text-align:right;">
+0.3592216
+</td>
+<td style="text-align:right;">
+0.0122300
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3585451
+</td>
+<td style="text-align:right;">
+0.0148973
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3582541
+</td>
+<td style="text-align:right;">
+0.0191940
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-euronews_tr
+</td>
+<td style="text-align:right;">
+0.3581601
+</td>
+<td style="text-align:right;">
+0.0149665
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3565172
+</td>
+<td style="text-align:right;">
+0.0091259
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3527138
+</td>
+<td style="text-align:right;">
+0.0051071
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-Sabah
+</td>
+<td style="text-align:right;">
+0.3516677
+</td>
+<td style="text-align:right;">
+0.0075679
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3508239
+</td>
+<td style="text-align:right;">
+0.0186730
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-ntv
+</td>
+<td style="text-align:right;">
+0.3504955
+</td>
+<td style="text-align:right;">
+0.0064411
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-solhaberportali
+</td>
+<td style="text-align:right;">
+0.3492678
+</td>
+<td style="text-align:right;">
+0.0056070
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-Hurriyet
+</td>
+<td style="text-align:right;">
+0.3471565
+</td>
+<td style="text-align:right;">
+0.0058412
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3456809
+</td>
+<td style="text-align:right;">
+0.0046989
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3443768
+</td>
+<td style="text-align:right;">
+0.0063400
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+cumhuriyetgzt-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3433734
+</td>
+<td style="text-align:right;">
+0.0065443
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-cnnturk
+</td>
+<td style="text-align:right;">
+0.3364997
+</td>
+<td style="text-align:right;">
+0.0028187
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.3361759
+</td>
+<td style="text-align:right;">
+0.0082618
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-yeniakit
+</td>
+<td style="text-align:right;">
+0.3353517
+</td>
+<td style="text-align:right;">
+0.0055062
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-Hurriyet
+</td>
+<td style="text-align:right;">
+0.3345587
+</td>
+<td style="text-align:right;">
+0.0081378
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3342991
+</td>
+<td style="text-align:right;">
+0.0110154
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+sputnik_TR-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3337218
+</td>
+<td style="text-align:right;">
+0.0087047
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+solhaberportali-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3293375
+</td>
+<td style="text-align:right;">
+0.0082908
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tgrthabertv-gazetesozcu
+</td>
+<td style="text-align:right;">
+0.3252408
+</td>
+<td style="text-align:right;">
+0.0172451
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-gazeteduvar
+</td>
+<td style="text-align:right;">
+0.3245054
+</td>
+<td style="text-align:right;">
+0.0048890
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-FOXhaber
+</td>
+<td style="text-align:right;">
+0.3230278
+</td>
+<td style="text-align:right;">
+0.0040446
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+dw_turkce-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3216916
+</td>
+<td style="text-align:right;">
+0.0056046
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3199987
+</td>
+<td style="text-align:right;">
+0.0106059
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+tele1comtr-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3153672
+</td>
+<td style="text-align:right;">
+0.0089188
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Haberturk-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3149255
+</td>
+<td style="text-align:right;">
+0.0099406
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-yeniakit
+</td>
+<td style="text-align:right;">
+0.3140351
+</td>
+<td style="text-align:right;">
+0.0098138
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+halktvcomtr-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3060827
+</td>
+<td style="text-align:right;">
+0.0073108
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Sabah-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3049851
+</td>
+<td style="text-align:right;">
+0.0114251
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+ntv-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3047723
+</td>
+<td style="text-align:right;">
+0.0062080
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+anadoluajansi-DikenComTr
+</td>
+<td style="text-align:right;">
+0.3037381
+</td>
+<td style="text-align:right;">
+0.0090901
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+gazeteduvar-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.3028468
+</td>
+<td style="text-align:right;">
+0.0117258
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-yenisafak
+</td>
+<td style="text-align:right;">
+0.3014180
+</td>
+<td style="text-align:right;">
+0.0112483
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+trthaber-DikenComTr
+</td>
+<td style="text-align:right;">
+0.2979784
+</td>
+<td style="text-align:right;">
+0.0110424
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+euronews_tr-DikenComTr
+</td>
+<td style="text-align:right;">
+0.2971398
+</td>
+<td style="text-align:right;">
+0.0085442
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.2853207
+</td>
+<td style="text-align:right;">
+0.0239892
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-cnnturk
+</td>
+<td style="text-align:right;">
+0.2845894
+</td>
+<td style="text-align:right;">
+0.0038484
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+Ahaber-DikenComTr
+</td>
+<td style="text-align:right;">
+0.2715798
+</td>
+<td style="text-align:right;">
+0.0047246
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+FOXhaber-DikenComTr
+</td>
+<td style="text-align:right;">
+0.2178037
+</td>
+<td style="text-align:right;">
+0.0015388
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+DikenComTr-tgrthabertv
+</td>
+<td style="text-align:right;">
+0.1910289
+</td>
+<td style="text-align:right;">
+0.0028210
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
+<!--radix_placeholder_article_footer-->
+<!--/radix_placeholder_article_footer-->
+</div>
+
+<div class="d-appendix">
+</div>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+<!--radix_placeholder_site_after_body-->
+<!--/radix_placeholder_site_after_body-->
+<!--radix_placeholder_appendices-->
+<div class="appendix-bottom"></div>
+<!--/radix_placeholder_appendices-->
+<!--radix_placeholder_navigation_after_body-->
+<!--/radix_placeholder_navigation_after_body-->
+
+</body>
+
+</html>
