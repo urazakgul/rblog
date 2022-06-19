@@ -1,0 +1,390 @@
+---
+title: "Çok Kriterli Karar Verme Yöntemleri ile Yaşanacak İl Seçimi"
+description: |
+  Yaşam endeksi verileri ve TOPSIS yöntemi kullanılarak illerin sıralanması.
+author:
+  - name: A. Uraz Akgül
+date: 2022-06-19
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Decision Making
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Yaşayacağımız yere karar verme süreci içerisinde olduğumuzu ve bunu da çok kriterli karar verme yöntemleri ile yapmak istediğimizi varsayalım. Böyle bir süreç ve düşüncenin içinde en uygun kararı verebilmek için bir veri setine ihtiyacımız olacak. Bu veri setini TÜİK'ten alacağız. TÜİK, 2016 yılında [İllerde Yaşam Endeksi, 2015](https://data.tuik.gov.tr/Bulten/Index?p=Illerde-Yasam-Endeksi-2015-24561) başlıklı bir çalışma paylaşmıştı ve en yüksek endeks değerini Isparta almıştı. Çalışmaya konu endeks, yaşamın 11 boyutunu 41 gösterge ile temsil eden bir bileşik endekstir.
+
+Biz karar verme sürecimizde bu 41 göstergeyi kullanmak zorunda değiliz. Hatta ağırlıkları da önem derecemize göre değiştirebiliriz.
+
+Uygulamanın bundan sonraki kısmında subjektif değerlendirmelerim ile devam edeceğim için sizler göstergeleri ve ağırlıkları değiştirebilirsiniz.
+
+11 boyut ve 41 gösterge içerisinden seçmiş olduğum boyut ve göstergeler aşağıdadır. Listeye aynı zamanda ilgili göstergenin pozitif ve negatif bilgisini ve ileride ihtiyacımız olacak ağırlıkları (toplamları 1 olacak) da ekledim.
+
+* (Konut, -) Konutun kalitesinde problem yaşayanların oranı, 0.02
+
+* (Çalışma hayatı, -) İşsizlik oranı, 0.03
+
+* (Sağlık, +) Kamunun sağlık hizmetlerinden memnuniyet oranı, 0.05
+
+* (Eğitim, +) Okul öncesi eğitimde (3-5 yaş) net okullaşma oranı, 0.03
+
+* (Eğitim, +) Kamunun eğitim hizmetlerinden memnuniyet oranı, 0.04
+
+* (Çevre, -) PM10 istasyon değerleri ortalaması (hava kirliliği), 0.09
+
+* (Çevre, +) Km2'ye düşen orman alanı, 0.09
+
+* (Çevre, -) Sokaktan gelen gürültü problemi yaşayanların oranı, 0.07
+
+* (Çevre, +) Belediyenin temizlik hizmetlerinden memnuniyet oranı, 0.06
+
+* (Güvenlik, -) Cinayet oranı, 0.05
+
+* (Güvenlik, +) Gece yalnız yürürken kendini güvende hissedenlerin oranı, 0.08
+
+* (Güvenlik, +) Kamunun asayiş hizmetlerinden memnuniyet oranı, 0.05
+
+* (Altyapı hizmetlerine erişim, +) İnternet abone sayısı (yüz kişide), 0.02
+
+* (Altyapı hizmetlerine erişim, +) Kanalizasyon ve şebeke suyuna erişim oranı, 0.05
+
+* (Altyapı hizmetlerine erişim, +) Havalimanına erişim oranı, 0.03
+
+* (Altyapı hizmetlerine erişim, +) Belediyenin toplu taşıma hizmetlerinden memnuniyet oranı, 0.05
+
+* (Sosyal yaşam, +) Sinema ve tiyatro seyirci sayısı (yüz kişide), 0.06
+
+* (Sosyal yaşam, +) Bin kişi başına düşen alışveriş merkezi alanı, 0.01
+
+* (Sosyal yaşam, +) Sosyal hayatından memnuniyet oranı, 0.06
+
+* (Yaşam memnuniyeti, +) Mutluluk düzeyi, 0.06
+
+11 boyutu 9'a, 41 göstergeyi 20'ye düşürmüş oldum. Verilere (*post13.xls*) [GitHub hesabımdan](https://github.com/rpydaneogrendim/rblog/tree/main/data) ulaşabilirsiniz. Eğer TÜİK üzerinden veri setine ulaşmak isterseniz *Gelir, Yaşam, Tüketim ve Yoksulluk* kategorisine girdikten sonra *İllerde Yaşam Endeksi* alt kategorisini filtreleyip *İstatistiksel Tablolar* bölümünden indirebilirsiniz. Hedef dosya: *İllerde Yaşam Endeksi Gösterge Değerleri*dir.
+
+Aşağıda örnek olması açısından İstanbul ve Muğla'ya ait gösterge değerleri verilmiştir.
+
+```{r echo=FALSE}
+
+library(readxl)
+library(tidyverse)
+
+endeks <- read_excel("yasam_endeksi.xls")
+
+endeks %>% 
+  pivot_longer(!il, names_to = "indicators", values_to = "values") %>% 
+  filter(il %in% c("İstanbul","Muğla")) %>% 
+  pivot_wider(names_from = "il", values_from = "values") %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Technique for Order Preference by Similarity to Ideal Solution'ın kısaltması ve çok kriterli karar verme yöntemlerinden biri olan TOPSIS, İdeal Çözüme Dayalı Sıralama Tekniği olarak çevrilebilir. TOPSIS'in gizemli mantığı, seçilen alternatifin en iyi çözümden en kısa geometrik uzaklığa ve en kötü çözümden en uzun geometrik uzaklığa sahip olması gerektiği kavramına dayanmaktadır.
+
+TOPSIS yönteminin hem adımlarına bakalım hem de bu adımları uygulayalım.
+
+Adım 0) Veri seti: 81 ilin 9 boyut ve 20 göstergede değerleri
+
+```{r}
+
+library(readxl)
+library(tidyverse)
+
+endeks <- read_excel("yasam_endeksi.xls")
+
+```
+
+Adım 1) Karar matrisinin yaratılması
+
+Karar matrisinin satırları alternatiflerden (iller), sütunları kriterlerden (göstergeler) oluşmaktadır.
+
+Alternatifler M, kriterler N olsun. Karar matrisi:
+
+$(a_{ij})_{MxN}$
+
+```{r}
+
+il <- endeks$il # kullanmak için il sütunu ayrıldı
+m <- as.matrix(endeks[,-1]) # matris oluşturuldu
+
+```
+
+Adım 2) Karar Matrisinin Normalize Edilmesi
+
+$a_{ij} = \frac{a_{ij}}{\sqrt{\sum_{i=1}^{M}(a_{ij}^2)}}$
+
+```{r}
+
+m_denominator <- apply(m, 2, function(x) sqrt(sum(x**2))) # payda burada hesaplandı
+m2 <- m # m matrisi haricinde ikinci bir matris oluşturuldu
+
+for(col in 1:ncol(m2)){
+  
+  for(row in 1:nrow(m2)){
+    
+    m2[row,col] <- m2[row,col] / m_denominator[col]
+    
+  }
+  
+}
+
+```
+
+Örnek: konut_kalite sütunundaki ilk değer 22.73'tür. 22.73'ü ilgili sütunda yer alan değerlerin karelerinin toplamının kareköküne bölüyoruz. Bu değer ise 203.314'tür. Sonuç olarak 22.73/203.314 = 0.1117975'tir.
+
+Adım 3) Ağırlıklı Normalleştirilmiş Karar Matrisinin Oluşturulması
+
+$x_{ij} = a_{ij} * w_j$
+
+$w_j = \frac{w_j}{\sum_{j=1}^{N}w_j}$
+
+$\sum_{j=1}^{N}w_j = 1$
+
+Göstergelere ilişkin ağırlık değerlerini toplamı 1 olacak şekilde belirleyelim. Eşit ağırlıklandırma yapsak 1/20 = 0.05 oluyor. Hepsine 0.05 atadım ve aralarındaki karşılaştırmaya göre birini artırıp diğerini azalttım.
+
+```{r}
+
+myWeights <- data.frame(
+  Indicator = names(endeks[,-1]),
+  Weight = c(0.02,0.03,0.05,0.03,0.04,0.09,0.09,0.07,0.06,0.05,
+             0.08,0.05,0.02,0.05,0.03,0.05,0.06,0.01,0.06,0.06)
+)
+
+```
+
+```{r echo=FALSE}
+
+myWeights %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Şimdi her bir ağırlığı o göstergeye ait sütunda yer alan değerler ile çarpacağız. Böylece Ağırlıklı Normalleştirilmiş Karar Matrisi oluşacak.
+
+```{r}
+
+for(col in 1:ncol(m2)){
+  
+  for(row in 1:nrow(m2)){
+    
+    m2[row,col] <- m2[row,col] * myWeights$Weight[col]
+    
+  }
+  
+}
+
+```
+
+Adım 4) En İyi ve En Kötü Alternatifin Belirlenmesi
+
+Tüm iller arasından her bir göstergenin maksimum ve minimum değeri bulunur.
+
+$x_j^b = max_{i=1}^{M} x_{ij}$
+
+$x_j^w = min_{i=1}^{M} x_{ij}$
+
+Ağırlıklı Normalleştirilmiş Karar Matrisi'nde her bir göstergenin ilgili sütunundan pozitif ideal çözüm için en büyük değer, negatif ideal çözüm için ise en küçük değer seçilmiştir. Dikkat etmemiz gereken nokta, pozitif ideal çözüm için eğer gösterge pozitif ise maksimum; negatif ise minimum değer; negatif ideal çözüm için eğer gösterge pozitif ise minimum; negatif ise maksimum değer seçilir.
+
+```{r}
+
+# pos: positive
+# neg: negative
+
+myDirections <- data.frame(
+  Indicator = names(endeks[,-1]),
+  Direction = c("neg","neg","pos","pos",
+                "pos","neg","pos","neg",
+                "pos","neg","pos","pos",
+                "pos","pos","pos","pos",
+                "pos","pos","pos","pos")
+)
+
+```
+
+```{r echo=FALSE}
+
+myDirections %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+```{r}
+
+pos_ideal <- numeric()
+neg_ideal <- numeric()
+criteria <- colnames(m2)
+
+for(col in 1:ncol(m2)){
+  
+  # pozitif taraf için;
+  
+  p_name <- criteria[col]
+  p_filter <- myDirections %>% 
+    filter(Indicator == p_name) %>% 
+    pull(Direction)
+  
+  p_ideal <- if_else(p_filter == "pos", max(m2[,col]), min(m2[,col]))
+  pos_ideal <- c(pos_ideal,p_ideal)
+  
+  # negatif taraf için;
+  
+  n_name <- criteria[col]
+  n_filter <- myDirections %>% 
+    filter(Indicator == n_name) %>% 
+    pull(Direction)
+  
+  n_ideal <- if_else(n_filter == "neg", max(m2[,col]), min(m2[,col]))
+  neg_ideal <- c(neg_ideal,n_ideal)
+  
+}
+
+pos_neg_ideal <- data.frame(
+  "Indicator" = myDirections$Indicator,
+  "PositiveIdeal" = pos_ideal,
+  "NegativeIdeal" = neg_ideal
+)
+
+```
+
+```{r echo=FALSE}
+
+pos_neg_ideal %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Adım 5) Öklid Uzaklığın Hesaplanması
+
+Hedef alternatif ile en iyi ve en kötü alternatif arasındaki Öklid uzaklığı hesaplanır.
+
+$d_i^b = \sqrt{\sum_{j=1}^{N}(x_{ij}-x_j^b)^2}$
+
+$d_i^w = \sqrt{\sum_{j=1}^{N}(x_{ij}-x_j^w)^2}$
+
+```{r}
+
+b_euclidean <- m2
+w_euclidean <- m2
+
+for(row in 1:nrow(m2)){
+  
+  for(col in 1:ncol(m2)){
+    
+    b_euclidean[row, col] <- (b_euclidean[row, col] - pos_neg_ideal$PositiveIdeal[col]) ** 2
+    w_euclidean[row, col] <- (w_euclidean[row, col] - pos_neg_ideal$NegativeIdeal[col]) ** 2
+    
+  }
+  
+}
+
+b_euclidean <- sqrt(rowSums(b_euclidean))
+w_euclidean <- sqrt(rowSums(w_euclidean))
+
+df_euclidean <- data.frame(
+  prov_num = seq(1,length(il),1),
+  b_euclidean = b_euclidean,
+  w_euclidean = w_euclidean
+)
+
+```
+
+```{r echo=FALSE}
+
+df_euclidean %>% 
+  head(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Adım 6) TOPSIS Skorunun Elde Edilmesi
+
+Her alternatif için en kötü alternatife olan benzerliğinin hesaplandığı adımdır. Burada, TOPSIS skoru elde edilir.
+
+$s_i = \frac{d_i^w}{d_i^w + d_i^b}$
+
+```{r}
+
+topsis_score <- df_euclidean %>% 
+  mutate(
+    score = w_euclidean / (w_euclidean + b_euclidean),
+    province = il
+  ) %>% 
+  arrange(desc(score)) %>% 
+  mutate(rank = seq(1,nrow(.),1))
+
+```
+
+```{r echo=FALSE}
+
+topsis_score %>% 
+  head(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Adım 7) TOPSIS Skorunun Büyükten Küçüğe Doğru Sıralanması
+
+Aşağıda ilk 10 il gösterilmiştir.
+
+```{r}
+
+topsis_score_desc <- topsis_score %>% 
+  select(province,score,rank)
+
+```
+
+```{r echo=FALSE}
+
+topsis_score_desc %>% 
+  filter(rank <= 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Birinci sırada yaşadığım il olan İstanbul çıktı. TÜİK'in endeksinde birinci olan Isparta ise bu veri setine ve ağırlıklandırmalarıma göre yaşayacağım iller arasında 16. olmuştur.
+
+Son olarak, *topsis* paketi ile aşağıdaki gibi çok kısa bir süre içerisinde sonuçlar elde edilebilir.
+
+```{r}
+
+library(topsis)
+
+m <- as.matrix(endeks[,-1]) # matris
+w <- myWeights$Weight # ağırlıklar
+i <- myDirections %>% 
+  mutate(Direction = ifelse(Direction == "neg", "-", "+")) %>% 
+  pull(Direction) # yönler
+
+df <- topsis(m,w,i) %>% 
+  mutate(province = il) %>% 
+  arrange(desc(score))
+
+```
+
+```{r preview=TRUE}
+
+ggplot(df %>% arrange(desc(score)) %>% slice(1:10),
+       aes(x = reorder(province,score), y = score, fill = score)) +
+  geom_col() +
+  coord_flip() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.title = element_blank()) +
+  scale_fill_gradient(low = "orange", high = "blue")
+
+```
+
+*Yararlandığım Kaynaklar:*
+
+[*What is TOPSIS?*](https://robertsoczewica.medium.com/what-is-topsis-b05c50b3cd05)
