@@ -463,7 +463,7 @@ history <- model %>%
     trainLabels,
     epochs = 50,
     batch_size = 64,
-    validation_split = 0.1 # 10% validasyon için ayrıldı
+    validation_split = 0.1 # 10%'luk kısım validasyon için ayrıldı
   )
 
 plot(history)
