@@ -535,7 +535,7 @@ Erdoğan'ın AKP'li bir yüze sahip olma olasılığı `r round(test_prob[1,1], 
 
 Bu uygulamanın ardından güzel bir Shiny Web uygulaması yapıp paylaşmak isterdim ancak hem veri setinin yetersiz oluşu hem de etik sebepler ile böyle bir şeyi paylaşmayı uygun görmedim. Çalışmaya konu veri setindeki fotoğrafların bugün itibarıyla hangi etiketin/sınıfın/kategorinin/partinin içinden olduğu net bir şekilde bellidir ancak dışarıdan uygulamaya girecek bir fotoğraf için bu tahmin şu şartlarda riskli olabilir. Çalışmanın eğitim amaçlı paylaşıldığını ve bu alanda neler yapılabileceği konusunda fikir vermeyi amaçladığını belirtmek isterim.
 
-Çalışmanın diğer kodlarına aşağıdan ulaşılabilirsiniz.
+Çalışmanın diğer kodlarına aşağıdan ulaşabilirsiniz.
 
 ```{r eval=FALSE}
 
