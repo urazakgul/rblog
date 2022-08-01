@@ -50,16 +50,17 @@ pre.numberSource code > span > a:first-child::before
   }
 pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
 div.sourceCode
-  {   }
+  { color: #00769e; background-color: #f1f3f5; }
 @media screen {
 pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
+code span { color: #00769e; } /* Normal */
 code span.al { color: #ad0000; } /* Alert */
 code span.an { color: #5e5e5e; } /* Annotation */
-code span.at { } /* Attribute */
+code span.at { color: #657422; } /* Attribute */
 code span.bn { color: #ad0000; } /* BaseN */
 code span.bu { } /* BuiltIn */
-code span.cf { color: #007ba5; } /* ControlFlow */
+code span.cf { color: #00769e; } /* ControlFlow */
 code span.ch { color: #20794d; } /* Char */
 code span.cn { color: #8f5902; } /* Constant */
 code span.co { color: #5e5e5e; } /* Comment */
@@ -73,9 +74,9 @@ code span.fl { color: #ad0000; } /* Float */
 code span.fu { color: #4758ab; } /* Function */
 code span.im { } /* Import */
 code span.in { color: #5e5e5e; } /* Information */
-code span.kw { color: #007ba5; } /* Keyword */
+code span.kw { color: #00769e; } /* Keyword */
 code span.op { color: #5e5e5e; } /* Operator */
-code span.ot { color: #007ba5; } /* Other */
+code span.ot { color: #00769e; } /* Other */
 code span.pp { color: #ad0000; } /* Preprocessor */
 code span.sc { color: #5e5e5e; } /* SpecialChar */
 code span.ss { color: #20794d; } /* SpecialString */
@@ -87,38 +88,38 @@ code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
 
 
   <!--radix_placeholder_meta_tags-->
-<title>R blog: Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi</title>
+<title>R blog: Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi</title>
 
-<meta property="description" itemprop="description" content="Enflasyonun uzun dönemde yükselmesi olasılığı 70%&#39;tir."/>
+<meta property="description" itemprop="description" content="NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların incelenmesi."/>
 
 
 <!--  https://schema.org/Article -->
-<meta property="article:published" itemprop="datePublished" content="2022-05-19"/>
-<meta property="article:created" itemprop="dateCreated" content="2022-05-19"/>
+<meta property="article:published" itemprop="datePublished" content="2022-08-01"/>
+<meta property="article:created" itemprop="dateCreated" content="2022-08-01"/>
 <meta name="article:author" content="A. Uraz Akgül"/>
 
 <!--  https://developers.facebook.com/docs/sharing/webmasters#markup -->
-<meta property="og:title" content="R blog: Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi"/>
+<meta property="og:title" content="R blog: Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi"/>
 <meta property="og:type" content="article"/>
-<meta property="og:description" content="Enflasyonun uzun dönemde yükselmesi olasılığı 70%&#39;tir."/>
+<meta property="og:description" content="NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların incelenmesi."/>
 <meta property="og:locale" content="en_US"/>
 <meta property="og:site_name" content="R blog"/>
 
 <!--  https://dev.twitter.com/cards/types/summary -->
 <meta property="twitter:card" content="summary"/>
-<meta property="twitter:title" content="R blog: Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi"/>
-<meta property="twitter:description" content="Enflasyonun uzun dönemde yükselmesi olasılığı 70%&#39;tir."/>
+<meta property="twitter:title" content="R blog: Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi"/>
+<meta property="twitter:description" content="NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların incelenmesi."/>
 
 <!--/radix_placeholder_meta_tags-->
   <!--radix_placeholder_rmarkdown_metadata-->
 
 <script type="text/json" id="radix-rmarkdown-metadata">
-{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","categories"]}},"value":[{"type":"character","attributes":{},"value":["Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi"]},{"type":"character","attributes":{},"value":["Enflasyonun uzun dönemde yükselmesi olasılığı 70%'tir."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["A. Uraz Akgül"]}]}]},{"type":"character","attributes":{},"value":["2022-05-19"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["Finance","Economics"]}]}
+{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["title","description","author","date","output","categories"]}},"value":[{"type":"character","attributes":{},"value":["Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi"]},{"type":"character","attributes":{},"value":["NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların incelenmesi."]},{"type":"list","attributes":{},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["name"]}},"value":[{"type":"character","attributes":{},"value":["A. Uraz Akgül"]}]}]},{"type":"character","attributes":{},"value":["2022-08-01"]},{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["distill::distill_article"]}},"value":[{"type":"list","attributes":{"names":{"type":"character","attributes":{},"value":["self_contained"]}},"value":[{"type":"logical","attributes":{},"value":[false]}]}]},{"type":"character","attributes":{},"value":["Web"]}]}
 </script>
 <!--/radix_placeholder_rmarkdown_metadata-->
   
   <script type="text/json" id="radix-resource-manifest">
-  {"type":"character","attributes":{},"value":["data.xlsx","post3_files/anchor-4.2.2/anchor.min.js","post3_files/bowser-1.9.3/bowser.min.js","post3_files/distill-2.2.21/template.v2.js","post3_files/figure-html5/unnamed-chunk-2-1.png","post3_files/figure-html5/unnamed-chunk-5-1.png","post3_files/figure-html5/unnamed-chunk-6-1.png","post3_files/header-attrs-2.13/header-attrs.js","post3_files/jquery-3.6.0/jquery-3.6.0.js","post3_files/jquery-3.6.0/jquery-3.6.0.min.js","post3_files/jquery-3.6.0/jquery-3.6.0.min.map","post3_files/kePrint-0.0.1/kePrint.js","post3_files/lightable-0.0.1/lightable.css","post3_files/popper-2.6.0/popper.min.js","post3_files/tippy-6.2.7/tippy-bundle.umd.min.js","post3_files/tippy-6.2.7/tippy-light-border.css","post3_files/tippy-6.2.7/tippy.css","post3_files/tippy-6.2.7/tippy.umd.min.js","post3_files/webcomponents-2.0.0/webcomponents.js"]}
+  {"type":"character","attributes":{},"value":["mail.jpg","post15_files/anchor-4.2.2/anchor.min.js","post15_files/bowser-1.9.3/bowser.min.js","post15_files/distill-2.2.21/template.v2.js","post15_files/figure-html5/unnamed-chunk-17-1.png","post15_files/figure-html5/unnamed-chunk-18-1.png","post15_files/figure-html5/unnamed-chunk-19-1.png","post15_files/figure-html5/unnamed-chunk-20-1.png","post15_files/header-attrs-2.14/header-attrs.js","post15_files/jquery-3.6.0/jquery-3.6.0.js","post15_files/jquery-3.6.0/jquery-3.6.0.min.js","post15_files/jquery-3.6.0/jquery-3.6.0.min.map","post15_files/kePrint-0.0.1/kePrint.js","post15_files/lightable-0.0.1/lightable.css","post15_files/popper-2.6.0/popper.min.js","post15_files/tippy-6.2.7/tippy-bundle.umd.min.js","post15_files/tippy-6.2.7/tippy-light-border.css","post15_files/tippy-6.2.7/tippy.css","post15_files/tippy-6.2.7/tippy.umd.min.js","post15_files/webcomponents-2.0.0/webcomponents.js"]}
   </script>
   <!--radix_placeholder_navigation_in_header-->
 <meta name="distill:offset" content="../.."/>
@@ -2074,7 +2075,7 @@ document.addEventListener('DOMContentLoaded', function() {
 </script>
 
 <!--/radix_placeholder_distill-->
-  <script src="../../site_libs/header-attrs-2.13/header-attrs.js"></script>
+  <script src="../../site_libs/header-attrs-2.14/header-attrs.js"></script>
   <script src="../../site_libs/kePrint-0.0.1/kePrint.js"></script>
   <link href="../../site_libs/lightable-0.0.1/lightable.css" rel="stylesheet" />
   <script src="../../site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -2097,7 +2098,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <!--radix_placeholder_front_matter-->
 
 <script id="distill-front-matter" type="text/json">
-{"title":"Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi","description":"Enflasyonun uzun dönemde yükselmesi olasılığı 70%'tir.","authors":[{"author":"A. Uraz Akgül","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2022-05-19T00:00:00.000+03:00","citationText":"Akgül, 2022"}
+{"title":"Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi","description":"NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların incelenmesi.","authors":[{"author":"A. Uraz Akgül","authorURL":"#","affiliation":"&nbsp;","affiliationURL":"#","orcidID":""}],"publishedDate":"2022-08-01T00:00:00.000+03:00","citationText":"Akgül, 2022"}
 </script>
 
 <!--/radix_placeholder_front_matter-->
@@ -2148,136 +2149,124 @@ Packages
 <!--/radix_placeholder_site_before_body-->
 
 <div class="d-title">
-<h1>Faizdeki Değişimin Enflasyon Üzerindeki Etkisinin Markov Zinciri Modeli ile Analizi</h1>
+<h1>Tarihsel Sıcaklıklar: İstanbul için 2014-2022 Yıllarının Aylık Bazda İncelenmesi</h1>
 <!--radix_placeholder_categories-->
 <div class="dt-tags">
-  <a href="../../index.html#category:Finance" class="dt-tag">Finance</a>
-  <a href="../../index.html#category:Economics" class="dt-tag">Economics</a>
+  <a href="../../index.html#category:Web" class="dt-tag">Web</a>
 </div>
 <!--/radix_placeholder_categories-->
-<p><p>Enflasyonun uzun dönemde yükselmesi olasılığı 70%’tir.</p></p>
+<p><p>NOAA verileri ve rnoaa paketi ile tarihsel sıcaklıkların
+incelenmesi.</p></p>
 </div>
 
 <div class="d-byline">
   A. Uraz Akgül  
   
-<br/>2022-05-19
+<br/>2022-08-01
 </div>
 
 <div class="d-article">
-<p>Markov süreci, bir stokastik sürecin şu anki değerleri bilindiğinde,
-sürecin gelecekteki değerlerinin geçmişteki değerlerinden koşullu olarak
-bağımsız olduğu süreçtir. Markov zinciri ise Markov sürecinin kesikli
-durum uzayına sahip olduğu özel bir durumdur. Stokastik sistemlerin kısa
-veya uzun dönemdeki davranışlarının modellenmesinde Markov
-zincirlerinden yararlanılmaktadır.</p>
-<p>Aylık frekansta olan ve Haziran 2018 (başkanlık sistemi) ile Nisan
-2022 (son veri) arasını kapsayan verileri TCMB/EVDS’den aldım. Faizi
-temsilen Ağırlık Ortalama Fonlama Maliyeti’ni; enflasyonu temsilen de
-TÜFE’den elde edilen yıllık değişimleri kullandım. Verilere
-<em>(post3.xlsx)</em> <a
-href="https://github.com/rpydaneogrendim/rblog/tree/main/data">GitHub
-hesabımdan</a> ulaşabilirsiniz.</p>
+<p>NOAA (National Oceanic and Atmospheric Administration/Ulusal Okyanus
+ve Atmosfer Dairesi), Amerika Birleşik Devletleri’nin Dünya’daki hava ve
+deniz olaylarını araştırması amacıyla görevlendirilmiş bir kurumudur.
+1807 yılında kurulmuş olan NOAA, hava, deniz ve gökyüzündeki tehlikeleri
+araştırıp, okyanus ve kıyı kaynaklarının korunması konusunda araştırma
+ve geliştirme yapmaktadır (<a
+href="https://tr.wikipedia.org/wiki/Ulusal_Okyanus_ve_Atmosfer_Dairesi"><em>Vikipedi</em></a>).</p>
+<p>NOAA’den faydalanabilmek için öncelikle bir token almak gerekiyor. <a
+href="https://www.ncdc.noaa.gov/cdo-web/token">Şu adresten</a> ilgili
+sayfaya ulaşılabilir. Yapılması gereken adımlar sitede yazmaktadır. Bir
+mail adresi girerek submit butonuna tıklayın. <em>An email has been sent
+containing your CDO web services token</em> mesajından sonra mailinizi
+kontrol edin. Örnek olması için gelen mail görüntüsünü paylaşıyorum.</p>
+<div class="layout-chunk" data-layout="l-body">
+<p><img src="mail.jpg" width="100%" /></p>
+</div>
+<p>NOAA’den verileri çekebilmek için rnoaa paketini kullanacağız.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://haozhu233.github.io/kableExtra/'>kableExtra</a></span><span class='op'>)</span> <span class='co'># zorunlu değil</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://R-Forge.R-project.org/projects/expm/'>expm</a></span><span class='op'>)</span> <span class='co'># %^% operatörü</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://github.com/spedygiorgio/markovchain/'>markovchain</a></span><span class='op'>)</span> <span class='co'># uzun dönem denge hesaplaması</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span>
-<span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='http://corybrunson.github.io/ggalluvial/'>ggalluvial</a></span><span class='op'>)</span>
-
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='fu'>readxl</span><span class='fu'>::</span><span class='fu'><a href='https://readxl.tidyverse.org/reference/read_excel.html'>read_excel</a></span><span class='op'>(</span><span class='st'>"data.xlsx"</span><span class='op'>)</span>
-<span class='va'>df</span> <span class='op'>&lt;-</span> <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>tarih <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>tarih</span>,<span class='st'>"-"</span>,<span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>tarih</span> <span class='op'>&gt;=</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='st'>"2018-06-01"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='co'># Mayıs 2022 verisi çıkarıldı.</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://tidyverse.tidyverse.org'>tidyverse</a></span><span class='op'>)</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://wilkelab.org/ggridges/'>ggridges</a></span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'>#install.packages("rnoaa")</span></span>
+<span><span class='kw'><a href='https://rdrr.io/r/base/library.html'>library</a></span><span class='op'>(</span><span class='va'><a href='https://docs.ropensci.org/rnoaa/'>rnoaa</a></span><span class='op'>)</span></span>
+<span></span>
+<span><span class='va'>myToken</span> <span class='op'>&lt;-</span> <span class='st'>"..."</span></span></code></pre>
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
-<p><img src="post3_files/figure-html5/unnamed-chunk-2-1.png" width="624" /></p>
+
 </div>
-<p>Elimizdeki durumların <em>(State; S1, S2, …)</em> neler olabileceğine
-bakalım:</p>
+<p>Önce Türkiye’deki istasyonların listesini alalım. ghcnd_stations()
+fonksiyonunda kullanacağımız id sütununun ilk iki harfi ülke kodunu
+temsil etmektedir. Türkiye için bu TU’dur.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>countries</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://docs.ropensci.org/rnoaa/reference/ghcnd_states.html'>ghcnd_countries</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>name</span> <span class='op'>==</span> <span class='st'>"Turkey"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/pull.html'>pull</a></span><span class='op'>(</span><span class='va'>code</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='co'># id: The weather station’s ID number. The first two letters denote the country</span></span>
+<span><span class='co'># (using FIPS country codes).</span></span>
+<span></span>
+<span><span class='va'>stations</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://docs.ropensci.org/rnoaa/reference/ghcnd_stations.html'>ghcnd_stations</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grepl</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"^"</span>,<span class='va'>countries</span><span class='op'>)</span>, <span class='va'>id</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
+</div>
+<p>Siz bundan sonrasında istediğiniz istasyon ile devam edebilirsiniz.
+Ben bu yazıda İstanbul için bir uygulama yapacağım.</p>
+<p>Aşağıdaki filtreleri yapalım.</p>
 <ul>
-<li><p>S1: Faiz Yükseldi - Enflasyon Yükseldi</p></li>
-<li><p>S2: Faiz Yükseldi - Enflasyon Düştü</p></li>
-<li><p>S3: Faiz Düştü - Enflasyon Yükseldi</p></li>
-<li><p>S4: Faiz Düştü - Enflasyon Düştü</p></li>
-<li><p>S5: Faiz Değişmedi - Enflasyon Yükseldi</p></li>
-<li><p>S6: Faiz Değişmedi - Enflasyon Düştü</p></li>
+<li>name sütunu İstanbul olsun.</li>
 </ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df2</span> <span class='op'>&lt;-</span> <span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>
-    durum <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/case_when.html'>case_when</a></span><span class='op'>(</span>
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S1"</span>,
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S2"</span>,
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S3"</span>,
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S4"</span>,
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&gt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S5"</span>,
-      <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>faiz</span><span class='op'>)</span> <span class='op'>==</span> <span class='va'>faiz</span> <span class='op'>&amp;</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>enflasyon</span><span class='op'>)</span> <span class='op'>&lt;</span> <span class='va'>enflasyon</span> <span class='op'>~</span> <span class='st'>"S6"</span>,
-    <span class='op'>)</span> <span class='co'># lead() ---&gt; bir sonraki durum; t + 1 ile t karşılaştırılıyor</span>
-  <span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># NA içeren değerler çıkarıldı</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>durum</span><span class='op'>)</span> <span class='co'># yeterli olacak sütun</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='co'># name: The station’s name.</span></span></code></pre>
 </div>
 </div>
-<p>Kesikli parametreli Markov zincirlerinde sistem belirli bir olasılık
-dağılımına bağlı olarak bulunduğu durumdan başka bir duruma geçebilir
-veya aynı durumda kalabilir. Bu nedenle, incelenen sistemin içinde
-bulunabileceği farklı durumların ve bu durumların birinden diğerine
-geçiş olasılıklarını bilmemiz gerekir. Sistemin bu durum değişiklikleri
-geçiş olarak isimlendirilir ve durum uzayındaki herhangi i ve j
-durumları için, <span class="math inline">\(p_{ij}(m,n) = P(X_{m+n} =
-j/X_m = i)\)</span> biçimindeki koşullu olasılığa geçiş olasılığı adı
-verilir. Ayrıca, homojen bir Markov zincirinde geçiş olasılığı yalnızca
-adım sayısının bir fonksiyonudur ve m zamanına bağlı değildir.</p>
-<p>Yukarıdaki durumları baz alarak Markov geçiş matrisini
-oluşturalım.</p>
+<ul>
+<li>element sütununda TAVG olsun. TAVG, ortalama sıcaklığı temsil
+ediyor.</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>mgm</span> <span class='op'>&lt;-</span> <span class='va'>df2</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>
-    durum2 <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/lead-lag.html'>lead</a></span><span class='op'>(</span><span class='va'>durum</span><span class='op'>)</span>
-  <span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># hangi durumdan hangi duruma geçti</span>
-  <span class='fu'><a href='https://rdrr.io/r/stats/na.fail.html'>na.omit</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>durum</span>,<span class='va'>durum2</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://dplyr.tidyverse.org/reference/context.html'>n</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span><span class='op'>(</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='co'># TAVG: Average temperature, in tenths of degrees Celsius</span></span></code></pre>
 </div>
 </div>
-<p>Tabloda olmayan bazı durumlar var. Bunları tüm durumları baz alarak
-ekleyebiliriz.</p>
+<ul>
+<li>Son ölçüm yılı olan last_year 2022 olsun.</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>tumDurumlar</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span>
-  durum <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"S"</span>,<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>6</span>,<span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span>, <span class='co'># tüm durumlar</span>
-  durum2 <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='st'>"S"</span>,<span class='fu'><a href='https://rdrr.io/r/base/seq.html'>seq</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fl'>6</span>,<span class='fl'>1</span><span class='op'>)</span><span class='op'>)</span> <span class='co'># tüm durumlar 2</span>
-<span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/expand.html'>expand</a></span><span class='op'>(</span><span class='va'>durum</span>,<span class='va'>durum2</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># tüm durumlar burada genişletiliyor</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate-joins.html'>left_join</a></span><span class='op'>(</span><span class='va'>mgm</span>, by <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"durum"</span>,<span class='st'>"durum2"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span>n <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/replace.html'>replace</a></span><span class='op'>(</span><span class='va'>n</span>,<span class='fu'><a href='https://rdrr.io/r/base/NA.html'>is.na</a></span><span class='op'>(</span><span class='va'>n</span><span class='op'>)</span>,<span class='fl'>0</span><span class='op'>)</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='co'># last_year: The last year of data available at that station for that weather element.</span></span></code></pre>
 </div>
 </div>
-<div class="layout-chunk" data-layout="l-body">
-<p><img src="post3_files/figure-html5/unnamed-chunk-6-1.png" width="624" data-distill-preview=1 /></p>
-</div>
-<p>Matrisi oluşturabiliriz. Her bir hücreyi o satırın toplamına bölerek
-olasılıkları hesaplayacağız.</p>
+<ul>
+<li>İlk ölçüm yılı olan first_year değişkeni de en eski yıl olsun.</li>
+</ul>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='va'>tumDurumlar</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_wider.html'>pivot_wider</a></span><span class='op'>(</span>names_from <span class='op'>=</span> <span class='st'>"durum2"</span>, values_from <span class='op'>=</span> <span class='st'>"n"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># sütun</span>
-  <span class='fu'><a href='https://tibble.tidyverse.org/reference/rownames.html'>column_to_rownames</a></span><span class='op'>(</span>var <span class='op'>=</span> <span class='st'>"durum"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># satır</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate_all.html'>mutate_all</a></span><span class='op'>(</span>.funs <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>x</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/colSums.html'>rowSums</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span>, digits <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate_all.html'>mutate_if</a></span><span class='op'>(</span><span class='va'>is.numeric</span>, <span class='fu'><a href='https://dplyr.tidyverse.org/reference/funs.html'>funs</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/is.finite.html'>is.nan</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span>, <span class='fl'>0</span>, <span class='va'>.</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='co'># first_year: The first year of data available at that station for that weather element.</span></span></code></pre>
+</div>
+</div>
+<p>Filtreleyelim.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>istanbul</span> <span class='op'>&lt;-</span> <span class='va'>stations</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='va'>id</span>,<span class='va'>name</span>,<span class='va'>element</span>,<span class='va'>first_year</span>,<span class='va'>last_year</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span></span>
+<span>    <span class='fu'><a href='https://rdrr.io/r/base/grep.html'>grepl</a></span><span class='op'>(</span><span class='st'>"ISTANBUL"</span>,<span class='va'>name</span><span class='op'>)</span> <span class='op'>&amp;</span> <span class='va'>element</span> <span class='op'>==</span> <span class='st'>"TAVG"</span> <span class='op'>&amp;</span> <span class='va'>last_year</span> <span class='op'>==</span> <span class='fl'>2022</span></span>
+<span>  <span class='op'>)</span></span></code></pre>
+</div>
+</div>
+<p>Yukarıdaki filtreye göre 1 tane istasyon kaldı. O da bundan sonra
+kullanacağımız TUM00017064 id’li istasyondur.</p>
+<p>Bu istasyondaki ulaşabileceğimiz verilere bakalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>myStation</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://docs.ropensci.org/rnoaa/reference/ncdc_datatypes.html'>ncdc_datatypes</a></span><span class='op'>(</span>stationid <span class='op'>=</span> <span class='st'>"GHCND:TUM00017064"</span>,</span>
+<span>                            datasetid <span class='op'>=</span> <span class='st'>"GHCND"</span>,</span>
+<span>                            token <span class='op'>=</span> <span class='va'>myToken</span><span class='op'>)</span><span class='op'>$</span><span class='va'>data</span></span></code></pre>
 </div>
 </div>
 <div class="layout-chunk" data-layout="l-body">
@@ -2285,562 +2274,404 @@ olasılıkları hesaplayacağız.</p>
 <thead>
 <tr>
 <th style="text-align:left;">
+mindate
 </th>
-<th style="text-align:right;">
-S1
-</th>
-<th style="text-align:right;">
-S2
-</th>
-<th style="text-align:right;">
-S3
-</th>
-<th style="text-align:right;">
-S4
-</th>
-<th style="text-align:right;">
-S5
-</th>
-<th style="text-align:right;">
-S6
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:left;">
-S1
-</td>
-<td style="text-align:right;">
-0.38
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.25
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S2
-</td>
-<td style="text-align:right;">
-0.50
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.25
-</td>
-<td style="text-align:right;">
-0.25
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S3
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-<td style="text-align:right;">
-0.07
-</td>
-<td style="text-align:right;">
-0.47
-</td>
-<td style="text-align:right;">
-0.13
-</td>
-<td style="text-align:right;">
-0.13
-</td>
-<td style="text-align:right;">
-0.13
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S4
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:right;">
-0.43
-</td>
-<td style="text-align:right;">
-0.43
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S5
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.62
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S6
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-<td style="text-align:right;">
-0.00
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Yukarıdaki matris bir-adım geçiş olasılığı matrisidir. Homojen bir
-Markov zincirinde m. adımda i durumunda bulunan sürecin bir adım sonra j
-durumunda bulunması olasılığı <span class="math inline">\(p_{ij} =
-p_{ij}(1) = p_{ij}^{(1)} = P(X_{m+1} = j/X_m = i)\)</span>’dir.
-Yukarıdaki bir-adım geçiş matrisinde satırlar sistemin şu an
-bulunabileceği durumları; sütunlar ise bir adım sonra bulunabileceği
-durumları göstermektedir.</p>
-<p>Başlangıç durumu S5’tir. Yani, faiz değişmedi - enflasyon yükseldi.
-Gelecek Mayıs ayına ait olasılıklara bakalım.</p>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>baslangicDurum</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span>
-  data <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0</span>,<span class='fl'>0</span>,<span class='fl'>0</span>,<span class='fl'>0</span>,<span class='fl'>1</span>,<span class='fl'>0</span><span class='op'>)</span>, <span class='co'># S5 ---&gt; 1; diğerleri 0</span>
-  nrow <span class='op'>=</span> <span class='fl'>1</span>,
-  byrow <span class='op'>=</span> <span class='cn'>TRUE</span>
-<span class='op'>)</span>
-</code></pre>
-</div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>baslangicDurum</span> <span class='op'><a href='https://rdrr.io/pkg/Matrix/man/matrix-products.html'>%*%</a></span> <span class='va'>m</span>
-</code></pre>
-</div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:right;">
-S1
-</th>
-<th style="text-align:right;">
-S2
-</th>
-<th style="text-align:right;">
-S3
-</th>
-<th style="text-align:right;">
-S4
-</th>
-<th style="text-align:right;">
-S5
-</th>
-<th style="text-align:right;">
-S6
-</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0
-</td>
-<td style="text-align:right;">
-0.62
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Faizin değişmediği ve enflasyonun yükseldiği bir dönemden yine faizin
-değişmediği ve enflasyonun yükseldiği bir döneme geçiş olasılığı
-62%’dir.</p>
-<p>Peki, Haziran ayı için (iki-adım geçiş) olasılıklar ne olacaktır?</p>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>m</span> <span class='op'><a href='https://rdrr.io/pkg/expm/man/matpow.html'>%^%</a></span> <span class='fl'>2</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>.</span>, digits <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</code></pre>
-</div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
 <th style="text-align:left;">
+maxdate
+</th>
+<th style="text-align:left;">
+name
 </th>
 <th style="text-align:right;">
-S1
+datacoverage
 </th>
-<th style="text-align:right;">
-S2
-</th>
-<th style="text-align:right;">
-S3
-</th>
-<th style="text-align:right;">
-S4
-</th>
-<th style="text-align:right;">
-S5
-</th>
-<th style="text-align:right;">
-S6
+<th style="text-align:left;">
+id
 </th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td style="text-align:left;">
-S1
+1781-01-01
 </td>
-<td style="text-align:right;">
-0.24
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-<td style="text-align:right;">
-0.31
-</td>
-<td style="text-align:right;">
-0.16
-</td>
-<td style="text-align:right;">
-0.15
-</td>
-<td style="text-align:right;">
-0.05
-</td>
-</tr>
-<tr>
 <td style="text-align:left;">
-S2
+2022-07-28
 </td>
-<td style="text-align:right;">
-0.21
-</td>
-<td style="text-align:right;">
-0.11
-</td>
-<td style="text-align:right;">
-0.35
-</td>
-<td style="text-align:right;">
-0.20
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-</tr>
-<tr>
 <td style="text-align:left;">
-S3
+Precipitation
 </td>
 <td style="text-align:right;">
-0.15
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-<td style="text-align:right;">
-0.14
-</td>
-<td style="text-align:right;">
-0.19
-</td>
-<td style="text-align:right;">
-0.08
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S4
-</td>
-<td style="text-align:right;">
-0.10
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-<td style="text-align:right;">
-0.42
-</td>
-<td style="text-align:right;">
-0.28
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S5
-</td>
-<td style="text-align:right;">
-0.17
-</td>
-<td style="text-align:right;">
-0.06
-</td>
-<td style="text-align:right;">
-0.16
-</td>
-<td style="text-align:right;">
-0.03
-</td>
-<td style="text-align:right;">
-0.45
-</td>
-<td style="text-align:right;">
-0.09
-</td>
-</tr>
-<tr>
-<td style="text-align:left;">
-S6
-</td>
-<td style="text-align:right;">
-0.33
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-<td style="text-align:right;">
-0.20
-</td>
-<td style="text-align:right;">
-0.12
-</td>
-<td style="text-align:right;">
-0.24
-</td>
-<td style="text-align:right;">
-0.04
-</td>
-</tr>
-</tbody>
-</table>
-</div>
-<p>Markov zincirinde ilk olasılık dağılımı ve zincirin bir-adım geçiş
-matrisini belirlediğimizde zincirin tüm adımlarındaki olasılıkları
-kolayca elde edebiliriz. n-adım olasılıklı vektörü <span
-class="math inline">\(\pi_{n} = \pi_{n-1}P\)</span> olsun. Buradan
-aşağıdaki eşitlikleri türetebiliriz.</p>
-<p><span class="math inline">\(\pi_n = (\pi_{n-2}P)P =
-\pi_{n-2}P^2\)</span></p>
-<p>.</p>
-<p>.</p>
-<p>.</p>
-<p><span class="math inline">\(\pi_n = \pi_0P^n\)</span></p>
-<p>P geçiş matrisinin n. kuvvetini aldığımızda elde edeceğimiz n-adım
-geçiş matrisi <span class="math inline">\(P^n\)</span>’de n değeri
-büyüdükçe <span class="math inline">\(P_{ij}^{(n)}\)</span> olasılık
-değerleri sabit bir değere ya da limite yaklaşıyorsa, n-adım geçiş
-olasılıkları denge durumuna ulaşır. Denge durumuna ulaştığımızda geçiş
-matrisinin satırlarında değişim olmadığını göreceğiz. Yani, her satırı
-aynı olan bir geçiş matrisi elde edeceğiz.</p>
-<p><span class="math inline">\(\pi_n = [\pi_0 \pi_1 ...
-\pi_n]\)</span></p>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>m</span> <span class='op'>&lt;-</span> <span class='va'>tumDurumlar</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_wider.html'>pivot_wider</a></span><span class='op'>(</span>names_from <span class='op'>=</span> <span class='st'>"durum2"</span>, values_from <span class='op'>=</span> <span class='st'>"n"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># sütun</span>
-  <span class='fu'><a href='https://tibble.tidyverse.org/reference/rownames.html'>column_to_rownames</a></span><span class='op'>(</span>var <span class='op'>=</span> <span class='st'>"durum"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='co'># satır</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate_all.html'>mutate_all</a></span><span class='op'>(</span>.funs <span class='op'>=</span> <span class='kw'>function</span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span> <span class='va'>x</span> <span class='op'>/</span> <span class='fu'><a href='https://rdrr.io/pkg/Matrix/man/colSums.html'>rowSums</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='co'># satır toplamı 1 olması için round() kaldırıldı</span>
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate_all.html'>mutate_if</a></span><span class='op'>(</span><span class='va'>is.numeric</span>, <span class='fu'><a href='https://dplyr.tidyverse.org/reference/funs.html'>funs</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/ifelse.html'>ifelse</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/is.finite.html'>is.nan</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span>, <span class='fl'>0</span>, <span class='va'>.</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>as.matrix</a></span><span class='op'>(</span><span class='op'>)</span>
-
-<span class='va'>n_adim</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/methods/new.html'>new</a></span><span class='op'>(</span>
-  <span class='st'>"markovchain"</span>,
-  transitionMatrix <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/matrix.html'>matrix</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/numeric.html'>as.numeric</a></span><span class='op'>(</span><span class='va'>m</span><span class='op'>)</span>, nrow <span class='op'>=</span> <span class='fl'>6</span>, ncol <span class='op'>=</span> <span class='fl'>6</span><span class='op'>)</span>
-<span class='op'>)</span>
-</code></pre>
-</div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='fu'><a href='https://rdrr.io/pkg/markovchain/man/steadyStates.html'>steadyStates</a></span><span class='op'>(</span><span class='va'>n_adim</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> <span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>.</span> ,digits <span class='op'>=</span> <span class='fl'>2</span><span class='op'>)</span>
-</code></pre>
-</div>
-</div>
-<div class="layout-chunk" data-layout="l-body">
-<table class="table" style="margin-left: auto; margin-right: auto;">
-<thead>
-<tr>
-<th style="text-align:right;">
 1
-</th>
-<th style="text-align:right;">
-2
-</th>
-<th style="text-align:right;">
-3
-</th>
-<th style="text-align:right;">
-4
-</th>
-<th style="text-align:right;">
-5
-</th>
-<th style="text-align:right;">
-6
-</th>
+</td>
+<td style="text-align:left;">
+PRCP
+</td>
 </tr>
-</thead>
-<tbody>
 <tr>
-<td style="text-align:right;">
-0.18
+<td style="text-align:left;">
+1857-01-18
+</td>
+<td style="text-align:left;">
+2022-07-28
+</td>
+<td style="text-align:left;">
+Snow depth
 </td>
 <td style="text-align:right;">
-0.09
+1
+</td>
+<td style="text-align:left;">
+SNWD
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1874-10-13
+</td>
+<td style="text-align:left;">
+2022-07-28
+</td>
+<td style="text-align:left;">
+Average Temperature.
 </td>
 <td style="text-align:right;">
-0.29
+1
+</td>
+<td style="text-align:left;">
+TAVG
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1763-01-01
+</td>
+<td style="text-align:left;">
+2022-07-28
+</td>
+<td style="text-align:left;">
+Maximum temperature
 </td>
 <td style="text-align:right;">
-0.15
+1
+</td>
+<td style="text-align:left;">
+TMAX
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+1763-01-01
+</td>
+<td style="text-align:left;">
+2022-07-28
+</td>
+<td style="text-align:left;">
+Minimum temperature
 </td>
 <td style="text-align:right;">
-0.23
+1
 </td>
-<td style="text-align:right;">
-0.07
+<td style="text-align:left;">
+TMIN
 </td>
 </tr>
 </tbody>
 </table>
 </div>
-<p>Uzun dönemde;</p>
-<ul>
-<li><p>Faizin yükseldiği ve enflasyonun yükseldiği dönem olasılığı
-18%,</p></li>
-<li><p>Faizin yükseldiği ve enflasyonun düştüğü dönem olasılığı
-9%,</p></li>
-<li><p>Faizin düştüğü ve enflasyonun yükseldiği dönem olasılığı
-29%,</p></li>
-<li><p>Faizin düştüğü ve enflasyonun düştüğü dönem olasılığı
-15%,</p></li>
-<li><p>Faizin değişmediği ve enflasyonun yükseldiği dönem olasılığı
-23%,</p></li>
-<li><p>Faizin değişmediği ve enflasyonun düştüğü dönem olasılığı
-7%’dir.</p></li>
-</ul>
-<p><em>Değerlerin toplamı yuvarlamadan dolayı 100% değildir.</em></p>
-<p>Yukarıdaki olasılıkları baz aldığımızda uzun vadede enflasyonun
-yükselmesi olasılığı 70% iken; düşmesi olasılığı 30%’dur.</p>
-<p>Görsellere ait kodlara aşağıdan ulaşılabilir.</p>
+<p>Verileri çekelim.</p>
 <div class="layout-chunk" data-layout="l-body">
 <div class="sourceCode">
-<pre class="sourceCode r"><code class="sourceCode r"><span class='va'>df</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/rename.html'>rename</a></span><span class='op'>(</span><span class='st'>"AOFM"</span><span class='op'>=</span><span class='fl'>2</span>, <span class='st'>"Enflasyon"</span><span class='op'>=</span><span class='fl'>3</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://tidyr.tidyverse.org/reference/pivot_longer.html'>pivot_longer</a></span><span class='op'>(</span><span class='op'>!</span><span class='va'>tarih</span>, names_to <span class='op'>=</span> <span class='st'>"variables"</span>, values_to <span class='op'>=</span> <span class='st'>"values"</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> 
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>tarih</span>, y <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Log.html'>log</a></span><span class='op'>(</span><span class='va'>values</span><span class='op'>)</span>, group <span class='op'>=</span> <span class='va'>variables</span>, color <span class='op'>=</span> <span class='va'>variables</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_path.html'>geom_line</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
-        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,
-        legend.position <span class='op'>=</span> <span class='st'>"top"</span>,
-        plot.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"bold"</span><span class='op'>)</span>,
-        plot.subtitle <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"italic"</span>, size <span class='op'>=</span> <span class='fl'>7</span><span class='op'>)</span>,
-        plot.caption <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"italic"</span>, size <span class='op'>=</span> <span class='fl'>5</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_manual.html'>scale_color_manual</a></span><span class='op'>(</span>values <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"blue"</span>,<span class='st'>"red"</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>title <span class='op'>=</span> <span class='st'>"Ağırlıklı Ortalama Fonlama Faizi ve Enflasyon (YoY)"</span>,
-       subtitle <span class='op'>=</span> <span class='st'>"Ocak 2011 - Nisan 2022"</span>,
-       caption <span class='op'>=</span> <span class='st'>"Değerler logaritmiktir.\nVeriler TCMB/EVDS'den alınmıştır."</span><span class='op'>)</span>
-
-<span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span>data <span class='op'>=</span> <span class='va'>tumDurumlar</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>axis1 <span class='op'>=</span> <span class='va'>durum</span>, axis2 <span class='op'>=</span> <span class='va'>durum2</span>, y <span class='op'>=</span> <span class='va'>n</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='http://corybrunson.github.io/ggalluvial/reference/geom_alluvium.html'>geom_alluvium</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='va'>durum2</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='http://corybrunson.github.io/ggalluvial/reference/geom_stratum.html'>geom_stratum</a></span><span class='op'>(</span>fill <span class='op'>=</span> <span class='st'>"gray15"</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span>stat <span class='op'>=</span> <span class='st'>"stratum"</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes_eval.html'>after_stat</a></span><span class='op'>(</span><span class='va'>stratum</span><span class='op'>)</span><span class='op'>)</span>, color <span class='op'>=</span> <span class='st'>"white"</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_discrete.html'>scale_x_discrete</a></span><span class='op'>(</span>limits <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"durum"</span>, <span class='st'>"durum2"</span><span class='op'>)</span>, expand <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='fl'>0.15</span>, <span class='fl'>0.05</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_void</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span> 
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>legend.position <span class='op'>=</span> <span class='st'>"none"</span><span class='op'>)</span> <span class='op'>+</span>
-  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_viridis.html'>scale_fill_viridis_d</a></span><span class='op'>(</span><span class='op'>)</span>
-</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>avg34</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://docs.ropensci.org/rnoaa/reference/ncdc.html'>ncdc</a></span><span class='op'>(</span></span>
+<span>  datasetid <span class='op'>=</span> <span class='st'>"GHCND"</span>,</span>
+<span>  stationid <span class='op'>=</span> <span class='st'>"GHCND:TUM00017064"</span>,</span>
+<span>  datatypeid <span class='op'>=</span> <span class='st'>"TAVG"</span>,</span>
+<span>  startdate <span class='op'>=</span> <span class='st'>"2014-01-01"</span>,</span>
+<span>  enddate <span class='op'>=</span> <span class='st'>"2022-07-31"</span>,</span>
+<span>  token <span class='op'>=</span> <span class='va'>myToken</span>,</span>
+<span>  units <span class='op'>=</span> <span class='st'>"metric"</span>,</span>
+<span>  limit <span class='op'>=</span> <span class='fl'>1000</span></span>
+<span><span class='op'>)</span><span class='op'>$</span><span class='va'>data</span></span></code></pre>
 </div>
 </div>
-<p><em>Yararlandığım Kaynaklar:</em></p>
-<p><em>Stokastik Süreçler ve R Uygulamaları; G.Ö.Kadılar</em></p>
+<p>Yukarıdaki kodu çalıştırdığımızda tarih aralığının 1 yıldan az olması
+gerektiğini belirten <em>The date range must be less than 1 year</em>
+uyarısını alacağız.</p>
+<p>O halde şöyle yapalım: Elimizde 1 yıllık farklı aralıklarda tarihler
+olsun ve bir döngü yardımı ile hepsine ulaşalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_date</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span></span>
+<span>  <span class='st'>"StartDate"</span> <span class='op'>=</span> <span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span><span class='op'>-</span><span class='fl'>365</span>,</span>
+<span>  <span class='st'>"EndDate"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/Sys.time.html'>Sys.Date</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>-</span><span class='fl'>1</span></span>
+<span><span class='op'>)</span></span>
+<span></span>
+<span><span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>2</span><span class='op'>:</span><span class='fl'>9</span><span class='op'>)</span><span class='op'>{</span></span>
+<span>  </span>
+<span>  <span class='va'>df_date</span><span class='op'>[</span><span class='va'>i</span>,<span class='fl'>2</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='va'>df_date</span><span class='op'>[</span><span class='op'>(</span><span class='va'>i</span><span class='op'>-</span><span class='fl'>1</span><span class='op'>)</span>,<span class='fl'>1</span><span class='op'>]</span> <span class='op'>-</span> <span class='fl'>1</span></span>
+<span>  <span class='va'>df_date</span><span class='op'>[</span><span class='va'>i</span>,<span class='fl'>1</span><span class='op'>]</span> <span class='op'>&lt;-</span> <span class='va'>df_date</span><span class='op'>[</span><span class='va'>i</span>,<span class='fl'>2</span><span class='op'>]</span> <span class='op'>-</span> <span class='fl'>365</span></span>
+<span>  </span>
+<span><span class='op'>}</span></span>
+<span></span>
+<span><span class='va'>df_date</span> <span class='op'>&lt;-</span> <span class='va'>df_date</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/arrange.html'>arrange</a></span><span class='op'>(</span><span class='va'>StartDate</span><span class='op'>)</span></span></code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+StartDate
+</th>
+<th style="text-align:left;">
+EndDate
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2013-07-25
+</td>
+<td style="text-align:left;">
+2014-07-25
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2014-07-26
+</td>
+<td style="text-align:left;">
+2015-07-26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2015-07-27
+</td>
+<td style="text-align:left;">
+2016-07-26
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2016-07-27
+</td>
+<td style="text-align:left;">
+2017-07-27
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2017-07-28
+</td>
+<td style="text-align:left;">
+2018-07-28
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2018-07-29
+</td>
+<td style="text-align:left;">
+2019-07-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2019-07-30
+</td>
+<td style="text-align:left;">
+2020-07-29
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2020-07-30
+</td>
+<td style="text-align:left;">
+2021-07-30
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2021-07-31
+</td>
+<td style="text-align:left;">
+2022-07-31
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Yukarıdaki tabloda yer alan her bir satır 1 yıllık aralıklar ile
+oluşturulan tarihlerdir. Her bir satır için verileri çekelim.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_avg34</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span><span class='op'>)</span></span>
+<span></span>
+<span><span class='kw'>for</span><span class='op'>(</span><span class='va'>i</span> <span class='kw'>in</span> <span class='fl'>1</span><span class='op'>:</span><span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>df_date</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>{</span></span>
+<span>  </span>
+<span>  <span class='va'>avg34</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://docs.ropensci.org/rnoaa/reference/ncdc.html'>ncdc</a></span><span class='op'>(</span></span>
+<span>    datasetid <span class='op'>=</span> <span class='st'>"GHCND"</span>,</span>
+<span>    stationid <span class='op'>=</span> <span class='st'>"GHCND:TUM00017064"</span>,</span>
+<span>    datatypeid <span class='op'>=</span> <span class='st'>"TAVG"</span>,</span>
+<span>    startdate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>df_date</span><span class='op'>[</span><span class='va'>i</span>, <span class='fl'>1</span><span class='op'>]</span><span class='op'>)</span>,</span>
+<span>    enddate <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/character.html'>as.character</a></span><span class='op'>(</span><span class='va'>df_date</span><span class='op'>[</span><span class='va'>i</span>, <span class='fl'>2</span><span class='op'>]</span><span class='op'>)</span>,</span>
+<span>    token <span class='op'>=</span> <span class='va'>myToken</span>,</span>
+<span>    units <span class='op'>=</span> <span class='st'>"metric"</span>,</span>
+<span>    limit <span class='op'>=</span> <span class='fl'>1000</span></span>
+<span>  <span class='op'>)</span></span>
+<span>  </span>
+<span>  <span class='va'>df_avg34</span> <span class='op'>&lt;-</span> <span class='va'>df_avg34</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span></span>
+<span>    <span class='fu'><a href='https://dplyr.tidyverse.org/reference/bind.html'>bind_rows</a></span><span class='op'>(</span></span>
+<span>      <span class='fu'><a href='https://rdrr.io/r/base/data.frame.html'>data.frame</a></span><span class='op'>(</span></span>
+<span>        <span class='st'>"Date"</span> <span class='op'>=</span> <span class='va'>avg34</span><span class='op'>$</span><span class='va'>data</span><span class='op'>$</span><span class='va'>date</span>,</span>
+<span>        <span class='st'>"AvgTemp"</span> <span class='op'>=</span> <span class='va'>avg34</span><span class='op'>$</span><span class='va'>data</span><span class='op'>$</span><span class='va'>value</span></span>
+<span>      <span class='op'>)</span></span>
+<span>    <span class='op'>)</span></span>
+<span>  </span>
+<span><span class='op'>}</span></span></code></pre>
+</div>
+</div>
+<p>Elde ettiğimiz veri setindeki minimum ve maksimum tarih aralıklarına
+bakalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_avg34</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/slice.html'>slice</a></span><span class='op'>(</span><span class='fl'>1</span>,<span class='fu'><a href='https://rdrr.io/r/base/nrow.html'>nrow</a></span><span class='op'>(</span><span class='va'>.</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:right;">
+AvgTemp
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2014-02-18T00:00:00
+</td>
+<td style="text-align:right;">
+130
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2022-07-27T00:00:00
+</td>
+<td style="text-align:right;">
+276
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Tabloda yer alan ortalama sıcaklıkları 10’a böldüğümüz zaman doğru
+değerlere ulaşacağız. Çünkü ham veride herhangi bir ondalık yer almıyor.
+Bunun yanında tarihlerin yer aldığı sütunu da tarih formatına çevirmemiz
+gerekiyor.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_avg34</span><span class='op'>$</span><span class='va'>AvgTemp</span> <span class='op'>&lt;-</span> <span class='va'>df_avg34</span><span class='op'>$</span><span class='va'>AvgTemp</span> <span class='op'>/</span> <span class='fl'>10</span></span>
+<span><span class='va'>df_avg34</span><span class='op'>$</span><span class='va'>Date</span> <span class='op'>&lt;-</span> <span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/substr.html'>substr</a></span><span class='op'>(</span><span class='va'>df_avg34</span><span class='op'>$</span><span class='va'>Date</span>,<span class='fl'>1</span>,<span class='fl'>10</span><span class='op'>)</span><span class='op'>)</span></span></code></pre>
+</div>
+</div>
+<div class="layout-chunk" data-layout="l-body">
+<table class="table" style="margin-left: auto; margin-right: auto;">
+<thead>
+<tr>
+<th style="text-align:left;">
+Date
+</th>
+<th style="text-align:right;">
+AvgTemp
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+2014-02-18
+</td>
+<td style="text-align:right;">
+13.0
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+2022-07-27
+</td>
+<td style="text-align:right;">
+27.6
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Sıcaklık verileri ile çalıştığım zaman ggridges paketini kullanmaya
+özen gösteriyorum. Bu paket ile özel bir görselleştirme türü olan
+Ridgeline veya Joy plot kullanılabilir.</p>
+<p>Tarihlerden ayları ve yılları elde edelim ve grafiği ay sayısına
+bölüp yukarıda belirttiğim Ridgeline’ı yapalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_avg34_split</span> <span class='op'>&lt;-</span> <span class='va'>df_avg34</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span></span>
+<span>    <span class='st'>"Year"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='va'>Date</span><span class='op'>)</span>,<span class='st'>"%Y"</span><span class='op'>)</span>,</span>
+<span>    <span class='st'>"Month"</span> <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/factor.html'>factor</a></span><span class='op'>(</span></span>
+<span>      <span class='fu'><a href='https://rdrr.io/r/base/format.html'>format</a></span><span class='op'>(</span><span class='fu'><a href='https://rdrr.io/r/base/as.Date.html'>as.Date</a></span><span class='op'>(</span><span class='va'>Date</span><span class='op'>)</span>,<span class='st'>"%B"</span><span class='op'>)</span>,</span>
+<span>      levels <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/c.html'>c</a></span><span class='op'>(</span><span class='st'>"Ocak"</span>,<span class='st'>"Şubat"</span>,<span class='st'>"Mart"</span>,<span class='st'>"Nisan"</span>,<span class='st'>"Mayıs"</span>,<span class='st'>"Haziran"</span>,</span>
+<span>                 <span class='st'>"Temmuz"</span>,<span class='st'>"Ağustos"</span>,<span class='st'>"Eylül"</span>,<span class='st'>"Ekim"</span>,<span class='st'>"Kasım"</span>,<span class='st'>"Aralık"</span><span class='op'>)</span></span>
+<span>    <span class='op'>)</span></span>
+<span>  <span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/mutate.html'>mutate</a></span><span class='op'>(</span></span>
+<span>    Year <span class='op'>=</span> <span class='fu'>forcats</span><span class='fu'>::</span><span class='fu'><a href='https://forcats.tidyverse.org/reference/fct_rev.html'>fct_rev</a></span><span class='op'>(</span><span class='va'>Year</span><span class='op'>)</span></span>
+<span>  <span class='op'>)</span></span>
+<span></span>
+<span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='va'>df_avg34_split</span>, <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>AvgTemp</span>, y <span class='op'>=</span> <span class='va'>Year</span>, fill <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes_eval.html'>stat</a></span><span class='op'>(</span><span class='va'>x</span><span class='op'>)</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://wilkelab.org/ggridges/reference/geom_ridgeline_gradient.html'>geom_density_ridges_gradient</a></span><span class='op'>(</span>scale <span class='op'>=</span> <span class='fl'>3</span>, rel_min_height <span class='op'>=</span> <span class='fl'>0.01</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_viridis.html'>scale_fill_viridis_c</a></span><span class='op'>(</span>option <span class='op'>=</span> <span class='st'>"C"</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/facet_wrap.html'>facet_wrap</a></span><span class='op'>(</span><span class='op'>~</span><span class='va'>Month</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,</span>
+<span>        legend.position <span class='op'>=</span> <span class='st'>"top"</span>,</span>
+<span>        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,</span>
+<span>        strip.text <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>size <span class='op'>=</span> <span class='fl'>20</span><span class='op'>)</span>,</span>
+<span>        plot.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_text</a></span><span class='op'>(</span>face <span class='op'>=</span> <span class='st'>"bold"</span>, hjust <span class='op'>=</span> <span class='fl'>0.5</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/labs.html'>labs</a></span><span class='op'>(</span>title <span class='op'>=</span> <span class='st'>"İstanbul'da Hava Sıcaklıkları, 2014-2022"</span><span class='op'>)</span></span></code></pre>
+</div>
+<p><img src="post15_files/figure-html5/unnamed-chunk-19-1.png" width="960" data-distill-preview=1 /></p>
+</div>
+<p>Son olarak, aylara göre ortalamada en sıcak yılın hangisi olduğuna
+bakalım.</p>
+<div class="layout-chunk" data-layout="l-body">
+<div class="sourceCode">
+<pre class="sourceCode r"><code class="sourceCode r"><span><span class='va'>df_avg34_split</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/select.html'>select</a></span><span class='op'>(</span><span class='op'>-</span><span class='va'>Date</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>Year</span>,<span class='va'>Month</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/summarise.html'>summarise</a></span><span class='op'>(</span>AvgTemp <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/mean.html'>mean</a></span><span class='op'>(</span><span class='va'>AvgTemp</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>ungroup</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/group_by.html'>group_by</a></span><span class='op'>(</span><span class='va'>Month</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://dplyr.tidyverse.org/reference/filter.html'>filter</a></span><span class='op'>(</span><span class='va'>AvgTemp</span> <span class='op'>==</span> <span class='fu'><a href='https://rdrr.io/r/base/Extremes.html'>max</a></span><span class='op'>(</span><span class='va'>AvgTemp</span><span class='op'>)</span><span class='op'>)</span> <span class='op'><a href='https://magrittr.tidyverse.org/reference/pipe.html'>%&gt;%</a></span> </span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggplot.html'>ggplot</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>x <span class='op'>=</span> <span class='va'>Month</span>, y <span class='op'>=</span> <span class='va'>AvgTemp</span>, fill <span class='op'>=</span> <span class='va'>AvgTemp</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_bar.html'>geom_col</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/geom_text.html'>geom_text</a></span><span class='op'>(</span><span class='fu'><a href='https://ggplot2.tidyverse.org/reference/aes.html'>aes</a></span><span class='op'>(</span>label <span class='op'>=</span> <span class='fu'><a href='https://rdrr.io/r/base/paste.html'>paste0</a></span><span class='op'>(</span><span class='va'>Year</span>,<span class='st'>"\n("</span>,<span class='fu'><a href='https://rdrr.io/r/base/Round.html'>round</a></span><span class='op'>(</span><span class='va'>AvgTemp</span>, digits <span class='op'>=</span> <span class='fl'>1</span><span class='op'>)</span>,<span class='st'>")"</span><span class='op'>)</span><span class='op'>)</span>, vjust <span class='op'>=</span> <span class='fl'>1.5</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/ggtheme.html'>theme_minimal</a></span><span class='op'>(</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/theme.html'>theme</a></span><span class='op'>(</span>axis.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span>,</span>
+<span>        legend.title <span class='op'>=</span> <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/element.html'>element_blank</a></span><span class='op'>(</span><span class='op'>)</span><span class='op'>)</span> <span class='op'>+</span></span>
+<span>  <span class='fu'><a href='https://ggplot2.tidyverse.org/reference/scale_gradient.html'>scale_fill_gradient</a></span><span class='op'>(</span>low <span class='op'>=</span> <span class='st'>"turquoise"</span>, high <span class='op'>=</span> <span class='st'>"red"</span><span class='op'>)</span></span></code></pre>
+</div>
+<p><img src="post15_files/figure-html5/unnamed-chunk-20-1.png" width="768" /></p>
+</div>
 <div class="sourceCode" id="cb1"><pre
 class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"></code></pre></div>
 <!--radix_placeholder_article_footer-->
@@ -2850,15 +2681,6 @@ class="sourceCode r distill-force-highlighting-css"><code class="sourceCode r"><
 <div class="d-appendix">
 </div>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 
 <!--radix_placeholder_site_after_body-->
 <!--/radix_placeholder_site_after_body-->
