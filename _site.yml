@@ -19,6 +19,8 @@ navbar:
           href: https://github.com/rpydaneogrendim/TCMB
         - text: "isyhisse"
           href: https://github.com/rpydaneogrendim/isyhisse
+        - text: "KantitatifTurk"
+          href: https://github.com/rpydaneogrendim/KantitatifTurk
     - icon: fab fa-twitter
       href: https://twitter.com/rpydaneogrendim
     - icon: fab fa-github

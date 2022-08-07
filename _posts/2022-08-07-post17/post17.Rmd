@@ -1,0 +1,288 @@
+---
+title: "KantitatifTurk 0.0.0.9000"
+description: |
+  KantitatifTurk paketi.
+author:
+  - name: A. Uraz Akgül
+date: 2022-08-07
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Development
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Türkçe içerikli ve finans alanındaki konulara odaklanacak şekilde tasarladığım {KantitatifTurk} paketinin başlangıç sayılabilecek versiyonunu bugün itibarıyla paylaştım. Hem kendi tarafımdan hem de projeye destek olmak isteyenler tarafından zamanla büyümesini istediğim bu projenin, finans alanına ilgi duyan ve bu alanı R ile birleştirenlere faydalı olmasını dilerim.
+
+Paketi, {devtools} yardımı ile GitHub üzerinden aşağıdaki gibi indirebilirsiniz.
+
+```{r eval=FALSE}
+
+devtools::install_github("rpydaneogrendim/KantitatifTurk")
+
+```
+
+Paketin yüklenme işlemi tamamlandıktan sonra aşağıdaki gibi çağrılabilir.
+
+```{r}
+
+library(KantitatifTurk)
+
+```
+
+Paketin fonksiyonlarını kütüphaneyi çağırmadan aşağıdaki gibi kullanmak da mümkündür.
+
+```{r eval=FALSE}
+
+KantitatifTurk::
+
+```
+
+İlk kullanılması gereken fonksiyon *veri()*'dir. Bu fonksiyon yardımı ile veriler tarihsel olarak çekilecek ve *varlik_tarihsel* adında bir obje yaratılacak. Bu objenin hiçbir şekilde değiştirilmemesi veya silinmemesi gerekiyor. Tarihsel veriler için şimdilik tek kaynak İş Yatırım'dır. Bu da paketin hisseler özelinde olduğu algısı oluşturabilir ancak hisseler dışında da varlıkları hedeflediğim için zamanla veri kaynağını genişleteceğim.
+
+Örnek olarak, 9 adet hissenin 253 günlük tarihsel verilerini çekelim.
+
+*veri()* fonksiyonu ile ilgili dokümantasyona ulaşmak için aşağıdaki komutu çalıştırabilirsiniz.
+
+```{r eval=FALSE}
+
+?veri
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+hisseler <- c(
+  "THYAO",
+  "SISE",
+  "SASA",
+  "BIMAS",
+  "GARAN",
+  "TCELL",
+  "PETKM",
+  "TUPRS",
+  "SOKM"
+)
+
+veri(
+  varlik_kod = hisseler,
+  baslangic_tarih = "2021-08-05",
+  bitis_tarih = "2022-08-05",
+  gorsel = TRUE, # varsayilan
+  kaynak = "isyatirim" # varsayilan
+)
+
+```
+
+Görsel olarak incelenebilen varlıkların verileri *varlik_tarihsel* olarak ortamınızda oluşturulmuştur.
+
+```{r echo=FALSE}
+
+varlik_tarihsel %>% 
+  tail() %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+İncelenmek istenen varlıkların getirilerine ait özet bilgiye *ozet_getiri()* fonksiyonu yardımı ile ulaşılabilir.
+
+```{r eval=FALSE}
+
+?ozet_getiri
+
+```
+
+Bu fonksiyon yardımı ile logaritmik veya aritmetik olarak hesaplanabilen getirilerin minimum, maksimum, ortalama, ortanca ve standart sapma bilgilerine ulaşılabilir.
+
+```{r fig.width=15, fig.height=10}
+
+ozet_getiri(
+  getiri = "logaritmik", # varsayilan
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+*getiri_risk()* fonksiyonu ile varlık getirilerinin yıllıklandırılmış getiri ve risk bilgileri aşağıdaki gibi incelenebilir. Fonksiyon çalıştırıldıktan sonra *risk_getiri* isminde bir obje yaratacaktır. Getiriler logaritmik veya aritmetik olarak hesaplanabilir.
+
+```{r eval=FALSE}
+
+?getiri_risk
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+getiri_risk(
+  getiri = "aritmetik",
+  gun = 252, # varsayilan
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+```{r echo=FALSE}
+
+risk_getiri %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+*maks_dusme_noktasi()* fonksiyonu ile varlıkların maksimum düşme noktası (Maximum Drawdown) hesaplanabilir. Fonksiyon tek bir parametre almaktadır. Çalıştırıldıktan sonra *maks_dusme_noktalari* isminde bir obje oluşturacaktır.
+
+```{r eval=FALSE}
+
+?maks_dusme_noktasi
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+maks_dusme_noktasi(
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+```{r echo=FALSE}
+
+maks_dusme_noktalari %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+*kaydirmali_korelasyon()* fonksiyonu ile varlıklar arası korelasyonlar kayan bir şekilde (Rolling Correlation) hesaplanabilir. Fonksiyon, ne kadarlık bir kayma olacağını belirten tek bir parametre ile çalışmaktadır.
+
+```{r eval=FALSE}
+
+?kaydirmali_korelasyon
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+kaydirmali_korelasyon(
+  gun = 90
+)
+
+```
+
+Paketin diğer fonksiyonlarında öngörüyü de dikkate aldım.
+
+*dogrusal_regresyon()* fonksiyonu, Doğrusal Regresyon yöntemi ile tahmin ve öngörü yapılmasını sağlar. Kullanıcı, güven aralığı ve öngörüsü yapılacak gün uzunluğunu belirleyebilir. Fonksiyon çalıştırıldıktan sonra *DR_varlik_ongoru* isminde bir obje oluşacaktır.
+
+```{r eval=FALSE}
+
+?dogrusal_regresyon
+
+```
+
+```{r fig.width=10, fig.height=7, preview=TRUE}
+
+dogrusal_regresyon(
+  guven = 0.95, # varsayilan
+  ongoru_gun = 180,
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+```{r echo=FALSE}
+
+DR_varlik_ongoru %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Öngörü için kullanılabilecek diğer bir fonksiyon *geometrik_brownian_hareketi()* ile varliklarin ileriye yönelik simülasyonu yapılabilir. Öngörüler, elde edilen simüle değerlerin ortanca ya da ortalamasıdır. Bu fonksiyon, *varlik_tarihsel* veri çerçevesinde bulunan tek bir hisse ile çalıştırılmalıdır. Bir obje oluşturulmamakla beraber sonuçlara görsel üzerinden ulaşılabilir.
+
+```{r eval=FALSE}
+
+?geometrik_brownian_hareketi
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+geometrik_brownian_hareketi(
+  varlik_kod = "TUPRS",
+  simulasyon_sayisi = 100, # varsayilan
+  gun_sayisi = 90,
+  beklenen_getiri = 0, # varsayilan
+  volatilite = 0.5, # varsayilan
+  is_gunu_sayisi = nrow(varlik_tarihsel),
+  ongoru_tipi = "ortanca", # varsayilan
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+Öngörü için kullanılabilecek son bir fonksiyon *markov_zinciri()* ile varliklarin ileriye yönelik yön olasılıkları hesaplanabilir. Fonksiyon, Markov Zinciri yöntemi ile varlığın son hareketinden yola çıkarak belirlenen gün sayısı kadar sonrası için yön olasılıkları hesaplamaktadır. Çalıştırıldıktan sonra görsel olarak sonuçlara ulaşılabileceği gibi *markov_olasilik* objesinden de faydalanılabilir.
+
+```{r eval=FALSE}
+
+?markov_zinciri
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+markov_zinciri(
+  n_adim = 1, # varsayilan
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+```{r echo=FALSE}
+
+markov_olasilik %>% 
+  dplyr::filter(KOD == "TUPRS") %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Son olarak, *riske_maruz_deger()* fonksiyonu ile şimdilik portföy bazında olmasa da varlıklar bazında riske maruz değerler parametrik veya tarihsel olarak hesaplanabilir. Fonksiyon, ilgili hesaplamaları obje olarak oluşturacaktır. Hata alınmaması için girilen gozlem sayısının *varlik_tarihsel* veri çerçevesindeki satırdan küçük olmasına dikkat edilmelidir. Örneğin, gözlem sayısı 252 girildiği zaman son 252 günü (getiriler için +1 daha 253) alacağı için satır sayısı 253 veya daha büyük olmalıdır.
+
+```{r eval=FALSE}
+
+?riske_maruz_deger
+
+```
+
+```{r fig.width=10, fig.height=7}
+
+riske_maruz_deger(
+  rmd = "parametrik", # varsayilan
+  guven_araligi = 0.99, # varsayilan
+  gozlem_sayisi = 252, # varsayilan
+  elde_tutma_suresi = 1, # varsayilan
+  volatilite = "standartsapma", #varsayilan
+  getiri = "logaritmik", #varsayilan
+  piyasa_degeri = 100, #varsayilan
+  gorsel = TRUE # varsayilan
+)
+
+```
+
+```{r echo=FALSE}
+
+parametrik_rmd %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+[URL:](https://github.com/rpydaneogrendim/KantitatifTurk)
+
+[BugReports:](https://github.com/rpydaneogrendim/KantitatifTurk/issues)
