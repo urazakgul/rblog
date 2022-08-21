@@ -2,11 +2,11 @@
   "articles": [
     {
       "path": "about.html",
-      "title": "Blog Hakkında",
-      "description": "Uygulamalar ile R programlama dilini öğretmeyi hedefliyorum.",
+      "title": "About",
+      "description": "I aim to teach R programming language with hands-on examples.",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-05-02T22:36:26+03:00"
+      "last_modified": "2022-08-21T19:21:45+03:00"
     },
     {
       "path": "index.html",

@@ -1,7 +1,7 @@
 ---
-title: "Blog Hakkında"
+title: "About"
 description: |
-  Uygulamalar ile R programlama dilini öğretmeyi hedefliyorum.
+  I aim to teach R programming language with hands-on examples.
 ---
 
 ```{r setup, include=FALSE}
