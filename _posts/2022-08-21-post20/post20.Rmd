@@ -1,0 +1,264 @@
+---
+title: "Sentiment Comparisons on Interest Rate Releases"
+description: |
+  Sentiment analysis of the CBRT's interest rates on press releases.
+author:
+  - name: A. Uraz Akgül
+date: 2022-08-21
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Text
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The CBRT cut its interest rate by 100 bps to 13% in its August 2022 meeting. In a country where official inflation goes to 100% and the exchange rate moves towards 20, the central bank of that country decides to cut interest rates. Hakan Kara, former chief economist of the CBRT, tweeted the day the decision was announced:
+
+*Economists are discussing why the CBRT cut its interest rate. I think this is no longer economists' question. Sociologists, political scientists, psychologists, etc. should evaluate the issue.*
+
+Although, Press Releases on Interest Rates are not taken seriously because the credibility of the CBRT has been shaken, we will take it seriously for sentiment analysis. You can access the data I collected using web scraping by downloading *post20_1.xlsx* file on [my GitHub account](https://github.com/rpydaneogrendim/rblog/tree/main/data). The codes I used to collect the data will be available at the end of the post. The reason I started the analysis date from 2014 is that the CBRT stopped publishing its press releases in pdf format as of 2014.
+
+```{r}
+
+library(tidyverse)
+
+master <- readxl::read_excel("data1.xlsx") %>% 
+  group_by(date) %>% 
+  slice(-1) %>% # remove dates from 'text' column
+  ungroup()
+
+```
+
+In the table below, you can see the CBRT's latest press release on interest rates.
+
+```{r echo=FALSE}
+
+master %>% 
+  filter(date == as.Date("2022-08-18")) %>% 
+  select(text) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Combining the rows of each date group into a single row is as follows.
+
+```{r}
+
+master2 <- data.frame()
+
+for(m in seq_along(unique(master$date))){
+  
+  master_filtered <- master %>% 
+    filter(date == unique(master$date)[m]) %>% 
+    pull(text) %>% 
+    paste(., collapse = " ") %>% 
+    str_replace_all(., "[\r\n]" , "") %>% 
+    as.data.frame() %>% 
+    rename("text"=1) %>% 
+    mutate(date = unique(master$date)[m])
+  
+  master2 <- master2 %>% 
+    bind_rows(master_filtered)
+  
+}
+
+```
+
+We can move on to sentiment analysis and we are going to use the sentimentr package to do it at sentence level. sentiment_by(), one of the functions of the sentimentr package, is used to calculate polarity score by groups.
+
+```{r}
+
+#install.packages("sentimentr")
+library(sentimentr)
+
+df_sentiment <- data.frame()
+
+for(s in 1:nrow(master2)){
+  
+  sentiment_by_date <- as.data.frame(sentiment_by(master2$text[s])) %>% 
+    mutate(date = master2$date[s])
+  
+  df_sentiment <- df_sentiment %>% 
+    bind_rows(sentiment_by_date)
+  
+}
+
+```
+
+```{r fig.width=15, fig.height=7}
+
+for(p in 2:4){
+  
+  df_sentiment %>% 
+    select(5,all_of(p)) %>% 
+    ggplot(aes(x = .[[1]], y = .[[2]])) +
+    geom_line() +
+    ggthemes::theme_fivethirtyeight() +
+    theme(plot.title = element_text(size = 30),
+          axis.text = element_text(size = 20)) +
+    labs(title = names(df_sentiment)[p]) -> plt
+  
+  plot(plt)
+  
+}
+
+```
+
+words_count: Since the middle of 2019, there has been an increase in the number of words. The latest press release is at its peak. I leave the press release of the day the sharp rise started and the previous day below.
+
+2019-06-12:
+
+```{r echo=FALSE}
+
+master %>% 
+  filter(date == as.Date("2019-06-12")) %>% 
+  select(text) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+2019-07-25:
+
+Murat Uysal, the former governor of the CBRT, took office in July 2019.
+
+```{r echo=FALSE}
+
+master %>% 
+  filter(date == as.Date("2019-07-25")) %>% 
+  select(text) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+sd: The ups and downs after 2018 are more volatile than before 2018. The worsening in inflation can be seen more clearly after 2018.
+
+ave_sentiment: Although it is a series with ups and downs, it can be seen that the average score is on the positive side and is in an upward trend after 2022. The first thing that comes to my mind here is that the central banks at least try to stabilize the situation with their verbal guidance, even though it is getting worse.
+
+Inflation in Turkey started to give signals of getting out of control as of 2018. The reason I shared the inflation graph is both to read it together with the graphs above and because the primary objective of the Bank is to achieve and maintain price stability.
+
+```{r}
+
+# post20_2.xlsx
+
+cpi <- readxl::read_excel("data2.xlsx") %>% 
+  mutate(date = as.Date(paste0(date,"-",1)))
+
+ggplot(cpi, aes(x = date, y = inflation)) +
+  geom_line() +
+  ggthemes::theme_fivethirtyeight()
+
+```
+
+We may wonder: Have we succeeded in perceiving emotions? Let's take a look at the latest press release as an example.
+
+```{r eval=FALSE}
+
+highlight(sentiment_by(master2$text[nrow(master2)]))
+
+```
+
+```{r pressure, echo=FALSE, preview=TRUE}
+knitr::include_graphics("img1.png")
+```
+*The weakening effects of geopolitical risks on global economic activity continue to increase.*
+
+The above sentence is negative but perceived as positive. Let's take a closer look.
+
+```{r}
+
+"The weakening effects of geopolitical risks on global economic activity continue to increase." %>% 
+  extract_sentiment_terms() %>% 
+  unlist(.)
+
+```
+
+Although the content of the package used is useful, it will be useful to use it carefully. This study also shows that a sentiment analysis package can be made for central banks, for example.
+
+You can access the other codes I mentioned at the beginning below.
+
+```{r eval=FALSE}
+
+library(rvest)
+library(tidyverse)
+
+urls <- str_c(
+  "https://www.tcmb.gov.tr/wps/wcm/connect/EN/TCMB+EN/Main+Menu/Announcements/Press+Releases/",
+  seq(2014,2022,1)
+)
+
+df_urls <- data.frame()
+
+for(i in seq_along(urls)){
+  
+  c1 <- read_html(urls[i]) %>% 
+    html_nodes("div.collection-content.w-clearfix a.collection-title") %>% 
+    html_attr("href")
+  
+  c2 <- read_html(urls[i]) %>% 
+    html_nodes("div.collection-content.w-clearfix a.collection-title") %>% 
+    html_text()
+  
+  tbl <- data.frame(
+    c1 = c1,
+    c2 = c2
+  )
+  
+  df_urls <- df_urls %>% 
+    bind_rows(tbl)
+  
+  Sys.sleep(3)
+  
+}
+
+df_urls <- df_urls %>% 
+  filter(grepl("Press Release on Interest Rates",c2)) %>% 
+  mutate(c1 = paste0("https://www.tcmb.gov.tr",c1))
+
+df_text <- data.frame()
+
+for(j in 1:nrow(df_urls)){
+  
+  txt <- read_html(df_urls$c1[j]) %>% 
+    html_nodes("div.tcmb-content.type-prg p") %>% 
+    html_text() %>% 
+    as.data.frame() %>% 
+    rename("text"=1) %>% 
+    filter(text != "") %>% 
+    mutate("date"=.$text[2])
+  
+  df_text <- df_text %>% 
+    bind_rows(txt)
+  
+  print(j)
+  
+  Sys.sleep(30)
+  
+}
+
+governors <- c(
+  "Şahap Kavcıoğlu",
+  "Naci Ağbal",
+  "Murat Uysal",
+  "Murat Çetinkaya",
+  "Erdem Başçı"
+)
+
+df_text2 <- df_text %>% 
+  mutate(date = gsub("Release Date: ","",date),
+         date = gsub("Aygust","August",date),
+         date = lubridate::dmy(date),
+         text = as.character(text)) %>% 
+  filter(!(grepl("No:|No.",text)) & grepl("[[:space:]]",text) & !(grepl(paste(governors,collapse="|"),text))) %>% 
+  arrange(date)
+
+#openxlsx::write.xlsx(df_text2,"data.xlsx")
+
+```
