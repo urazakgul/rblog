@@ -1,0 +1,272 @@
+---
+title: "Displaying Distributions of Continuous Data With 5 Different Charts"
+description: |
+  Histogram, Density, Violin, Boxplot, Ridgeline.
+author:
+  - name: A. Uraz Akgül
+date: 2022-08-28
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Data Visualization
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+*Borsa Istanbul calculates variety of indices to follow the movements of markets, to be an underlying asset for the financial products, and to be used as a benchmark for collective investment instruments.* Click [here](https://borsaistanbul.com/en/sayfa/2818/bist-indices) for further information.
+
+You can access the data by downloading *post21.xlsx* file on [my GitHub account](https://github.com/rpydaneogrendim/rblog/tree/main/data). The 12 BIST Indices were chosen by me. You can find all of BIST indices [here](https://www.kap.org.tr/en/Endeksler). Reuters data is used.
+
+```{r}
+
+library(tidyverse)
+
+df <- readxl::read_excel("data.xlsx") %>% 
+  select(-DATE) %>% 
+  mutate_all(
+    ., function(x) (lead(x)/x-1)*100
+  ) %>% 
+  na.omit()
+
+```
+
+```{r eval=FALSE}
+
+head(df)
+
+```
+
+```{r echo=FALSE}
+
+df %>% 
+  mutate_all(., function(x) round(x, digits = 2)) %>% 
+  head(.) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+```{r}
+
+df <- df %>% 
+  mutate(t = seq(1,nrow(.),1), .before = 1) %>% 
+  pivot_longer(!t, names_to = "vars", values_to = "vals")
+
+```
+
+**Histogram and Density**
+
+If there are two variables:
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  filter(vars %in% c("XU100","XBANK")) %>% 
+  ggplot(aes(x = vals, fill = vars)) +
+  geom_histogram(position = "identity", alpha = .5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top") +
+  scale_fill_manual(values = c("red","blue"))
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  filter(vars %in% c("XU100","XBANK")) %>% 
+  ggplot(aes(x = vals, fill = vars)) +
+  geom_density(alpha = .5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top") +
+  scale_fill_manual(values = c("red","blue"))
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  filter(vars %in% c("XU100","XBANK")) %>% 
+  pivot_wider(names_from = "vars", values_from = "vals") %>% 
+  ggplot(aes(x = vals)) +
+  geom_histogram(aes(x = XU100, y = ..density..), fill = "red" ) +
+  geom_label(aes(x = 4, y = 0.25, label = "XU100"), color = "red") +
+  geom_histogram(aes(x = XBANK, y = -..density..), fill = "blue") +
+  geom_label(aes(x = 4, y = -0.25, label = "XBANK"), color = "blue") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank())
+
+```
+
+```{r fig.width=10, fig.height=6, preview=TRUE}
+
+df %>% 
+  filter(vars %in% c("XU100","XBANK")) %>% 
+  pivot_wider(names_from = "vars", values_from = "vals") %>% 
+  ggplot(aes(x = vals)) +
+  geom_density(aes(x = XU100, y = ..density..), fill = "red" ) +
+  geom_label(aes(x=4, y=0.25, label = "XU100"), color="red") +
+  geom_density(aes(x = XBANK, y = -..density..), fill = "blue") +
+  geom_label(aes(x=4, y = -0.25, label = "XBANK"), color="blue") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank())
+
+```
+
+If there are more than two variables:
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  filter(vars %in% c("XU100","XBANK","XBLSM")) %>% 
+  ggplot(aes(x = vals, color = vars)) +
+  geom_density(lwd = 1.5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.title = element_blank(),
+        legend.position = "top")
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vals, fill = vars)) +
+  geom_histogram(position = "identity") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "none") +
+  facet_wrap(~vars)
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vals, fill = vars)) +
+  geom_density() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.y = element_blank(),
+        legend.position = "none") +
+  facet_wrap(~vars)
+
+```
+
+**Violin and Boxplot**
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_violin() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_violin() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  coord_flip()
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_boxplot() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  coord_flip()
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_violin() +
+  geom_boxplot(alpha = .5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vars, y = vals, fill = vars)) +
+  geom_violin() +
+  geom_boxplot(alpha = .5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none") +
+  coord_flip()
+
+```
+
+**Ridgeline**
+
+```{r}
+
+library(ggridges)
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(x = vals, y = vars, fill = stat(x))) +
+  geom_density_ridges_gradient(scale = 3) +
+  geom_vline(xintercept = 0, linetype = "dashed") +
+  scale_fill_viridis_c(option = "C") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+
+```
+
+```{r fig.width=10, fig.height=6}
+
+df %>% 
+  ggplot(aes(vals, y = vars, fill = 0.5 - abs(0.5 - stat(ecdf)))) +
+  stat_density_ridges(geom = "density_ridges_gradient", calc_ecdf = TRUE) +
+  scale_fill_gradient(low = "white", high = "red") +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        legend.position = "none")
+
+```
