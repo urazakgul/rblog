@@ -1,0 +1,332 @@
+---
+title: "Using Cosine Similarity to Build a Movie Recommendation System"
+description: |
+  Create your own dataset and build your own movie recommender system.
+author:
+  - name: A. Uraz Akgül
+date: 2022-08-30
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Machine Learning
+  - Text
+  - Web
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Have you ever fallen into a void after finishing a movie and tried to find similar ones? After a movie that impressed me, I immediately try to find alternatives. If we really enjoy working with data and are good at algorithms, why not build our own system?
+
+We used the cosine similarity metric to achieve our results. I think I've been obsessed with it lately. I use it especially when I study on text similarities. In this study, we are going to use the method I mentioned. Let's dive into it.
+
+Cosine similarity measures the similarity between two vectors and is the cosine of the angle between two vectors. The smaller the angle between two vectors, the more similar they are to each other.
+
+Consider two vectors, x and y. We can calculate the cosine similarity between the vectors as follows:
+
+$cos(\theta) = \frac{x.y}{||x||||y||} = \frac{\sum_{i=1}^{n}x_iy_i}{\sqrt{\sum_{i=1}^{n}x_i^2}\sqrt{\sum_{i=1}^{n}y_i^2}}$
+
+See how it's calculated with a simple example.
+
+```{r}
+
+x <- c(3,4,1,0)
+y <- c(3,4,4,8)
+
+```
+
+$x.y = 3*3 + 4*4 + 1*4 + 0*8 = 29$
+
+$||x|| = \sqrt{3^2 + 4^2 + 1^2 + 0^2} = 5.09902$
+
+$||y|| = \sqrt{3^2 + 4^2 + 4^2 + 8^2} = 10.24695$
+
+$cos(x,y) = cos(\theta) = \frac{29}{5.09902*10.24695} = 0.5550303$
+
+Remember: The smaller the angle between two vectors, the more similar they are to each other. So, if the angle between vectors is zero degrees, then the cosine similarity value is 1, which means the two vectors are similar or relevant. The similarity can be any value in the range [−1,1]. In addition to this, the cosine distance is as:
+
+$Cosine\ Distance\ =\ 1\ -\ Cosine\ Similarity$
+
+Cosine similarity can also be calculated with the help of the {lsa} package.
+
+```{r}
+
+as.numeric(lsa::cosine(x,y))
+
+```
+
+So, how can similarity be calculated when it comes to texts? Let me give you an example.
+
+```{r}
+
+text1 <- "I am learning R programming language"
+text2 <- "I am learning Python programming language"
+
+```
+
+We can create two vectors with the word frequencies corresponding to each other as follows:
+
+```{r}
+
+# I, am, learning, R, Python, programming, language
+
+text1_n <- c(1,1,1,1,0,1,1)
+text2_n <- c(1,1,1,0,1,1,1)
+
+as.numeric(lsa::cosine(text1_n,text2_n))
+
+```
+
+We can move on to building a movie recommender system. The data to be used in the study will be obtained by web scraping from IMDB.
+
+The following steps can be followed:
+
+i. https://www.imdb.com/
+
+ii. Menu/Browse Movies by Genre
+
+iii. Popular Movies by Genre/Sci-Fi (Scroll down to see)
+
+iv. https://www.imdb.com/search/title/?title_type=feature&genres=sci-fi&start=1&explore=genres&ref_=adv_nxt
+
+Focus on last URL. The value you see as 1 next to start will increase by 50 each time you switch to the next page. In fact, you do not encounter this URL at first, but when you move to the next page, you can obtain this URL and edit the first page yourself. The movie list starts with the value you type in the value to the right of start.
+
+I want to get the first 100 URLs in the list sorted by popularity.
+
+```{r}
+
+library(rvest)
+library(tidyverse)
+
+```
+
+URLs need to be created first.
+
+```{r}
+
+urls <- str_c(
+  "https://www.imdb.com/search/title/?title_type=feature&genres=sci-fi&start=",
+  seq(1,5000,50),
+  "&explore=genres&ref_=adv_nxt"
+)
+
+urls[c(1,length(urls))]
+
+```
+
+We are going to get the titles and descriptions of the movies using a for loop. See the examples below for the first page.
+
+```{r}
+
+firstURL <- urls[1]
+
+title <- read_html(firstURL) %>% 
+  html_nodes("div.lister-item-content h3.lister-item-header a") %>% 
+  html_text()
+
+head(title)
+
+description <- read_html(firstURL) %>% 
+  html_nodes("p.text-muted") %>% 
+  html_text() %>% 
+  .[c(FALSE,TRUE)] %>% 
+  gsub("[\n]", "", .)
+
+head(paste0(substr(description,1,100),"..."))
+
+df <- data.frame(
+  title = title,
+  description = description
+)
+
+```
+
+```{r echo=FALSE}
+
+df %>% 
+  head(.) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Creating the dataset...
+
+```{r}
+
+master <- data.frame()
+
+for(i in seq_along(urls)){
+  
+  title <- read_html(urls[i]) %>% 
+  html_nodes("div.lister-item-content h3.lister-item-header a") %>% 
+  html_text()
+  
+  description <- read_html(urls[i]) %>% 
+  html_nodes("p.text-muted") %>% 
+  html_text() %>% 
+  .[c(FALSE,TRUE)] %>% 
+  gsub("[\n]", "", .)
+  
+  master <- master %>% 
+    bind_rows(
+      data.frame(
+        title = title,
+        description = description
+      )
+    )
+  
+  #print(i)
+  Sys.sleep(1)
+  
+}
+
+```
+
+A dataset should be examined after it is created, but in this work I ignore this step. Ultimately, we have `r nrow(master)` movies.
+
+Finally we can move on to the cosine similarity calculation. The {widyr} package can be used to calculate it. The 2 packages shown below will be used.
+
+```{r}
+
+library(tidytext)
+library(widyr)
+
+```
+
+We are going to calculate cosine similarity based on two methods: Word Frequencies and TF-IDF.
+
+```{r}
+
+master2 <- master %>% 
+  unnest_tokens(output = "word", input = "description") %>% 
+  anti_join(get_stopwords()) %>% 
+  count(word, title) %>% 
+  bind_tf_idf(word, title, n)
+
+```
+
+*Cosine Similarity - Word Frequencies:*
+
+```{r}
+
+master_freq <- master2 %>% 
+  pairwise_similarity(title, word, n, upper = FALSE, sort = TRUE) %>% 
+  mutate(item = paste0(item1,"---",item2), .before = similarity) %>% 
+  select(-c(item1,item2)) %>% 
+  rename("similarity_freq"=2)
+
+```
+
+*Cosine Similarity - TF-IDF:*
+
+TF-IDF stands for Term Frequency-Inverse Document Frequency, and it's intended to measure how important a word is to a document in a collection or corpus.
+
+i: term (word),
+
+j: document (set of words),
+
+N: count of corpus (the total document set)
+
+tf(i,j) = count of i in j / number of words in j
+
+df(i) = occurrence of i in documents
+
+idf(i) = log(N/(df + 1))
+
+tf-idf(i,j) = tf(i,j) * log(N/(df + 1))
+
+```{r}
+
+master_tf_idf <- master2 %>% 
+  pairwise_similarity(title, word, tf_idf, upper = FALSE, sort = TRUE) %>% 
+  mutate(item = paste0(item1,"---",item2), .before = similarity) %>% 
+  select(-c(item1,item2)) %>% 
+  rename("similarity_tf_idf"=2)
+
+```
+
+I used Minority Report, of the Sci-Fi genre as the item to be used for cosine similarity calculations when recommending the top 10 movies.
+
+*Based on word frequency:*
+
+```{r}
+
+df_wf <- master_freq %>% 
+  filter(grepl("Minority Report",item)) %>% 
+  top_n(10, similarity_freq) %>% 
+  arrange(desc(similarity_freq))
+
+```
+
+```{r echo=FALSE}
+
+df_wf %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+The title with the closest similarity was Judge Dredd based on word frequency.
+
+*Based on TF-IDF:*
+
+```{r}
+
+df_tfidf <- master_tf_idf %>% 
+  filter(grepl("Minority Report",item)) %>% 
+  top_n(10, similarity_tf_idf) %>% 
+  arrange(desc(similarity_tf_idf))
+
+```
+
+```{r echo=FALSE}
+
+df_tfidf %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+The title with the closest similarity was Time Frame based on TF-IDF.
+
+```{r}
+
+df_wf %>% 
+  ggplot(aes(x = reorder(item, similarity_freq), y = similarity_freq, fill = similarity_freq)) +
+  geom_col() +
+  ggthemes::theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  scale_fill_gradient(low = "orange", high = "red") +
+  coord_flip() +
+  labs(title = "Word Frequency") -> g1
+
+df_tfidf %>% 
+  ggplot(aes(x = reorder(item, similarity_tf_idf), y = similarity_tf_idf, fill = similarity_tf_idf)) +
+  geom_col() +
+  ggthemes::theme_fivethirtyeight() +
+  theme(legend.position = "none") +
+  scale_fill_gradient(low = "orange", high = "red") +
+  coord_flip() +
+  labs(title = "TF-IDF") -> g2
+
+```
+
+```{r fig.width=12, fig.height=7, preview=TRUE}
+
+gridExtra::grid.arrange(g1,g2,ncol=2)
+
+```
+
+```{r echo=FALSE}
+
+master %>% 
+  filter(title %in% c("Minority Report","Judge Dredd","Time Frame")) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+If everything is clear so far, you can do more using your imagination. These studies don't work without story and imagination.
