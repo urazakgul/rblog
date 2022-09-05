@@ -24,7 +24,7 @@ i. https://evds2.tcmb.gov.tr/index.php?/evds/serieMarket
 
 ii. Interest Rates
 
-iii. Weighted Average Interest Rates For Banks Loans (Flow Data, %)). Select the following items click the Add button:
+iii. Weighted Average Interest Rates For Banks Loans (Flow Data, %)). Select the following items and click the Add button:
 
 - Personal (TRY)(Flow Data, %)
 
