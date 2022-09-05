@@ -1,0 +1,253 @@
+---
+title: "6 Types of Investments: What Has Made You the Most Money?"
+description: |
+  Hands-on with performing data manipulation.
+author:
+  - name: A. Uraz Akgül
+date: 2022-09-04
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Data Manipulation
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Although I'll focus on data manipulation rather than the question in this post, at the end of the post we'll have answered an important question. Let's define data manipulation briefly before answering the question.
+
+Data manipulation is the process of changing data to make it more readable and organized. We manipulate data in order to analyze and visualize it.
+
+The data for this study were obtained from TURKSTAT. You can access the data by downloading *post23.xls* file [here](https://github.com/rpydaneogrendim/rblog/tree/main/data). The metadata can be found [here](https://data.tuik.gov.tr/Kategori/GetKategori?p=Inflation-v-Price-106).
+
+Importing the dataset:
+
+```{r}
+
+df <- readxl::read_excel("data.xls")
+
+```
+
+I bet you can't do analysis with this dataset! :-) In this case we convert it into an analysis-ready format.
+
+```{r}
+
+library(dplyr) # Our main package
+library(ggplot2)
+
+```
+
+Because annual returns adjusted for CPI will be used, the relevant columns, including the years and months, will be chosen. The column positions are in the following order: 1, 17, 33, 49, ... So, 16 is the difference between two numbers that follow one another. Don't forget the months in column 2!
+
+```{r}
+
+df2 <- df %>% 
+  select(2, seq(1,ncol(.),16)) # select(2,1,17,33,49,65,81,97)
+
+```
+
+```{r echo=FALSE}
+
+df2 %>% 
+  head(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+The first 6 lines can be removed.
+
+```{r}
+
+df2 <- df2 %>% 
+  slice(-c(1:6))
+
+```
+
+Changing column names:
+
+```{r}
+
+df2 <- df2 %>% 
+  rename(
+    "Months"=1,
+    "Years"=2,
+    "DepositInterest"=3,
+    "StockExchange"=4,
+    "USDollar"=5,
+    "Euro"=6,
+    "GoldIngot"=7,
+    "GDDI"=8 # Government Domestic Debt Instruments
+  )
+
+```
+
+The Months column contains two month names, one in English and one in Turkish. We'll go with the English ones.
+
+I'd like to draw your attention to the fact that there is a line break between the month names in each line. Click the icon to the left of the df2 in the environment to see it.
+
+```{r}
+
+df2$Months[1]
+
+```
+
+These line breaks need to be eliminated.
+
+```{r}
+
+df2 <- df2 %>% 
+  mutate(
+    Months = stringr::str_replace_all(Months, "[\n]" , " ")
+  )
+
+```
+
+```{r}
+
+df2$Months[1]
+
+```
+
+Extracting the second word from each line:
+
+```{r}
+
+df2 <- df2 %>% 
+  mutate(
+    Months = stringr::word(Months,2,2)
+  )
+
+```
+
+```{r}
+
+df2$Months[1]
+
+```
+
+Combining month and year into a date format column and removing the Months and Years columns:
+
+```{r}
+
+df2 <- df2 %>% 
+  mutate(
+    Date = lubridate::ymd(paste0(Years,"-",Months,"-",1)), .before = Months
+  ) %>% 
+  select(-c(Months,Years))
+
+```
+
+We can also remove lines that contain NA (Not Available).
+
+```{r}
+
+df2 <- df2 %>% 
+  na.omit()
+
+```
+
+We'll convert each column to numeric format, but some values have the letter e next to them.
+
+```{r}
+
+df2[211,6]
+
+```
+
+Let's remove the values containing the letter "e" with their parentheses.
+
+*e: Data is corrected.*
+
+```{r}
+
+df2 <- df2 %>% 
+  mutate_at(
+    vars(-Date), function(x) gsub("\\(.*", "", x)
+  )
+
+```
+
+Except for the Date column, all columns can be converted to numbers.
+
+Wait a minute! There are several values that require the conversion of commas to dots.
+
+```{r}
+
+df2 <- df2 %>% 
+  mutate_at(
+    vars(-Date), function(x) stringr::str_replace_all(x, ",", ".")
+  ) %>% 
+  mutate_if(is.character,as.numeric)
+
+```
+
+```{r}
+
+df2[211,6]
+
+```
+
+```{r echo=FALSE}
+
+df2 %>% 
+  tail(., 10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+Before performing the calculation that will take place soon, the table needs to be converted from wide to long format.
+
+```{r}
+
+df2 <- df2 %>% 
+  tidyr::pivot_longer(!Date, names_to = "Types", values_to = "Returns") %>% 
+  arrange(Types)
+
+```
+
+Calculating the average rate of return on an investment that is compounded over several periods is possible using the **geometric average return** formula, also known as **geometric mean return**.
+
+Geometric Average Return = $\sqrt[n]{(1+r_1)x(1+r_2)x...x(1+r_n)}-1$
+
+r: Rate of return
+
+n: Number of periods
+
+To calculate the compound average return, we first add 1.00 to each annual return. Then the above formula can be applied.
+
+```{r}
+
+gar <- df2 %>% 
+  mutate(
+    Returns2 = 1 + Returns/100
+  ) %>% 
+  group_by(Types) %>% 
+  summarise(
+    GAR = ((prod(Returns2)^(1/211))-1)*100
+  ) %>% 
+  ungroup()
+
+```
+
+```{r fig.width=10, fig.height=7, preview=TRUE}
+
+ggplot(gar, aes(x = reorder(Types,GAR), y = GAR, fill = GAR)) +
+  geom_col() +
+  geom_text(aes(label = paste0(round(GAR,digits = 1),"%")), hjust = 1, size = 4) +
+  theme_minimal() +
+  theme(legend.position = "none",
+        axis.title = element_blank(),
+        axis.text = element_text(size = 15),
+        plot.title = element_text(face = "bold", size = 15, hjust = 0.5)) +
+  scale_fill_gradient(low = "orange", high = "red") +
+  coord_flip() +
+  labs(
+    title = "Geometric Average Returns"
+  )
+
+```

@@ -6,14 +6,21 @@
       "description": "I aim to teach R programming language with hands-on examples.",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-08-21T19:21:45+03:00"
+      "last_modified": "2022-08-21T19:21:46+03:00"
     },
     {
       "path": "index.html",
       "title": "",
       "author": [],
       "contents": "\r\n\r\n\r\n\r\n",
-      "last_modified": "2022-08-30T17:51:42+03:00"
+      "last_modified": "2022-09-05T22:09:02+03:00"
+    },
+    {
+      "path": "index.html",
+      "title": "",
+      "author": [],
+      "contents": "\r\n\r\n\r\n\r\n",
+      "last_modified": "2022-09-05T22:09:02+03:00"
     }
   ],
   "collections": ["posts/posts.json"]
