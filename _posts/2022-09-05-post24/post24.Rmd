@@ -94,7 +94,6 @@ ggplot(df, aes(x = date, y = vals)) +
   geom_line(color = "dark blue", size = 2) +
   ggthemes::theme_fivethirtyeight() +
   theme(strip.text = element_text(size = 20),
-        legend.position = "none",
         axis.text = element_text(size = 20)) +
   facet_wrap(~vars, ncol = 2) +
   labs(
