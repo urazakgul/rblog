@@ -1,0 +1,98 @@
+---
+title: "Adding a Shadow to a Line Chart in ggplot2"
+description: |
+  Shadowing your ggplot lines.
+author:
+  - name: A. Uraz Akgül
+date: 2022-09-06
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Data Visualization
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Line charts with shadows let one feel in control. I'll use the weekly death statistics from Istanbul to illustrate what I mean.
+
+The data can be accessed by downloading the *post25.xlsx* file [here](https://github.com/rpydaneogrendim/rblog/tree/main/data) or visiting [this](https://sarkac.org/2022/08/istanbulda-haftalik-vefat-sayilari/) site.
+
+```{r}
+
+library(tidyverse)
+
+df <- readxl::read_excel("data.xlsx") %>% 
+  select(-day,-y2020,-y2021) %>% 
+  pivot_longer(!week, names_to = "years", values_to = "values") %>% 
+  group_by(week,years) %>% 
+  summarise(total = sum(values)) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = "years", values_from = "total")
+
+```
+
+Let's see the lines before adding a shadow.
+
+```{r fig.width=15, fig.height=10}
+
+df %>% 
+  pivot_longer(!week, names_to = "years", values_to = "values") %>% 
+  ggplot(aes(x = week, y = values, group = years, color = years)) +
+  geom_line() +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        strip.text = element_text(size = 20),
+        legend.title = element_blank(),
+        legend.text = element_text(size = 20),
+        legend.key.size = unit(1, 'cm'))
+
+```
+
+First, we'll create a ribbon by determining the minimum and maximum values by week from deaths between 2015 and 2019.
+
+```{r}
+
+df2 <- df %>% 
+  mutate(
+    normal_min = apply(X = .[,2:6], MARGIN = 1, FUN = function(x) min(x)),
+    normal_max = apply(X = .[,2:6], MARGIN = 1, FUN = function(x) max(x)),
+    normal_mean = apply(X = .[,2:6], MARGIN = 1, FUN = function(x) mean(x))
+  )
+
+```
+
+The following things are easier after the above step. We can add shadowed areas to our lines using geom_ribbon().
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+lastWeek <- df2 %>% 
+  pull(y2022) %>% 
+  na.omit() %>% 
+  length(.)
+
+ggplot(df2, aes(x = week)) +
+  geom_ribbon(
+    aes(
+      ymin = normal_min,
+      ymax = normal_max
+    ),
+    fill = "dark blue",
+    alpha = .5
+  ) +
+  geom_line(aes(y = normal_mean)) +
+  geom_line(aes(y = y2022), color = "dark red", size = 2) +
+  geom_vline(xintercept = lastWeek, linetype = "dotdash", size = 1) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        axis.title.x = element_text(size = 20)) +
+  scale_x_continuous(breaks = c(1,lastWeek,52)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(
+    title = "Weekly Deaths in Istanbul (from all causes), 2015-2019 vs 2022",
+    x = "Weeks"
+  )
+
+```
