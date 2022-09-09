@@ -1,7 +1,7 @@
 [
   {
     "path": "posts/2022-09-09-post26/",
-    "title": "Make Plot Look Like a Reuters Plot in R",
+    "title": "Make Plot Look Like a Reuters Plot",
     "description": "Making a Reuters style chart.",
     "author": [
       {
@@ -15,7 +15,7 @@
     ],
     "contents": "\r\nIt is critical to convey data through beautiful visualizations in\r\naddition to being rich in data. Reuters is a platform where I can\r\nprovide an example of what I just said.\r\nIn this post, we will use ggplot2 to create a Reuters-style chart.\r\nI’d like to emphasize that our goal is not to make exactly the same\r\nthing, but to capture the main style.\r\n\r\n\r\n\r\nYou are free to use any data you want, but if you want to use the\r\ndata from this post, download the post26.xlsx file here.\r\n\r\n\r\nlibrary(tidyverse)\r\n\r\ndf <- readxl::read_excel(\"data.xlsx\") %>% \r\n  mutate(\r\n    date = lubridate::ymd(date)\r\n  )\r\n\r\n\r\n\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line() +\r\n  theme_minimal()\r\n\r\n\r\n\r\n\r\nMaking the line orange could be a good starting point.\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line(color = \"#ffa500\") +\r\n  theme_minimal()\r\n\r\n\r\n\r\n\r\nDarken the background.\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line(color = \"#ffa500\") +\r\n  theme_minimal() +\r\n  theme(\r\n    plot.background = element_rect(fill = \"#262626\")\r\n  )\r\n\r\n\r\n\r\n\r\nChange the colors of the grid lines.\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line(color = \"#ffa500\") +\r\n  theme_minimal() +\r\n  theme(\r\n    plot.background = element_rect(fill = \"#262626\"),\r\n    panel.grid = element_line(color = \"#4c4c4c\")\r\n  )\r\n\r\n\r\n\r\n\r\nMake the axis texts white, remove the axis titles and place y-axis on\r\nthe right.\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line(color = \"#ffa500\") +\r\n  theme_minimal() +\r\n  theme(\r\n    plot.background = element_rect(fill = \"#262626\"),\r\n    panel.grid = element_line(color = \"#4c4c4c\"),\r\n    axis.title = element_blank(),\r\n    axis.text = element_text(color = \"#ffffff\")\r\n  ) +\r\n  scale_y_continuous(position = \"right\")\r\n\r\n\r\n\r\n\r\nFinally, we may have made the most significant contribution here. The\r\narea under the line will be filled and its transparency will be adjusted\r\nin this step.\r\n\r\n\r\nggplot(df, aes(x = date, y = close)) +\r\n  geom_line(color = \"#ffa500\", size = 1, alpha = 0.9) +\r\n  geom_area(alpha = 0.1, fill = \"#ffa500\") +\r\n  theme(\r\n    plot.background = element_rect(fill = \"#262626\"),\r\n    panel.background = element_blank(),\r\n    panel.grid = element_line(color = \"#4c4c4c\"),\r\n    axis.title = element_blank(),\r\n    axis.text = element_text(color = \"#ffffff\", size = 20)\r\n  ) +\r\n  scale_y_continuous(position = \"right\")\r\n\r\n\r\n\r\n\r\nSomeone looking at the chart will most likely identify it as a\r\nReuters type chart! :-)\r\nDon’t forget about your contributions!\r\n\r\n\r\n\r\n",
     "preview": "posts/2022-09-09-post26/post26_files/figure-html5/unnamed-chunk-8-1.png",
-    "last_modified": "2022-09-09T23:10:39+03:00",
+    "last_modified": "2022-09-09T23:23:22+03:00",
     "input_file": {}
   },
   {

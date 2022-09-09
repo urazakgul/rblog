@@ -1,5 +1,5 @@
 ---
-title: "Make Plot Look Like a Reuters Plot in R"
+title: "Make Plot Look Like a Reuters Plot"
 description: |
   Making a Reuters style chart.
 author:
