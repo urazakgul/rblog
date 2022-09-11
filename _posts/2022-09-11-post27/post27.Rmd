@@ -1,0 +1,277 @@
+---
+title: "How to Automate Repetitive and Time-Consuming Reports"
+description: |
+  Scheduling a report to run at regular intervals.
+author:
+  - name: Uraz Akgül
+date: 2022-09-11
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Automation
+  - Web
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In the age of technology we live in, manual processes are extremely time-consuming. Fortunately, there are an increasing number of people who know how to use technology or desire to do so.
+
+In this post, I'll show you how to run a script at regular intervals. Assume we want to get intraday cryptocurrencies data from Yahoo Finance every 5 minutes using web scraping. The top 100 cryptocurrencies in the table are what we are most interested in.
+
+```{r}
+
+library(rvest)
+library(tidyverse)
+library(DBI)
+library(RSQLite)
+library(taskscheduleR)
+
+```
+
+```{r}
+
+url <- "https://finance.yahoo.com/cryptocurrencies/?count=100&offset=0"
+
+df <- read_html(url) %>% 
+  html_table() %>% 
+  .[[1]]
+
+```
+
+The top ten cryptocurrencies in the table are listed below.
+
+```{r echo=FALSE}
+
+df %>% 
+  head(.,10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+It's enough for us to select the Symbol and % Change columns.
+
+```{r}
+
+master <- df %>% 
+  select(1,5) %>% 
+  rename("Change"=2)
+
+```
+
+I'd like to draw your attention to the fact that the values in the Change column are not numeric format.
+
+```{r}
+
+str(master)
+
+```
+
+We need to remove the plus and percent signs from the column I mentioned and convert the values to numeric format.
+
+```{r}
+
+master <- master %>% 
+  mutate(
+    Change = as.numeric(gsub("[^0-9\\.]","",Change))
+  )
+
+```
+
+There, it is done!
+
+```{r}
+
+str(master)
+
+```
+
+Before proceeding, I should point out that we will need to create a new column and get the dates as IDs as well.
+
+```{r}
+
+master <- master %>% 
+  mutate(
+    ID = Sys.time()
+  )
+
+```
+
+And now we can move on to the data visualization step.
+
+```{r}
+
+gainers <- master %>% 
+  arrange(desc(Change)) %>% 
+  filter(Change > 0) %>% 
+  slice(1:10)
+
+if(nrow(gainers) > 0){
+  g <- ggplot(gainers, aes(x = reorder(Symbol, Change), y = Change, fill = Change)) +
+    geom_col() +
+    coord_flip() +
+    theme_minimal() +
+    theme(
+      plot.background = element_rect(fill = "#262626"),
+      panel.background = element_blank(),
+      panel.grid = element_line(color = "#4c4c4c"),
+      axis.title = element_blank(),
+      axis.text = element_text(color = "#ffffff", size = 15),
+      legend.position = "none",
+      plot.title = element_text(color = "#ffffff", size = 20, face = "bold"),
+      plot.subtitle = element_text(color = "#ffffff", size = 13, face = "italic")
+    ) +
+    scale_fill_gradient(low = "red", high = "green") +
+    labs(title = "Top 10 Gainers",
+         subtitle = gainers$ID[1])
+}
+
+ggsave("g.png")
+
+```
+
+```{r echo=FALSE, fig.width=10, fig.height=7, preview=TRUE}
+
+plot(g)
+
+```
+
+The following are the codes that we have written thus far.
+
+```{r eval=FALSE}
+
+library(rvest)
+library(tidyverse)
+
+url <- "https://finance.yahoo.com/cryptocurrencies/?count=100&offset=0"
+
+df <- read_html(url) %>% 
+  html_table() %>% 
+  .[[1]]
+
+master <- df %>% 
+  select(1,5) %>% 
+  rename("Change"=2) %>% 
+  mutate(
+    Change = as.numeric(gsub("[^0-9\\.]","",Change)),
+    ID = Sys.time()
+  )
+
+gainers <- master %>% 
+  arrange(desc(Change)) %>% 
+  filter(Change > 0) %>% 
+  slice(1:10)
+
+if(nrow(gainers) > 0){
+  g <- ggplot(gainers, aes(x = reorder(Symbol, Change), y = Change, fill = Change)) +
+    geom_col() +
+    coord_flip() +
+    theme_minimal() +
+    theme(
+      plot.background = element_rect(fill = "#262626"),
+      panel.background = element_blank(),
+      panel.grid = element_line(color = "#4c4c4c"),
+      axis.title = element_blank(),
+      axis.text = element_text(color = "#ffffff", size = 15),
+      legend.position = "none",
+      plot.title = element_text(color = "#ffffff", size = 20, face = "bold"),
+      plot.subtitle = element_text(color = "#ffffff", size = 13, face = "italic")
+    ) +
+    scale_fill_gradient(low = "red", high = "green") +
+    labs(title = "Top 10 Gainers",
+         subtitle = gainers$ID[1])
+}
+
+ggsave("g.png")
+
+```
+
+**Writing the data to the database.**
+
+SQLite will be used in this study. My reasoning for choosing SQLite is that we will not require any software or server setup. It also has a simple structure. For SQLite, we will use the DBI and RSQLite packages, and the following command will be used to create the database (not temporary; permanent). Wherever the address is, the file path will save the database.
+
+```{r}
+
+# working directory
+# getwd()
+
+myDB <- dbConnect(SQLite(), "cryptoDB.sqlite") # "C:/.../cryptoDB.sqlite"
+
+```
+
+Let's write the data to the database named cryptoDB. When we do this on a regular basis, say every 5 minutes, we will be careful not to overwrite the table in the database with new data. The append parameter is set to TRUE for this purpose.
+
+```{r}
+
+dbWriteTable(myDB, "master", master, append = TRUE)
+
+```
+
+Let's get the data from the database using SQL.
+
+```{r}
+
+mastertbl <- dbGetQuery(myDB, "SELECT * FROM master")
+
+```
+
+```{r echo=FALSE}
+
+mastertbl %>% 
+  head(.,10) %>% 
+  kableExtra::kbl() %>% 
+  kableExtra::kable_styling()
+
+```
+
+When the processes are finished, use the code below to exit the database. It will be reconnected with the code that was written at the start (comment line below).
+
+```{r}
+
+dbDisconnect(myDB)
+
+# myDB <- dbConnect(SQLite(), "cryptoDB.sqlite")
+
+```
+
+The following are the codes that we have written thus far.
+
+```{r eval=FALSE}
+
+library(DBI)
+library(RSQLite)
+
+myDB <- dbConnect(SQLite(), "cryptoDB.sqlite") # "C:/.../cryptoDB.sqlite"
+dbWriteTable(myDB, "master", master, append = TRUE)
+dbDisconnect(myDB)
+
+```
+
+**Schedule the task scheduler to run the script on a regular basis.**
+
+The task scheduler can be configured via the PC or the taskscheduleR package.
+
+```{r eval=FALSE}
+
+taskscheduler_create(
+  
+  taskname = "Post27",
+  rscript = "post27.R", # "C:/.../"
+  schedule = "MINUTE",
+  starttime = "12:00",
+  modifier = 5
+  
+)
+
+```
+
+The process has been automated.
+
+What can be done next?
+
+* By converting the .R extension to the .Rmd extension, the report can be sent.
+
+* E-mail can be used to send outputs with the .R or .Rmd extensions.

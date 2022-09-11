@@ -10,21 +10,21 @@ navbar:
     - text: "Books"
       menu:
         - text: "R'da Ekonometri Uygulamaları"
-          href: https://rpydaneogrendim.github.io/rEkonometri/
+          href: https://urazakgul.github.io/rEkonometri/
         - text: "R'da Veri Görselleştirme"
-          href: https://rpydaneogrendim.github.io/rViz/
+          href: https://urazakgul.github.io/rViz/
     - text: "Packages"
       menu:
         - text: "TCMB"
-          href: https://github.com/rpydaneogrendim/TCMB
+          href: https://github.com/urazakgul/TCMB
         - text: "isyhisse"
-          href: https://github.com/rpydaneogrendim/isyhisse
+          href: https://github.com/urazakgul/isyhisse
         - text: "KantitatifTurk"
-          href: https://github.com/rpydaneogrendim/KantitatifTurk
+          href: https://github.com/urazakgul/KantitatifTurk
     - icon: fab fa-twitter
       href: https://twitter.com/rpydaneogrendim
     - icon: fab fa-github
-      href: https://github.com/rpydaneogrendim
+      href: https://github.com/urazakgul
 collections:
   posts:
     categories: true
