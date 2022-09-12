@@ -1,5 +1,24 @@
 [
   {
+    "path": "posts/2022-09-12-post28/",
+    "title": "How to Create Bar Race Animation Charts",
+    "description": "Animated bar race ranking.",
+    "author": [
+      {
+        "name": "Uraz Akgül",
+        "url": {}
+      }
+    ],
+    "date": "2022-09-12",
+    "categories": [
+      "Data Visualization"
+    ],
+    "contents": "\r\nYou can compare variables over time using animated bar charts by\r\nfollowing the bars as if you were betting on a single one.\r\nLet’s create a static graph first, and then one that is dynamic, to\r\ncompare the two.\r\nFollow the steps below to access the data, or click here to download the post28.xlsx file.\r\nhttps://www.tuik.gov.tr/ (The English language option is\r\navailable in the upper right corner)\r\nStatistics/Transportation and Communication\r\nDatabases/Road Motor Vehicle Statistics\r\nThe number of road motor vehicles registered to the traffic/Type\r\nof Vehicle&Brand\r\nCars&All, respectively.\r\nMonthly (All), Region (Turkey)\r\n\r\n\r\nlibrary(tidyverse)\r\nlibrary(gganimate)\r\nlibrary(gifski)\r\n\r\n\r\n\r\n\r\n\r\ndf <- readxl::read_excel(\"data.xlsx\") %>% \r\n  select(-1) %>% \r\n  slice(-c(1:3)) %>% \r\n  `colnames<-`(paste0(\"C\",seq(1,ncol(.),1))) %>% \r\n  mutate(\r\n    C1 = unlist(lapply(str_extract_all(C1, \"\\\\([^()]+\\\\)\"), \"[[\", 1)),\r\n    C1 = gsub(\"[()]\", \"\", C1),\r\n    C1 = zoo::na.locf(C1)\r\n  ) %>% \r\n  pivot_longer(!c(C1,C2), names_to = \"month\", values_to = \"value\") %>% \r\n  mutate(\r\n    month = case_when(\r\n      month == \"C3\" ~ \"01\",\r\n      month == \"C4\" ~ \"02\",\r\n      month == \"C5\" ~ \"03\",\r\n      month == \"C6\" ~ \"04\",\r\n      month == \"C7\" ~ \"05\",\r\n      month == \"C8\" ~ \"06\",\r\n      month == \"C9\" ~ \"07\",\r\n      month == \"C10\" ~ \"08\",\r\n      month == \"C11\" ~ \"09\",\r\n      month == \"C12\" ~ \"10\",\r\n      month == \"C13\" ~ \"11\",\r\n      month == \"C14\" ~ \"12\",\r\n    )\r\n  ) %>% \r\n  mutate(\r\n    date = as.Date(paste0(C2,\"-\",month,\"-\",1)),\r\n    value = as.numeric(value)\r\n  ) %>% \r\n  rename(\"brand\"=\"C1\") %>% \r\n  select(date,brand,value) %>% \r\n  filter(date <= as.Date(\"2022-07-01\")) %>% \r\n  mutate(value = ifelse(is.na(value), 0, value),\r\n         brand = ifelse(brand == \"Diger\",\"Others\",brand))\r\n\r\n\r\n\r\nThere are 49 different car brands.\r\n\r\n\r\ndf_filtered <- df %>% \r\n  group_by(date) %>% \r\n  mutate(p = value / sum(value) * 100) %>% \r\n  ungroup()\r\n\r\n\r\n\r\nStatic plot:\r\n\r\n\r\nggplot(df_filtered %>% filter(date == as.Date(\"2022-07-01\")),\r\n       aes(x = reorder(brand,p), y = p, fill = p)) +\r\n  geom_col() +\r\n  geom_text(aes(label = round(p,digits = 1)), hjust = -0.1, size = 5) +\r\n  coord_flip() +\r\n  theme_minimal() +\r\n  theme(legend.position = \"none\",\r\n        axis.title = element_blank(),\r\n        axis.text.y = element_text(size = 17),\r\n        axis.text.x = element_blank(),\r\n        plot.title = element_text(size = 20, face = \"bold\"),\r\n        plot.subtitle = element_text(size = 20)) +\r\n  scale_fill_gradient(low = \"orange\", high = \"red\") +\r\n  scale_y_continuous(limits = c(0,max(df_filtered$p)+1)) +\r\n  labs(\r\n    title = \"Number of Newly Registered Car Brands in Turkey (%)\",\r\n    subtitle = \"07/2022\"\r\n  )\r\n\r\n\r\n\r\n\r\nNow it’s time to set the animation up.\r\n\r\n\r\ndf_rank <- df_filtered %>% \r\n  arrange(date,desc(p)) %>% \r\n  group_by(date) %>% \r\n  mutate(rank = row_number(),\r\n         date = format(date,\"%Y/%m\"),\r\n         p = round(p, digits = 1))\r\n\r\nanim <- ggplot(df_rank, aes(x = rank, y = p, fill = p)) +\r\n  geom_col() +\r\n  geom_text(aes(y = 0, label = paste0(brand,\" \")), hjust = 1) +\r\n  geom_text(aes(y = p, label = p), hjust = -0.1) +\r\n  coord_flip(expand = TRUE) +\r\n  theme_minimal() +\r\n  theme(legend.position = \"none\",\r\n        axis.title = element_blank(),\r\n        axis.text = element_blank(),\r\n        plot.title = element_text(size = 20, face = \"bold\"),\r\n        plot.subtitle = element_text(size = 20)) +\r\n  scale_fill_gradient(low = \"orange\", high = \"red\") +\r\n  scale_x_reverse() +\r\n  labs(\r\n    title = \"Number of Newly Registered Car Brands in Turkey (%)\",\r\n    subtitle = \"{closest_state}\"\r\n  ) +\r\n  transition_states(date) +\r\n  view_follow()\r\n\r\nanimate(\r\n  anim,\r\n  223,\r\n  fps = 40,\r\n  duration = 50,\r\n  width = 1800,\r\n  height = 1000,\r\n  renderer = gifski_renderer(\"gganim.gif\")\r\n)\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+    "preview": "posts/2022-09-12-post28/post28_files/figure-html5/unnamed-chunk-4-1.png",
+    "last_modified": "2022-09-12T19:00:17+03:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2022-09-11-post27/",
     "title": "How to Automate Repetitive and Time-Consuming Reports",
     "description": "Scheduling a report to run at regular intervals.",
