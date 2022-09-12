@@ -22,7 +22,7 @@ navbar:
         - text: "KantitatifTurk"
           href: https://github.com/urazakgul/KantitatifTurk
     - icon: fab fa-twitter
-      href: https://twitter.com/rpydaneogrendim
+      href: https://twitter.com/handsonrpy
     - icon: fab fa-github
       href: https://github.com/urazakgul
 collections:
