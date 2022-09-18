@@ -1,0 +1,176 @@
+---
+title: "Scraping Data from Wikipedia Tables"
+description: |
+  How to scrape and clean wikipedia tables.
+author:
+  - name: Uraz Akgül
+date: 2022-09-18
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Web
+  - Data Manipulation
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+I've scraped many websites, and scraping Wikipedia is by far the simplest. This post will teach you how to scrape tables from Wikipedia and how to clean the data that has been scraped.
+
+The two urls we'll use are given below.
+
+i. https://en.wikipedia.org/wiki/Democracy_Index
+
+*The index is based on 60 indicators grouped in five different categories, measuring pluralism, civil liberties and political culture.*
+
+ii. https://en.wikipedia.org/wiki/Corruption_Perceptions_Index
+
+*The index which ranks countries by their perceived levels of public sector corruption, as determined by expert assessments and opinion surveys.*
+
+For more information, please see the URLs above.
+
+The index scores of countries participating in the Shanghai Cooperation Organization Summit in 2022 will be compared to those of countries that are not members of the organization.
+
+```{r}
+
+library(rvest)
+library(tidyverse)
+
+```
+
+```{r}
+
+url1 <- "https://en.wikipedia.org/wiki/Democracy_Index"
+url2 <- "https://en.wikipedia.org/wiki/Corruption_Perceptions_Index"
+
+participants <- c(
+  "China",
+  "Russia",
+  "Kyrgyzstan",
+  "Tajikistan",
+  "Kazakhstan",
+  "Uzbekistan",
+  "India",
+  "Pakistan",
+  "Iran",
+  "Turkmenistan",
+  "Mongolia",
+  "Belarus",
+  "Turkey",
+  "Azerbaijan"
+)
+
+```
+
+While scraping the Democracy Index table, we followed the steps outlined below.
+
+i. Read HTML code using the read_html() function
+
+ii. Get tables using the html_table() function
+
+iii. The 6th table in the list is the one we want (by running the first two lines of code, you can see all of the tables)
+
+iv. Select country and score columns
+
+v. Divide the countries based on the previously stated criteria
+
+vi. Rename score column
+
+```{r}
+
+democracy <- read_html(url1) %>% 
+  html_table() %>% 
+  .[[6]] %>% 
+  select(3,5) %>% 
+  mutate(
+    Shanghai = ifelse(
+      Country %in% participants, "Shanghai", "Non-Shanghai"
+    )
+  ) %>% 
+  rename(
+    "Democracy"=2
+  )
+
+```
+
+While scraping the Corruption Index table, we followed the steps outlined below.
+
+i. Read HTML code using the read_html() function
+
+ii. Get tables using the html_table() function
+
+iii. The 5th table in the list is the one we want (by running the first two lines of code, you can see all of the tables)
+
+iv. Select country and score columns
+
+v. Remove the first line
+
+vi. Rename country and score columns
+
+vii. Convert character to numeric for the score column
+
+```{r}
+
+corruption <- read_html(url2) %>% 
+  html_table() %>% 
+  .[[5]] %>% 
+  select(2,3) %>% 
+  slice(-1) %>% 
+  rename(
+    "Country"=1,
+    "Corruption"=2
+  ) %>% 
+  mutate(
+    Corruption = as.numeric(Corruption)
+  )
+
+```
+
+The inner_join() function can be used to join common countries from two tables.
+
+```{r}
+
+master <- democracy %>% 
+  inner_join(corruption, by = "Country") %>% # the common rows between two tables
+  select(Country,Democracy,Corruption,Shanghai)
+
+```
+
+As an example, the ten countries in the table are listed below.
+
+```{r echo=FALSE}
+
+master %>% 
+  head(., 10) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T) %>% 
+  kableExtra::column_spec(3, width = "10em", background = "gray", color = "white", bold = T) %>% 
+  kableExtra::column_spec(4, width = "10em", background = "red", color = "white", bold = T)
+
+```
+
+Let's visualize the data in the last step.
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+ggplot(master, aes(x = Democracy, y = Corruption, color = Shanghai)) +
+  geom_point(size = 5, alpha = .5) +
+  ggrepel::geom_text_repel(data = master %>% filter(Shanghai == "Shanghai"),
+                           aes(label = Country), size = 7, show.legend = FALSE) +
+  geom_vline(xintercept = 5, linetype = "dashed") +
+  geom_hline(yintercept = 50, linetype = "dashed") +
+  ggthemes::theme_fivethirtyeight() +
+  theme(
+    axis.title = element_text(size = 25),
+    axis.text = element_text(size = 20),
+    legend.title = element_blank(),
+    legend.position = "top",
+    legend.text = element_text(size = 20)
+  ) +
+  scale_color_manual(values = c("gray60","red"))
+
+```
