@@ -1,0 +1,217 @@
+---
+title: "Clustering of Currency Exchange Rates Using Hierarchical Methods Based on Dynamic Time Warping"
+description: |
+  Clustering the daily spot exchange rates of the 30 currencies.
+author:
+  - name: Uraz Akgül
+date: 2022-09-18
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Machine Learning
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+In this study, we collect and analyze historical exchange rate data for the 30 currencies listed in the table below, considering the US dollar as reference. Reuters is the source of the data and you can access it by downloading *post29.xlsx* file [here](https://github.com/rpydaneogrendim/rblog/tree/main/data).
+
+```{r echo=FALSE}
+
+library(dplyr)
+
+readxl::read_excel("currencies.xlsx") %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+```{r}
+
+library(tidyverse)
+library(dtwclust)
+
+```
+
+By calculating the average, we can convert the daily frequency data to monthly data.
+
+```{r}
+
+df <- readxl::read_excel("data.xlsx") %>% 
+  na.omit() %>% 
+  pivot_longer(!DATE, names_to = "Vars", values_to = "Vals") %>% 
+  mutate(
+    Months = format(DATE,"%m"),
+    Years = format(DATE,"%Y")
+  ) %>% 
+  group_by(Vars,Months,Years) %>% 
+  summarise(
+    MeanVals = mean(Vals)
+  ) %>% 
+  ungroup() %>% 
+  arrange(Vars,Years) %>% 
+  mutate(
+    DATE = as.Date(paste0(Years,"-",Months,"-",1))
+  ) %>% 
+  select(DATE,Vars,MeanVals) %>% 
+  pivot_wider(names_from = "Vars", values_from = "MeanVals")
+
+```
+
+It would be better if we standardize the data. The following formula can be used to standardize the values in a dataset.
+
+$z = \frac{(x - \mu)}{\sigma}$
+
+$z$: Standardised value or Z-score
+
+$x$: Original value
+
+$\mu$: Sample mean
+
+$\sigma$: Sample standard deviation
+
+```{r}
+
+standardize <- function(x){
+  
+  (x - mean(x)) / sd(x)
+  
+}
+
+df_standardize <- df %>% 
+  mutate_at(
+    vars(-DATE), function(x) standardize(x)
+  )
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+df_standardize %>% 
+  pivot_longer(!DATE, names_to = "Vars", values_to = "Vals") %>% 
+  ggplot(aes(x = DATE, y = Vals)) +
+  geom_line() +
+  facet_wrap(~Vars, ncol = 5) +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text.x = element_text(size = 15),
+        axis.text.y = element_blank(),
+        strip.text = element_text(size = 20))
+
+```
+
+What happens when the data is standardised? An example is provided below. I'd like to draw your attention to the y-axis.
+
+```{r fig.width=15, fig.height=10, echo=FALSE}
+
+g1 <- df %>% 
+  select(DATE,TRY,INR) %>% 
+  pivot_longer(!DATE, names_to = "vars", values_to = "vals") %>% 
+  ggplot(aes(x = DATE, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.key.size = unit(3,"cm"),
+        legend.text = element_text(size = 20)) +
+  scale_color_manual(values = c("red","blue"))
+
+g2 <- df_standardize %>% 
+  select(DATE,TRY,INR) %>% 
+  pivot_longer(!DATE, names_to = "vars", values_to = "vals") %>% 
+  ggplot(aes(x = DATE, y = vals, group = vars, color = vars)) +
+  geom_line() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 20),
+        plot.title = element_text(size = 20, face = "bold"),
+        legend.title = element_blank(),
+        legend.position = "top",
+        legend.key.size = unit(3,"cm"),
+        legend.text = element_text(size = 20)) +
+  scale_color_manual(values = c("red","blue")) +
+  labs(
+    title = "Standardized Data"
+  )
+
+gridExtra::grid.arrange(g1,g2,ncol=2)
+
+```
+
+**Type**: h or Hierarchical
+
+An algorithm called hierarchical clustering divides objects into clusters based on how similar they are. The result is a collection of clusters, each of which differs from the others while having things that are generally similar to one another.
+
+**Distance**: dtw or Dynamic Time Warping
+
+We can explain DTW by comparing it to the Euclidean distance. The distance between two points in Euclidean space is known as the Euclidean distance.
+
+```{r echo=FALSE, fig.cap="https://rtavenar.github.io/blog/dtw.html", out.width = "100%"}
+knitr::include_graphics("dtw.png")
+```
+
+Dynamic Time Warping uses temporal distortions to create the best possible alignment, whereas Euclidean only allows one-to-one point comparison.
+
+As a result of various trials, I decided to create 3 different clusters.
+
+```{r}
+
+k <- 3L
+
+data_cluster <- tsclust(
+  t(df_standardize[,-1]), # data
+  type = "h", # What type of clustering method to use
+  k = k, # Number of desired clusters
+  distance = "dtw" # Dynamic time warping
+)
+cluster <- as.data.frame(cutree(data_cluster, k=k)) %>% 
+  rownames_to_column(., var = "Vars") %>% 
+  rename("Cluster"=2)
+
+```
+
+```{r echo=FALSE}
+
+cluster %>% 
+  arrange(Cluster) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+```{r}
+
+df2 <- df_standardize %>% 
+  pivot_longer(!DATE, names_to = "Vars", values_to = "Vals") %>% 
+  arrange(Vars) %>% 
+  left_join(cluster, by = "Vars")
+
+```
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+for(i in 1:length(unique(cluster$Cluster))){
+  
+  g <- ggplot(df2 %>% filter(Cluster == i), aes(x = DATE, y = Vals)) +
+    geom_line(data = df2 %>% filter(Cluster == i) %>% rename(Vars2 = Vars), aes(group = Vars2), color = "gray", size = 1) +
+    geom_line(color = "dark blue", size = 2) +
+    ggthemes::theme_fivethirtyeight() +
+    theme(strip.text = element_text(size = 20),
+          axis.text = element_blank()) +
+    facet_wrap(~Vars)
+  
+  plot(g)
+  
+}
+
+```
