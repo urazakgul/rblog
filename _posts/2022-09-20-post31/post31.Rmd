@@ -1,0 +1,197 @@
+---
+title: "Mapping of Istanbul's Districts Based on Socioeconomic Development Index Results"
+description: |
+  How to map data.
+author:
+  - name: Uraz Akgül
+date: 2022-09-20
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Map
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Turkey's most developed districts were determined by the Ministry of Industry and Technology.
+
+According to the data of the Ministry, the top 10 most developed districts out of 973 are:
+
+```{r echo=FALSE}
+
+library(dplyr)
+
+df <- readxl::read_excel("data.xlsx")
+
+df %>% 
+  head(.,10) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(3, width = "10em", background = "gray", color = "white", bold = T) %>% 
+  kableExtra::column_spec(4, width = "10em", background = "red", color = "white", bold = T)
+
+```
+
+Istanbul’s Şişli named most-developed district in Turkey.
+
+In this study, we will map the districts of Istanbul. All data can be accessed by downloading the *post31.xlsx* file from [here](https://github.com/urazakgul/rblog/tree/main/data).
+
+```{r}
+
+library(tidyverse)
+library(raster)
+library(sf)
+
+```
+
+Following is a ranking of the districts' socioeconomic development:
+
+```{r fig.width=10, fig.height=9}
+
+df <- readxl::read_excel("data.xlsx")
+
+df %>% 
+  filter(province == "İstanbul") %>% 
+  ggplot(aes(x = reorder(district,score), y = score, fill = score)) +
+  geom_col() +
+  theme_minimal() +
+  theme(axis.title = element_blank(),
+        axis.text = element_text(size = 15),
+        legend.position = "none") +
+  scale_fill_gradient(low = "red", high = "orange") +
+  coord_flip()
+
+```
+
+We first download Turkey's file from [here](https://gadm.org/download_country.html) in order to create the map. Click on the Shapefile name to download it. The zip you downloaded can be extracted and placed in your project file. There are 3 levels: level-0, level-1, and the level we are interested in, level-2.
+
+Another option is to run the code below instead of following the steps above. The {raster} package will be used.
+
+```{r}
+
+# raster::getData()
+
+districts_shp <- getData(
+  name = "GADM",
+  country = "TUR",
+  level = 2
+)
+
+class(districts_shp)
+
+```
+
+Let's create a data frame from the file you'll see in your environment.
+
+```{r}
+
+# ggplot2::fortify()
+
+districts_shp_df <- fortify(districts_shp, region = "NAME_2")
+
+class(districts_shp_df)
+
+```
+
+Merge the istanbul and districts_shp_df dataframes.
+
+```{r}
+
+istanbul <- df %>% 
+  filter(province == "İstanbul") %>% 
+  rename("id"="district") %>% 
+  mutate(
+    id = ifelse(id == "Arnavutköy", "Arnavutkoy", id),
+    id = ifelse(id == "Ataşehir", "Atasehir", id),
+    id = ifelse(id == "Başakşehir", "Basaksehir", id),
+    id = ifelse(id == "Beylikdüzü", "Beylikduzu", id),
+    id = ifelse(id == "Eyüpsultan", "Eyüp", id),
+    id = ifelse(id == "Çekmeköy", "Çekmekoy", id)
+  )
+
+master <- districts_shp_df %>% 
+  inner_join(istanbul, by = "id")
+
+```
+
+It's now time to map the data.
+
+```{r fig.width=12, fig.height=7}
+
+ggplot() +
+  geom_polygon(data = master, aes(x = long, y = lat, group = group, fill  = score)) +
+  scale_fill_gradient(low = "dark red", high = "yellow") +
+  theme_void() +
+  theme(
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    legend.key.width = unit(2,"cm")
+  )
+
+```
+
+Oops! Even to someone who is familiar with Istanbul, the map appears normal, but Silivri, one of the city's districts, is not included.
+
+```{r}
+
+unique(master$id)
+
+```
+
+```{r}
+
+istanbul$id
+
+```
+
+We leave everything behind and move on!
+
+We went with the second option, but now we're back to the first. With the help of the {sf} package, we'll read a file with the .shp extension from the file we saved earlier.
+
+```{r}
+
+# sf::read_sf()
+
+districts_shp2 <- read_sf("gadm41_TUR_shp/gadm41_TUR_2.shp") %>% 
+  filter(
+    NAME_1 == "Istanbul"
+  )
+
+```
+
+I won't change anything from what I previously told you.
+
+```{r}
+
+istanbul2 <- istanbul %>% 
+  rename("NAME_2"="id")
+
+master2 <- districts_shp2 %>% 
+  inner_join(istanbul2, by = "NAME_2")
+
+```
+
+It's now time to remap the data.
+
+```{r fig.width=12, fig.height=7, preview=TRUE}
+
+master2 %>% 
+  ggplot(aes(fill = score)) +
+  geom_sf() +
+  scale_fill_gradient(low = "dark red", high = "yellow") +
+  theme_void() +
+  theme(
+    legend.title = element_blank(),
+    legend.position = "bottom",
+    legend.key.width = unit(2,"cm"),
+    plot.title = element_text(size = 15, face = "bold", hjust = 0.5)
+  ) +
+  labs(
+    title = "Socioeconomic Development Ranking of Istanbul's Districts, 2022"
+  )
+
+```
