@@ -1,0 +1,297 @@
+---
+title: "A Look at Stock Market Performance After Elections: The Case of BIST100 Indices"
+description: |
+  Stock market performance by elections.
+author:
+  - name: Uraz Akgül
+date: 2022-09-21
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finance
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Turkey held general elections on the following dates (not included before 2002):
+
+```{r echo=FALSE}
+
+library(dplyr)
+
+elections <- data.frame(
+  date = c(
+    "Nov 3, 2002",
+    "Jul 22, 2007",
+    "Jun 12, 2011",
+    "Jun 07, 2015",
+    "Nov 01, 2015",
+    "Jun 24, 2018"
+  ),
+  election = c(
+    "General",
+    "General",
+    "General",
+    "General",
+    "General",
+    "General"
+  )
+)
+
+elections %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+Since the AKP has been ruling Turkey since 2002, this work will actually be the government's performance.
+
+You can download the *post32_1.xlsx* and *post32_2.xlsx* files [here](https://github.com/urazakgul/rblog/tree/main/data) or go to the [CBRT's website](https://evds2.tcmb.gov.tr/index.php?/evds/serieMarket).
+
+```{r}
+
+library(tidyverse)
+
+```
+
+```{r}
+
+bist100 <- readxl::read_excel("data1.xlsx") %>% 
+  mutate(date = lubridate::dmy(date))
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+election_dates <- c("2002-11-03",
+                    "2007-07-22",
+                    "2011-06-12",
+                    "2015-06-07",
+                    "2015-11-01",
+                    "2018-06-24")
+
+ggplot(bist100, aes(x = date, y = close)) +
+  geom_line() +
+  geom_vline(xintercept = as.Date(election_dates), linetype = "dotdash", color = "red", size = 1) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20)) +
+  scale_y_continuous(labels = scales::comma)
+
+```
+
+We'll create indices starting with 100 using each election date as a start date.
+
+```{r}
+
+# Groups
+
+bist100 <- bist100 %>% 
+  mutate(
+    election = case_when(
+      date >= as.Date("2002-11-03") & date < as.Date("2007-07-22") ~ "GE-1 (Nov 3, 2002)",
+      date >= as.Date("2007-07-22") & date < as.Date("2011-06-12") ~ "GE-2 (Jul 22, 2007)",
+      date >= as.Date("2011-06-12") & date < as.Date("2015-06-07") ~ "GE-3 (Jun 12, 2011)",
+      date >= as.Date("2015-06-07") & date < as.Date("2015-11-01") ~ "GE-4 (Jun 07, 2015)",
+      date >= as.Date("2015-11-01") & date < as.Date("2018-06-24") ~ "GE-5 (Nov 01, 2015)",
+      date >= as.Date("2018-06-24") ~ "GE-6 (Jun 24, 2018)"
+    )
+  )
+
+```
+
+```{r}
+
+# Initial Values
+
+initialValues <- bist100 %>% 
+  group_by(election) %>% 
+  slice_min(date) %>% 
+  rename("initial"=2) %>% 
+  ungroup()
+
+```
+
+```{r}
+
+# Indices
+
+master <- bist100 %>% 
+  left_join(initialValues, by = c("date","election")) %>% 
+  mutate(initial = zoo::na.locf(initial), # Replace NAs with previous value
+         "indices" = close / initial * 100) %>% 
+  group_by(election) %>% 
+  mutate(t = row_number()) %>% 
+  ungroup()
+
+```
+
+Done!
+
+```{r fig.width=15, fig.height=10}
+
+ggplot(master, aes(x = t, y = indices)) +
+  geom_line(data = master %>% rename(election2 = election),
+            aes(group = election2), color = "gray", size = 1) +
+  geom_line(color = "dark blue", size = 1.5) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(strip.text = element_text(size = 20),
+        axis.text = element_text(size = 20)) +
+  facet_wrap(~election, ncol = 2)
+
+```
+
+Let's calculate the returns on a group basis.
+
+```{r}
+
+perform100 <- master %>% 
+  group_by(election) %>% 
+  filter(date == min(date) | date == max(date)) %>% 
+  mutate(
+    return = log(1 + (lead(indices) - indices) / indices) * 100
+  ) %>% 
+  ungroup() %>% 
+  select(election,return) %>% 
+  na.omit()
+
+```
+
+```{r echo=FALSE}
+
+perform100 %>% 
+  mutate(return = round(return, digits = 1)) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+The best performance was demonstrated between the elections in 2002 and 2007 as seen in the table above. The period following the 2018 general elections has the second best performance. Yay!
+
+It's too soon to celebrate! See below for the CPI values during the time of the ruling party!
+
+```{r}
+
+cpi <- readxl::read_excel("data2.xlsx") %>% 
+  mutate(
+    date = lubridate::ymd(paste0(date,"-",1))
+  )
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+ggplot(cpi, aes(x = date, y = cpi)) +
+  geom_line() +
+  geom_vline(xintercept = as.Date(election_dates), linetype = "dotdash", color = "red", size = 1) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20)) +
+  scale_y_continuous(labels = scales::comma)
+
+```
+
+Because CPI values are published on a monthly basis, we must convert the stock market index to a monthly basis. The following formulas can be used to perform calculations.
+
+$P_t^{real} = P_t / CPI_t$
+
+$r_t^{real} = ln(1 + R_t^{real})$
+
+$R_t^{real} = (P_t^{real} - P_{t-1}^{real}) / P_{t-1}^{real}$
+
+```{r}
+
+bist100_monthly <- readxl::read_excel("data1.xlsx") %>% 
+  mutate(date = lubridate::dmy(date),
+         year = lubridate::year(date),
+         month = lubridate::month(date)) %>% 
+  group_by(year,month) %>% 
+  summarise(close = mean(close)) %>% 
+  ungroup() %>% 
+  mutate(date = as.Date(paste0(year,"-",month,"-",1))) %>% 
+  select(date,close) %>% 
+  mutate(
+    election = case_when(
+      date >= as.Date("2002-11-01") & date < as.Date("2007-07-01") ~ "GE-1 (Nov 3, 2002)",
+      date >= as.Date("2007-07-01") & date < as.Date("2011-06-01") ~ "GE-2 (Jul 22, 2007)",
+      date >= as.Date("2011-06-01") & date < as.Date("2015-06-01") ~ "GE-3 (Jun 12, 2011)",
+      date >= as.Date("2015-06-01") & date < as.Date("2015-11-01") ~ "GE-4 (Jun 07, 2015)",
+      date >= as.Date("2015-11-01") & date < as.Date("2018-06-01") ~ "GE-5 (Nov 01, 2015)",
+      date >= as.Date("2018-06-01") ~ "GE-6 (Jun 24, 2018)"
+    )
+  ) %>% 
+  left_join(cpi, by = "date") %>% 
+  na.omit() %>% 
+  mutate(
+    new_close = close / cpi, .before = close
+  ) %>% 
+  select(-close,-cpi)
+
+```
+
+```{r}
+
+initialValues2 <- bist100_monthly %>% 
+  group_by(election) %>% 
+  slice_min(date) %>% 
+  rename("initial"=2) %>% 
+  ungroup()
+
+```
+
+```{r}
+
+master2 <- bist100_monthly %>% 
+  left_join(initialValues2, by = c("date","election")) %>% 
+  mutate(initial = zoo::na.locf(initial),
+         "indices" = new_close / initial * 100) %>% 
+  group_by(election) %>% 
+  mutate(t = row_number()) %>% 
+  ungroup()
+
+```
+
+```{r fig.width=15, fig.height=10, preview=TRUE}
+
+ggplot(master2, aes(x = t, y = indices)) +
+  geom_line(data = master2 %>% rename(election2 = election),
+            aes(group = election2), color = "gray", size = 1) +
+  geom_line(color = "dark blue", size = 1.5) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(strip.text = element_text(size = 20),
+        axis.text = element_text(size = 20)) +
+  facet_wrap(~election, ncol = 2)
+
+```
+
+```{r}
+
+perform100_2 <- master2 %>% 
+  group_by(election) %>% 
+  filter(date == min(date) | date == max(date)) %>% 
+  mutate(
+    return = log(1 + (lead(indices)-indices) / indices) * 100
+  ) %>% 
+  ungroup() %>% 
+  select(election,return) %>% 
+  na.omit()
+
+```
+
+```{r echo=FALSE}
+
+perform100_2 %>% 
+  mutate(return = round(return, digits = 1)) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+When we consider inflation, we can see how the gap between the best return and the current period widens!
