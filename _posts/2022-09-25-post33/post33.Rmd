@@ -1,0 +1,443 @@
+---
+title: "Does History Repeat Itself in the Financial Markets?"
+description: |
+  Hierarchical clustering based on DTW and markov chains were used.
+author:
+  - name: Uraz Akgül
+date: 2022-09-25
+output:
+  distill::distill_article:
+    self_contained: false
+categories:
+  - Finance
+  - Machine Learning
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+Everyone has an opinion on whether history repeats itself, with some claiming that it does and others claiming that it does not. I agree with those who believe history repeats itself. This study's claim will be revealed at the end of this post.
+
+I'd like to inform you about how the study will progress step by step.
+
+First things first, it'll be decided what the financial series will be. I chose to use data from the Borsa Istanbul 100 index for this study. We'll divide the series into the number of slices we determined in the second step once we know what the data will be. After dividing the series, we'll use the hierarchical clustering method based on Dynamic Time Warping to find similar series. More information about DTW can be found in [my previous post](https://urazakgul.github.io/rblog/posts/2022-09-18-post29/). Following the discovery of similar series, the movements of these series in a given time interval will be examined. We expect that the series will behave similarly in the given time interval. Because, well, why not?
+
+The data were obtained from CBRT's website, which you can access by downloading the *post33.xlsx* file from [here](https://github.com/urazakgul/rblog/tree/main/data).
+
+```{r}
+
+library(tidyverse)
+library(dtwclust)
+library(markovchain)
+
+```
+
+```{r}
+
+df <- readxl::read_excel("data.xlsx") %>% 
+  mutate(date = lubridate::dmy(date),
+         t = seq(1,nrow(.),1), .before = date)
+
+```
+
+The dataset contains `r nrow(df)` rows.
+
+```{r}
+
+df %>% 
+  tail(.,10) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "3em", background = "red", color = "white", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(3, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+ggplot(df, aes(x = date, y = close)) +
+  geom_line() +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "BIST100")
+
+```
+
+The first 4900 days of the current series will be used.
+
+```{r}
+
+bist100 <- df %>% 
+  filter(t %in% 1:4900)
+
+```
+
+```{r}
+
+bist100 %>% 
+  tail(.,10) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "3em", background = "red", color = "white", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "yellow", bold = T) %>% 
+  kableExtra::column_spec(3, width = "10em", background = "gray", color = "white", bold = T)
+
+```
+
+The number of sub-series into which we'll divide the series is critical. If we choose a very long time interval, there may be issues with similarity; if we choose a very short time interval, it may be time consuming and we may not get the desired movements. The optimal number can be determined later, but for now, I'd like to set it to 50. When the number is set to 50, there will be 98 sub-series.
+
+```{r fig.width=15, fig.height=10}
+
+ggplot(bist100, aes(x = t, y = close)) +
+  geom_line() +
+  geom_vline(xintercept = seq(1,4900,50), linetype = "dotdash") +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "BIST100")
+
+```
+
+```{r}
+
+bist100 <- bist100 %>% 
+  mutate(
+    group = paste0("G",rep(1:98, each = 50))
+  )
+
+```
+
+```{r}
+
+bist100 %>% 
+  slice(c(1:5,4895:4900)) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "3em", background = "red", color = "white", bold = T) %>% 
+  kableExtra::column_spec(2, width = "5em", background = "gray", color = "white", bold = T) %>% 
+  kableExtra::column_spec(3, width = "5em", background = "gray", color = "white", bold = T) %>% 
+  kableExtra::column_spec(4, width = "3em", background = "yellow", bold = T)
+
+```
+
+It'd be better if we normalize the data.
+
+```{r}
+
+normalized <- function(x,...){
+  
+  (x - min(x)) / (max(x) - min(x))
+  
+}
+
+master <- bist100 %>% 
+  select(close,group) %>% 
+  group_by(group) %>% 
+  mutate(t = row_number()) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = "group", values_from = "close") %>% 
+  mutate_at(
+    vars(-t), function(x) normalized(x, na.rm = TRUE)
+  )
+
+```
+
+The first 10 normalized groups are displayed below.
+
+```{r}
+
+master %>% 
+  select(1:11) %>% 
+  slice(1:5) %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "3em", background = "red", color = "white", bold = T) %>% 
+  kableExtra::column_spec(2:11, width = "3em", background = "gray", color = "white", bold = T)
+
+```
+
+We can now proceed to hierarchical clustering based on DTW. The sub-series will be divided into 4 classes.
+
+```{r}
+
+k <- 4L
+
+data_cluster <- tsclust(
+  t(master[,-1]),
+  type = "h",
+  k = k,
+  distance = "dtw"
+)
+
+cluster <- as.data.frame(cutree(data_cluster, k=k)) %>% 
+  rownames_to_column(., var = "group") %>% 
+  rename("cluster"=2)
+
+master2 <- bist100 %>% 
+  arrange(group) %>% 
+  left_join(cluster, by = "group") %>% 
+  group_by(group) %>% 
+  mutate(n = row_number()) %>% 
+  mutate_at(vars(close), function(x) normalized(x, na.rm = TRUE)) %>% 
+  ungroup()
+
+```
+
+```{r fig.width=15, fig.height=10}
+
+for(i in 1:k){
+  
+  g <- ggplot(master2 %>% filter(cluster == i), aes(x = n, y = close)) +
+    geom_line(data = master2 %>% filter(cluster == i) %>% rename(group2 = group), aes(group = group2), color = "gray", size = 1) +
+    geom_line(color = "dark blue", size = 1) +
+    ggthemes::theme_fivethirtyeight() +
+    theme(strip.text = element_text(size = 20),
+          axis.text = element_blank()) +
+    facet_wrap(~group, scales = "free")
+  
+  plot(g)
+  
+}
+
+```
+
+Let's look at the transition probabilities between clusters.
+
+```{r}
+
+probs <- as.data.frame(createSequenceMatrix(cluster$cluster)) %>% 
+  rowid_to_column(".")
+
+```
+
+```{r}
+
+probs %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, background = "red", color = "white", bold = T)
+
+```
+
+We'll use the table above, but right now we need to focus on the last sub-series, G98.
+
+```{r}
+
+cluster %>% 
+  filter(group == "G98") %>% 
+  kableExtra::kbl(align = "c") %>% 
+  kableExtra::kable_paper(full_width = F) %>% 
+  kableExtra::column_spec(1, width = "10em", background = "red", color = "white", bold = T) %>% 
+  kableExtra::column_spec(2, width = "10em", background = "blue", color = "white", bold = T)
+
+```
+
+```{r}
+
+g98 <- cluster %>% 
+  filter(group == "G98") %>% 
+  pull(cluster)
+
+```
+
+The sub-series G98 is in cluster `r g98`, which indicates that the following probabilities will hold true.
+
+* The probability of transitioning from cluster `r g98` to cluster 1 is `r round(probs[g98,2]/rowSums(probs)[g98], digits=2) * 100`%
+
+* The probability of transitioning from cluster `r g98` to cluster 2 is `r round(probs[g98,3]/rowSums(probs)[g98], digits=2) * 100`%
+
+* The probability of transitioning from cluster `r g98` to cluster 3 is `r round(probs[g98,4]/rowSums(probs)[g98], digits=2) * 100`%
+
+* The probability of transitioning from cluster `r g98` to cluster 4 is `r round(probs[g98,5]/rowSums(probs)[g98], digits=2) * 100`%
+
+We then normalize the remaining 43 days that we excluded at the beginning of the study. The averages of the groups divided into 4 clusters over normalized values are shown below, where we can see four different patterns.
+
+```{r}
+
+df43 <- df %>% 
+  slice(4901:nrow(.)) %>% 
+  mutate_at(vars(close), function(x) normalized(x, na.rm = TRUE)) %>% 
+  mutate(n = seq(51,93,1), .before = date) %>% 
+  select(-date)
+
+```
+
+```{r preview=TRUE}
+
+pred <- master2 %>% 
+  select(n,group,cluster,close) %>% 
+  group_by(n,cluster) %>% 
+  summarise(close_mean = mean(close)) %>% 
+  ungroup() %>% 
+  arrange(cluster)
+
+ggplot(pred, aes(x = n, y = close_mean)) +
+  geom_line(size = 1) +
+  facet_wrap(~cluster) +
+  ggthemes::theme_fivethirtyeight()
+
+```
+
+```{r}
+
+cluster_g98 <- pred %>% 
+  filter(cluster == g98) %>% 
+  select(n,close_mean) %>% 
+  rename("close"=2) %>% 
+  bind_rows(df43)
+
+ggplot(cluster_g98, aes(x = n, y = close)) +
+  geom_line() +
+  geom_vline(xintercept = 50, linetype = "dotdash", size = 1) +
+  scale_color_manual(values = c("red","blue")) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(legend.title = element_blank(),
+        legend.position = "top")
+
+```
+
+We can see that the `r round(probs[g98,3]/rowSums(probs)[1], digits=2) * 100`% chance of moving from cluster 1 to cluster 2 has occurred. So, what will the next 50-day movement look like?
+
+* The probability of transitioning from cluster 2 to cluster 1 is `r round(probs[2,2]/rowSums(probs)[2], digits=2) * 100`%
+
+* The probability of transitioning from cluster 2 to cluster 2 is `r round(probs[2,3]/rowSums(probs)[2], digits=2) * 100`%
+
+* The probability of transitioning from cluster 2 to cluster 3 is `r round(probs[2,4]/rowSums(probs)[2], digits=2) * 100`%
+
+* The probability of transitioning from cluster 2 to cluster 4 is `r round(probs[2,5]/rowSums(probs)[2], digits=2) * 100`%
+
+We can expect that the BIST100 will continue to rise with a 43% probability until mid-December.
+
+The codes used in the study can be found below.
+
+```{r eval=FALSE, echo=TRUE}
+
+library(tidyverse)
+library(dtwclust)
+library(markovchain)
+
+df <- readxl::read_excel("data.xlsx") %>% 
+  mutate(date = lubridate::dmy(date),
+         t = seq(1,nrow(.),1), .before = date)
+
+ggplot(df, aes(x = date, y = close)) +
+  geom_line() +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "BIST100")
+
+bist100 <- df %>% 
+  filter(t %in% 1:4900)
+
+ggplot(bist100, aes(x = t, y = close)) +
+  geom_line() +
+  geom_vline(xintercept = seq(1,4900,50), linetype = "dotdash") +
+  ggthemes::theme_fivethirtyeight() +
+  theme(axis.text = element_text(size = 20),
+        plot.title = element_text(size = 25, hjust = 0.5)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(title = "BIST100")
+
+bist100 <- bist100 %>% 
+  mutate(
+    group = paste0("G",rep(1:98, each = 50))
+  )
+
+normalized <- function(x,...){
+  
+  (x - min(x)) / (max(x) - min(x))
+  
+}
+
+master <- bist100 %>% 
+  select(close,group) %>% 
+  group_by(group) %>% 
+  mutate(t = row_number()) %>% 
+  ungroup() %>% 
+  pivot_wider(names_from = "group", values_from = "close") %>% 
+  mutate_at(
+    vars(-t), function(x) normalized(x, na.rm = TRUE)
+  )
+
+k <- 4L
+
+data_cluster <- tsclust(
+  t(master[,-1]),
+  type = "h",
+  k = k,
+  distance = "dtw"
+)
+
+cluster <- as.data.frame(cutree(data_cluster, k=k)) %>% 
+  rownames_to_column(., var = "group") %>% 
+  rename("cluster"=2)
+
+master2 <- bist100 %>% 
+  arrange(group) %>% 
+  left_join(cluster, by = "group") %>% 
+  group_by(group) %>% 
+  mutate(n = row_number()) %>% 
+  mutate_at(vars(close), function(x) normalized(x, na.rm = TRUE)) %>% 
+  ungroup()
+
+for(i in 1:k){
+  
+  g <- ggplot(master2 %>% filter(cluster == i), aes(x = n, y = close)) +
+    geom_line(data = master2 %>% filter(cluster == i) %>% rename(group2 = group), aes(group = group2), color = "gray", size = 1) +
+    geom_line(color = "dark blue", size = 1) +
+    ggthemes::theme_fivethirtyeight() +
+    theme(strip.text = element_text(size = 20),
+          axis.text = element_blank()) +
+    facet_wrap(~group, scales = "free")
+  
+  plot(g)
+  
+}
+
+probs <- as.data.frame(createSequenceMatrix(cluster$cluster)) %>% 
+  rowid_to_column(".")
+
+g98 <- cluster %>% 
+  filter(group == "G98") %>% 
+  pull(cluster)
+
+df43 <- df %>% 
+  slice(4901:nrow(.)) %>% 
+  mutate_at(vars(close), function(x) normalized(x, na.rm = TRUE)) %>% 
+  mutate(n = seq(51,93,1), .before = date) %>% 
+  select(-date)
+
+pred <- master2 %>% 
+  select(n,group,cluster,close) %>% 
+  group_by(n,cluster) %>% 
+  summarise(close_mean = mean(close)) %>% 
+  ungroup() %>% 
+  arrange(cluster)
+
+ggplot(pred, aes(x = n, y = close_mean)) +
+  geom_line(size = 1) +
+  facet_wrap(~cluster) +
+  ggthemes::theme_fivethirtyeight()
+
+cluster_g98 <- pred %>% 
+  filter(cluster == g98) %>% 
+  select(n,close_mean) %>% 
+  rename("close"=2) %>% 
+  bind_rows(df43)
+
+ggplot(cluster_g98, aes(x = n, y = close)) +
+  geom_line() +
+  geom_vline(xintercept = 50, linetype = "dotdash", size = 1) +
+  scale_color_manual(values = c("red","blue")) +
+  ggthemes::theme_fivethirtyeight() +
+  theme(legend.title = element_blank(),
+        legend.position = "top")
+
+```
