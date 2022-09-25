@@ -131,7 +131,7 @@ It'd be better if we normalize the data.
 
 normalized <- function(x,...){
   
-  (x - min(x)) / (max(x) - min(x))
+  (x - min(x,...)) / (max(x,...) - min(x,...))
   
 }
 
@@ -352,7 +352,7 @@ bist100 <- bist100 %>%
 
 normalized <- function(x,...){
   
-  (x - min(x)) / (max(x) - min(x))
+  (x - min(x,...)) / (max(x,...) - min(x,...))
   
 }
 
