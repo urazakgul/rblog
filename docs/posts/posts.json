@@ -1,5 +1,24 @@
 [
   {
+    "path": "posts/2022-09-27-post34/",
+    "title": "Close-to-Close vs High-Low (Parkinson) Volatility",
+    "description": "Close-to-Close and High-Low (Parkinson) volatility types are compared.",
+    "author": [
+      {
+        "name": "Uraz Akgül",
+        "url": {}
+      }
+    ],
+    "date": "2022-09-27",
+    "categories": [
+      "Finance"
+    ],
+    "contents": "\r\nVolatility can be measured in a variety of ways, and in this post I’d\r\nlike to compare two of them.\r\nThe formulas for the two volatility methods mentioned in the title\r\nare shown below.\r\nClose-to-Close Volatility:\r\nClose-to-close historical volatility is calculated using only the\r\nclosing prices of stocks.\r\n\\(\\sigma_{cl} =\r\n\\sqrt{\\frac{1}{T-1}\\sum_{t=1}^{T}(r_t-\\bar{r})^2}\\)\r\nwhere:\r\n\\(T:\\) Number of days in the sample\r\nperiod\r\n\\(r_t:\\) Return on day t\r\n\\(\\bar{r}:\\) Mean return\r\nHigh-Low or Parkinson Volatility:\r\nParkinson volatility is a measure of volatility that takes into\r\naccount the stock’s high and low prices for the day.\r\n\\(\\sigma_{hl} =\r\n\\sqrt{\\frac{1}{4Tln2}\\sum_{t=1}^{T}ln(\\frac{H_t}{L_t})^2}\\)\r\nwhere:\r\n\\(T:\\) Number of days in the sample\r\nperiod\r\n\\(H_t:\\) High price on day t\r\n\\(L_t:\\) Low price on day t\r\nWe’ll use two methods to calculate the volatility of the stocks in\r\nthe BIST30 index. The stock list is available on PDP, which stands for\r\nPublic Disclosure Platform. The data were obtained from Reuters, which\r\nyou can access by downloading the post34.xlsx file from here.\r\n\r\n\r\nlibrary(tidyverse)\r\n\r\n\r\n\r\n\r\n\r\ndf <- readxl::read_excel(\"data.xlsx\")\r\n\r\nsampleSize <- nrow(df)\r\nstockList <- unique(gsub(\"_Open|_High|_Low|_Close\",\"\",names(df)))[-1]\r\n\r\n\r\n\r\nClose-to-Close Volatility:\r\n\r\n\r\nclose_to_close <- data.frame()\r\n\r\nfor(i in 1:31){\r\n  \r\n  cl <- df %>% \r\n    select(contains(paste0(stockList[i],\"_Close\"))) %>% \r\n    rename(\"Close\"=1) %>% \r\n    mutate(\r\n      Return = lag(log(lead(Close) / Close)),\r\n      Mean = mean(Return, na.rm = TRUE),\r\n      ReturnMean2 = (Return - Mean)^2\r\n    ) %>% \r\n    pull(ReturnMean2) %>% \r\n    sum(., na.rm = TRUE) / (sampleSize - 2) %>% # 31.12.2021 is not included & T - 1 = T - 2\r\n    sqrt(.) * 100\r\n  \r\n  tbl_cl <- data.frame(\r\n    \"Ticker\" = stockList[i],\r\n    \"ClosetoCloseVol\" = cl\r\n  )\r\n  \r\n  close_to_close <- close_to_close %>% \r\n    bind_rows(tbl_cl)\r\n    \r\n}\r\n\r\n\r\n\r\nHigh-Low or Parkinson Volatility:\r\n\r\n\r\nhigh_low <- data.frame()\r\n\r\nfor(j in 1:31){\r\n  \r\n  hl <- df %>% \r\n    select(contains(c(paste0(stockList[j],\"_High\"),paste0(stockList[j],\"_Low\")))) %>% \r\n    rename(\"High\"=1, \"Low\"=2) %>% \r\n    mutate(HL = log(High/Low)^2) %>% \r\n    pull(HL) %>% \r\n    sum(.) / (4 * (sampleSize - 1) * log(2)) %>% # 31.12.2021 is not included = T - 1\r\n    sqrt(.) * 100\r\n  \r\n  tbl <- data.frame(\r\n    \"Ticker\"= stockList[j],\r\n    \"HighLowVol\" = hl\r\n  )\r\n  \r\n  high_low <- high_low %>% \r\n    bind_rows(tbl)\r\n  \r\n}\r\n\r\n\r\n\r\n\r\n\r\nmaster <- close_to_close %>% \r\n  left_join(high_low, by = \"Ticker\")\r\n\r\n\r\n\r\n\r\n\r\nggplot(master, aes(x = ClosetoCloseVol, y = HighLowVol)) +\r\n  geom_point(size = 5, alpha = .3) + \r\n  geom_point(data = master %>% filter(Ticker == \"XU030\"), color = \"red\", size = 5) +\r\n  ggrepel::geom_text_repel(aes(label = Ticker), size = 4, nudge_x = 0.05) +\r\n  hrbrthemes::theme_ipsum() +\r\n  labs(\r\n    title = \"The Most and Least Volatile Stocks Among the BIST30 (XU030)\",\r\n    x = \"Close-to-Close Volatility\",\r\n    y = \"High and Low or Parkinson Volatility\"\r\n  )\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+    "preview": "posts/2022-09-27-post34/post34_files/figure-html5/unnamed-chunk-6-1.png",
+    "last_modified": "2022-09-27T21:48:09+03:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2022-09-25-post33/",
     "title": "Does History Repeat Itself in the Financial Markets?",
     "description": "Hierarchical clustering based on DTW and markov chains were used.",
