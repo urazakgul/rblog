@@ -1,5 +1,24 @@
 [
   {
+    "path": "posts/2022-10-03-post35/",
+    "title": "What Beta Means: Measuring a Stock's Risk",
+    "description": "Historical betas of BIST30 stocks.",
+    "author": [
+      {
+        "name": "Uraz Akgül",
+        "url": {}
+      }
+    ],
+    "date": "2022-10-03",
+    "categories": [
+      "Finance"
+    ],
+    "contents": "\r\nThe volatility of a stock in relation to the overall market is\r\nmeasured by beta (\\(\\beta\\)). The\r\nmarket, such as the BIST100 Index, has a beta of 1.0 by definition, and\r\nindividual stocks are ranked based on how much they deviate from the\r\nmarket.\r\n\\(\\beta =\r\n\\frac{cov(R_e,R_m)}{var(R_m)}\\)\r\n\\(\\beta:\\) Beta coefficient\r\n\\(R_e:\\) The return on an individual\r\nstock\r\n\\(R_m:\\) The return on the overall\r\nmarket\r\n\\(cov(R_e,R_m):\\) How changes in a\r\nstock’s returns are related to changes in the market’s returns.\r\n\\(var(R_m):\\) How far the market’s\r\ndata points spread out from their average value\r\nRegression analysis is used to calculate beta. The beta coefficient\r\ncan be interpreted as follows:\r\n\\(\\beta > 1:\\) High\r\nCorrelation, Higher Volatility\r\n\\(\\beta = 1:\\) High Correlation,\r\nSame Volatility\r\n\\(\\beta < 1 > 0\\ or\\ 0\\ to\\\r\n1:\\) Slight Correlation, Lower Volatility\r\n\\(\\beta = 0:\\) No\r\nCorrelation\r\n\\(\\beta > -1 < 0\\ or\\ -1\\ to\\\r\n0:\\) Slight Inverse Correlation, Lower Volatility\r\n\\(\\beta = -1:\\) High Inverse\r\nCorrelation, Same Volatility\r\n\\(\\beta < -1:\\) High Inverse\r\nCorrelation, Higher Volatility\r\nThe data you can access by downloading the post35.xlsx file\r\nfrom here is\r\nfrom Reuters.\r\n\r\n\r\nlibrary(tidyverse)\r\n\r\n\r\n\r\n\r\n\r\nbist30 <- readxl::read_excel(\"data.xlsx\")\r\n\r\n\r\n\r\nConsider a stock and a market index. To build a regression model,\r\nwe’ll use stock returns as the dependent variable and market index\r\nreturns as the independent variable.\r\nLet’s start with the daily returns.\r\n\r\n\r\nmaster <- bist30 %>% \r\n  mutate_at(\r\n    vars(-DATE), function(x) lag(log(lead(x) / x))\r\n  ) %>% \r\n  slice(-1) %>% \r\n  pivot_longer(!c(DATE,XU100), names_to = \"TICKER\", values_to = \"Return\") %>% \r\n  arrange(TICKER) %>% \r\n  mutate(\r\n    \"YEAR\" = lubridate::year(DATE)\r\n  )\r\n\r\n\r\n\r\nWe can now build the regression models.\r\n\r\n\r\nbetas <- data.frame(\r\n  ticker = rep(unique(master$TICKER), each = length(unique(master$YEAR))),\r\n  year = rep(unique(master$YEAR), length(unique(master$TICKER))),\r\n  beta = NA\r\n)\r\n\r\nfor(i in 1:nrow(betas)) {\r\n  \r\n  ticker <- betas$ticker[i]\r\n  year <- betas$year[i]\r\n  \r\n  df_model <- master %>%\r\n    filter(TICKER == ticker & YEAR == year) %>%\r\n    na.omit()\r\n  \r\n  model <- lm(df_model$Return ~ df_model$XU100)\r\n  beta <- model$coefficients[2]\r\n  \r\n  betas$beta[i] <- beta\r\n  \r\n}\r\n\r\n\r\n\r\nI’d like to show the year-based betas of the stocks we are studying\r\non.\r\n\r\n\r\n\r\nLet’s rank the stocks’ betas for 2022.\r\n\r\n\r\n\r\nThe codes for the last two data visualizations are provided\r\nbelow.\r\n\r\n\r\nbetas %>% \r\n  ggplot(aes(x = year, y = beta)) +\r\n  geom_line() +\r\n  geom_point() +\r\n  geom_hline(yintercept = 1, linetype = \"dashed\") +\r\n  facet_wrap(~ticker) +\r\n  ggthemes::theme_fivethirtyeight() +\r\n  theme(strip.text = element_text(size = 15),\r\n        plot.title = element_text(size = 20, hjust = 0.5),\r\n        axis.text.y = element_text(size = 15),\r\n        axis.text.x = element_blank(),\r\n        panel.grid.major = element_blank()) +\r\n  scale_y_continuous(breaks = c(0,1)) +\r\n  labs(title = \"Historical Betas of BIST30 Stocks, 2013-2022\") +\r\n  annotate(\r\n    geom = \"rect\",\r\n    xmin = -Inf,\r\n    xmax = Inf,\r\n    ymin = 1,\r\n    ymax = Inf,\r\n    fill = \"red\",\r\n    alpha = .2\r\n  )\r\n\r\nbetas %>%\r\n  filter(year == 2022) %>%\r\n  ggplot(aes(x = reorder(ticker, -beta), y = beta)) +\r\n  geom_point(size = 5, alpha = .5) +\r\n  ggrepel::geom_text_repel(aes(label = ticker), size = 7) +\r\n  geom_hline(yintercept = 1, linetype = \"dashed\") +\r\n  ggthemes::theme_fivethirtyeight() +\r\n  theme(\r\n    axis.text.x = element_blank(),\r\n    panel.grid.major = element_blank(),\r\n    axis.text.y = element_text(size = 15)\r\n  ) +\r\n  annotate(\r\n    geom = \"rect\",\r\n    xmin = -Inf,\r\n    xmax = Inf,\r\n    ymin = 1,\r\n    ymax = Inf,\r\n    fill = \"red\",\r\n    alpha = .2\r\n  )\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+    "preview": "posts/2022-10-03-post35/post35_files/figure-html5/unnamed-chunk-5-1.png",
+    "last_modified": "2022-10-03T21:42:06+03:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2022-09-27-post34/",
     "title": "Close-to-Close vs High-Low (Parkinson) Volatility",
     "description": "Close-to-Close and High-Low (Parkinson) volatility types are compared.",
