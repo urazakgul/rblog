@@ -1,5 +1,25 @@
 [
   {
+    "path": "posts/2022-10-05-post36/",
+    "title": "Extracting Emojis from WhatsApp Chat",
+    "description": "Easily access your most used emojis in WhatsApp chat.",
+    "author": [
+      {
+        "name": "Uraz Akgül",
+        "url": {}
+      }
+    ],
+    "date": "2022-10-05",
+    "categories": [
+      "Text",
+      "Social Media"
+    ],
+    "contents": "\r\nEmojis are widely used, and data & text analysis should take them\r\ninto account. The good news is that it’s not a big deal to get emojis\r\nand use them in the analysis.\r\nI’ll show you how to get emojis from WhatsApp chats. To get your own,\r\nfollow the steps outlined here.\r\nWhy not give them a little surprise?\r\nYou can easily import whatsapp chats downloaded in txt format into R\r\nusing the {rwhatsapp} package.\r\n\r\n\r\nlibrary(rwhatsapp)\r\nlibrary(ggimage) # ggimage::geom_image()\r\nlibrary(tidyverse)\r\n\r\n\r\n\r\n\r\n\r\nchat <- rwa_read(\"wp.txt\")\r\n\r\n\r\n\r\nThe column names are listed below.\r\ntime\r\nauthor\r\ntext\r\nsource\r\nemoji\r\nemoji_name\r\nWe’ll be interested in the author and emoji columns.\r\n\r\n\r\ndf <- chat %>% \r\n  select(author,emoji)\r\n\r\n\r\n\r\nWe can obtain the most frequently used emojis after importing the\r\nemoji data.\r\n\r\n\r\nemoji_data <- emojis %>% \r\n  mutate(\r\n    hex_runes = gsub(\"\\\\s.*\", \"\", hex_runes), # ignore combined emojis\r\n    emoji_url = paste0(\"https://abs.twimg.com/emoji/v2/72x72/\",tolower(hex_runes), \".png\")\r\n    # E.g. https://abs.twimg.com/emoji/v2/72x72/1f60b.png\r\n  )\r\n\r\n\r\n\r\nTop 10 emojis used by the Author-1:\r\n\r\n\r\ndf %>%\r\n  unnest(emoji) %>%\r\n  count(author, emoji, sort = TRUE) %>%\r\n  filter(author == \"Author1\") %>% \r\n  top_n(n = 10, n) %>%\r\n  left_join(emoji_data, by = \"emoji\") %>% \r\n  ggplot(aes(x = reorder(emoji, n), y = n)) +\r\n  geom_col(fill = \"dark red\") +\r\n  geom_image(aes(y = n + 100, image = emoji_url)) +\r\n  theme_minimal() +\r\n  theme(axis.text.y = element_blank(),\r\n        axis.title = element_blank(),\r\n        plot.title = element_text(face = \"bold\", size = 20, hjust = 0.5)) +\r\n  scale_y_continuous(labels = scales::comma) +\r\n  coord_flip() +\r\n  labs(title = \"Author-1\") -> g1\r\n\r\n\r\n\r\nTop 10 emojis used by the Author-2:\r\n\r\n\r\ndf %>%\r\n  unnest(emoji) %>%\r\n  count(author, emoji, sort = TRUE) %>%\r\n  filter(author == \"Author2\") %>% \r\n  top_n(n = 10, n) %>%\r\n  left_join(emoji_data, by = \"emoji\") %>% \r\n  ggplot(aes(x = reorder(emoji, n), y = n)) +\r\n  geom_col(fill = \"dark red\") +\r\n  geom_image(aes(y = n + 100, image = emoji_url)) +\r\n  theme_minimal() +\r\n  theme(axis.text.y = element_blank(),\r\n        axis.title = element_blank(),\r\n        plot.title = element_text(face = \"bold\", size = 20, hjust = 0.5)) +\r\n  scale_y_continuous(labels = scales::comma) +\r\n  coord_flip() +\r\n  labs(title = \"Author-2\") -> g2\r\n\r\n\r\n\r\nYou can save the image with the code snippet shown below.\r\n\r\n\r\ng <- gridExtra::arrangeGrob(g1, g2, nrow = 1)\r\nggsave(file=\"wp.jpg\", g, width = 10, height = 5)\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+    "preview": "posts/2022-10-05-post36/wp.jpg",
+    "last_modified": "2022-10-05T20:16:39+03:00",
+    "input_file": {}
+  },
+  {
     "path": "posts/2022-10-03-post35/",
     "title": "What Beta Means: Measuring a Stock's Risk",
     "description": "Historical betas of BIST30 stocks.",
