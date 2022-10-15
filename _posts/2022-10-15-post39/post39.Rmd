@@ -1,7 +1,7 @@
 ---
 title: "Importing and Combining Excel Files, Including Transformations"
 description: |
-  Two ways to import and merge Excel files.
+  Two ways to import and combine Excel files.
 author:
   - name: Uraz Akgül
 date: 2022-10-15
